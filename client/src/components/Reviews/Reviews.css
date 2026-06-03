@@ -1,0 +1,16 @@
+/* Styles for Reviews components */
+.review-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.review-card:hover {
+  transform: translateY(-2px);
+}
+
+.review-summary {
+  position: relative;
+}
+
+.review-subscores .badge {
+  background-color: var(--surface-container-highest);
+}

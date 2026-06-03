@@ -1,0 +1,147 @@
+.detail-breadcrumb {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--on-surface-variant);
+  letter-spacing: 0.05em;
+}
+
+.detail-breadcrumb a {
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.detail-breadcrumb a:hover {
+  text-decoration: underline;
+}
+
+.detail-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--on-surface);
+  line-height: 1.2;
+}
+
+@media (min-width: 768px) {
+  .detail-title {
+    font-size: 3rem; /* display-lg */
+  }
+}
+
+.detail-price {
+  font-family: var(--font-mono);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--tertiary);
+}
+
+.detail-gallery-main {
+  height: 400px;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  border: 1px solid rgba(66, 71, 84, 0.3); /* outline-variant */
+  position: relative;
+}
+
+@media (min-width: 768px) {
+  .detail-gallery-main {
+    height: 500px;
+  }
+}
+
+.detail-gallery-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.detail-thumbnail {
+  height: 80px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+  opacity: 0.6;
+}
+
+.detail-thumbnail:hover {
+  opacity: 1;
+}
+
+.detail-thumbnail.active {
+  opacity: 1;
+  border-color: var(--primary);
+}
+
+.spec-bento-card {
+  background-color: var(--surface-container-highest);
+  padding: 1rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(66, 71, 84, 0.2);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.spec-bento-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.spec-label {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--on-surface-variant);
+}
+
+.spec-value {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--on-surface);
+}
+
+.tab-btn {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--on-surface-variant);
+  background: transparent;
+  border: none;
+  padding: 1rem 1.5rem;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+}
+
+.tab-btn:hover {
+  color: var(--on-surface);
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.tab-btn.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+.review-card {
+  background-color: var(--surface-container-high);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  border: 1px solid rgba(66, 71, 84, 0.2);
+}
+
+.chart-container-card {
+  background-color: var(--surface-container);
+  border-radius: var(--radius-xl);
+  padding: 1.5rem;
+  border: 1px solid rgba(66, 71, 84, 0.2);
+}

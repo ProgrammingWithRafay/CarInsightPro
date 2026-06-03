@@ -1,0 +1,117 @@
+:root {
+  /* Stitch Theme Colors */
+  --surface: #10131a;
+  --on-surface: #e1e2ec;
+  --surface-variant: #32353c;
+  --on-surface-variant: #c2c6d6;
+  
+  --surface-container-lowest: #0b0e15;
+  --surface-container-low: #191b23;
+  --surface-container: #1d2027;
+  --surface-container-high: #272a31;
+  --surface-container-highest: #32353c;
+  
+  --primary: #adc6ff;
+  --on-primary: #002e6a;
+  --primary-container: #4d8eff;
+  --on-primary-container: #00285d;
+  
+  --secondary: #c0c1ff;
+  --on-secondary: #1000a9;
+  --secondary-container: #3131c0;
+  --on-secondary-container: #b0b2ff;
+  
+  --tertiary: #ffb786;
+  --on-tertiary: #502400;
+  --tertiary-container: #df7412;
+  --on-tertiary-container: #461f00;
+  
+  --error: #ffb4ab;
+  --on-error: #690005;
+  --error-container: #93000a;
+  --on-error-container: #ffdad6;
+  
+  --outline: #8c909f;
+  --outline-variant: #424754;
+  
+  --success: #10B981; /* Default success */
+
+  /* Fonts */
+  --font-heading: 'Syne', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Geometry */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-pill: 9999px;
+  
+  --transition: all 0.2s ease-in-out;
+}
+
+body {
+  background-color: var(--surface);
+  color: var(--on-surface);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6, .font-heading {
+  font-family: var(--font-heading);
+}
+
+.font-mono, .data-mono, .label-caps {
+  font-family: var(--font-mono);
+}
+
+/* Material Icons Helper */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+/* Common UI Elements from Stitch */
+.glass-panel {
+  background: rgba(10, 15, 30, 0.6);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.active-glow {
+  box-shadow: 0 0 20px rgba(173, 198, 255, 0.3);
+}
+
+.particle-grid {
+  background-image: radial-gradient(rgba(173, 198, 255, 0.1) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* Base resets */
+a {
+  color: var(--primary);
+  text-decoration: none;
+}
+a:hover {
+  color: var(--primary-container);
+}
+
+.bg-surface { background-color: var(--surface); }
+.bg-surface-container { background-color: var(--surface-container); }
+.bg-surface-container-high { background-color: var(--surface-container-high); }
+.bg-surface-container-highest { background-color: var(--surface-container-highest); }
+.bg-surface-container-lowest { background-color: var(--surface-container-lowest); }
+
+.text-primary { color: var(--primary) !important; }
+.text-secondary { color: var(--secondary) !important; }
+.text-tertiary { color: var(--tertiary) !important; }
+.text-on-surface { color: var(--on-surface) !important; }
+.text-on-surface-variant { color: var(--on-surface-variant) !important; }
+
+/* Selection */
+::selection {
+  background-color: var(--primary);
+  color: var(--on-primary);
+}

@@ -1,0 +1,21 @@
+.static-page-header {
+  padding-top: 2rem;
+}
+
+.static-content h2 {
+  margin-top: 1rem;
+}
+
+.static-content p {
+  line-height: 1.8;
+}
+
+.contact-icon-wrapper {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}

@@ -1,0 +1,102 @@
+.car-card-stitch {
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.car-card-stitch:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+}
+
+.car-card-img-container {
+  height: 14rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.car-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.car-card-stitch:hover .car-card-img {
+  transform: scale(1.05);
+}
+
+.car-card-bookmark {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background-color: rgba(29, 32, 39, 0.8); /* surface-container/80 */
+  backdrop-filter: blur(12px);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary);
+  border: none;
+  z-index: 2;
+  transition: transform 0.2s, color 0.2s;
+}
+
+.car-card-bookmark:hover {
+  transform: scale(1.1);
+}
+
+.car-card-bookmark.bookmarked {
+  color: var(--error);
+}
+
+.car-card-bookmark .material-symbols-outlined {
+  font-size: 20px;
+}
+
+.car-card-content {
+  padding: 1.5rem; /* p-stack-md */
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex-grow: 1;
+}
+
+.car-card-title {
+  font-family: var(--font-body);
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--on-surface);
+  margin: 0;
+}
+
+.car-card-price {
+  font-family: var(--font-mono);
+  color: var(--tertiary);
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+.car-card-specs {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+
+.car-card-spec-badge {
+  padding: 0.25rem 0.5rem;
+  background-color: var(--surface-container-high);
+  border-radius: var(--radius-sm);
+  font-size: 0.625rem; /* 10px */
+  font-weight: 700;
+  color: var(--on-surface-variant);
+  font-family: var(--font-body);
+  text-transform: uppercase;
+}

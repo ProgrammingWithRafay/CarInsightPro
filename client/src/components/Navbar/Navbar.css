@@ -1,0 +1,74 @@
+.navbar-stitch {
+  background-color: rgba(16, 19, 26, 0.8); /* surface/80 */
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-bottom: 1px solid rgba(66, 71, 84, 0.3); /* outline-variant/30 */
+  box-shadow: 0 10px 15px -3px rgba(173, 198, 255, 0.05); /* shadow-primary/5 */
+  transition: all 0.3s ease;
+}
+
+.navbar-brand-text {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: var(--primary) !important;
+}
+
+.nav-link-stitch {
+  font-family: var(--font-mono);
+  font-size: 0.75rem; /* label-caps */
+  font-weight: 700;
+  color: var(--on-surface-variant) !important;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding-bottom: 0.25rem;
+  border-bottom: 2px solid transparent;
+  transition: color 0.2s;
+}
+
+.nav-link-stitch:hover {
+  color: var(--on-surface) !important;
+}
+
+.nav-link-stitch.active {
+  color: var(--primary) !important;
+  border-bottom-color: var(--primary);
+}
+
+.btn-signin {
+  font-family: var(--font-body);
+  font-weight: 700;
+  background-color: var(--primary);
+  color: var(--on-primary);
+  border-radius: var(--radius-lg);
+  padding: 0.5rem 1.5rem;
+  border: none;
+  transition: transform 0.1s, box-shadow 0.2s;
+}
+
+.btn-signin:hover {
+  box-shadow: 0 0 20px rgba(173, 198, 255, 0.3); /* active-glow */
+}
+
+.btn-signin:active {
+  transform: scale(0.95);
+}
+
+.icon-btn {
+  color: var(--on-surface-variant);
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.icon-btn:hover {
+  background-color: rgba(50, 53, 60, 0.5); /* surface-container-highest/50 */
+  color: var(--primary);
+}

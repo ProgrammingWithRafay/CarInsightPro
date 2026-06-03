@@ -1,0 +1,80 @@
+import React from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { useAuth } from '../../hooks/useAuth';
+import './Navbar.css';
+
+const Navbar: React.FC = () => {
+  const { user, logout } = useAuth();
+  const location = useLocation();
+
+  const isActive = (path: string) => {
+    return location.pathname === path ? 'active' : '';
+  };
+
+  return (
+    <header className="fixed-top navbar-stitch">
+      <div className="container-fluid max-w-container-max mx-auto px-3 px-md-4 py-3 d-flex justify-content-between align-items-center">
+        <Link to="/" className="text-decoration-none d-flex align-items-center gap-2">
+          <img src="/logo.png" alt="CarInsight Pro Logo" style={{ height: '40px', width: 'auto', borderRadius: '4px' }} />
+          <span className="navbar-brand-text">CarInsight Pro</span>
+        </Link>
+        
+        <nav className="d-none d-md-flex align-items-center gap-4">
+          <Link to="/" className={`text-decoration-none nav-link-stitch ${isActive('/')}`}>Home</Link>
+          <Link to="/cars" className={`text-decoration-none nav-link-stitch ${isActive('/cars')}`}>Cars</Link>
+          <Link to="/compare" className={`text-decoration-none nav-link-stitch ${isActive('/compare')}`}>Compare</Link>
+          <Link to="/ev-hub" className={`text-decoration-none nav-link-stitch ${isActive('/ev-hub')}`}>EV Hub</Link>
+          {user && <Link to="/matchmaker" className={`text-decoration-none nav-link-stitch ${isActive('/matchmaker')}`}>Matchmaker</Link>}
+          {user && <Link to="/dashboard" className={`text-decoration-none nav-link-stitch ${isActive('/dashboard')}`}>Dashboard</Link>}
+          {user?.role === 'admin' && <Link to="/admin" className={`text-decoration-none nav-link-stitch ${isActive('/admin')}`}>Admin</Link>}
+        </nav>
+
+        <div className="d-flex align-items-center gap-3">
+          {user ? (
+            <>
+              <Link to="/dashboard" className="icon-btn text-decoration-none">
+                <span className="material-symbols-outlined">account_circle</span>
+              </Link>
+              <button className="btn-signin bg-transparent border border-secondary text-on-surface" onClick={logout}>
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <Link to="/login" className="icon-btn text-decoration-none">
+                <span className="material-symbols-outlined">account_circle</span>
+              </Link>
+              <Link to="/login" className="text-decoration-none">
+                <button className="btn-signin active-glow">Sign In</button>
+              </Link>
+            </>
+          )}
+          
+          {/* Mobile Menu Toggle (Simplified for now) */}
+          <button className="icon-btn d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileMenu">
+            <span className="material-symbols-outlined">menu</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Offcanvas Mobile Menu */}
+      <div className="offcanvas offcanvas-end bg-surface border-start border-secondary" tabIndex={-1} id="mobileMenu">
+        <div className="offcanvas-header border-bottom border-secondary">
+          <h5 className="font-heading text-primary m-0">Menu</h5>
+          <button type="button" className="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div className="offcanvas-body d-flex flex-column gap-3">
+          <Link to="/" className="text-decoration-none text-on-surface fs-5 font-heading" data-bs-dismiss="offcanvas">Home</Link>
+          <Link to="/cars" className="text-decoration-none text-on-surface fs-5 font-heading" data-bs-dismiss="offcanvas">Cars</Link>
+          <Link to="/compare" className="text-decoration-none text-on-surface fs-5 font-heading" data-bs-dismiss="offcanvas">Compare</Link>
+          <Link to="/ev-hub" className="text-decoration-none text-on-surface fs-5 font-heading" data-bs-dismiss="offcanvas">EV Hub</Link>
+          {user && <Link to="/matchmaker" className="text-decoration-none text-on-surface fs-5 font-heading" data-bs-dismiss="offcanvas">Matchmaker</Link>}
+          {user && <Link to="/dashboard" className="text-decoration-none text-on-surface fs-5 font-heading" data-bs-dismiss="offcanvas">Dashboard</Link>}
+          {user?.role === 'admin' && <Link to="/admin" className="text-decoration-none text-on-surface fs-5 font-heading" data-bs-dismiss="offcanvas">Admin</Link>}
+        </div>
+      </div>
+    </header>
+  );
+};
+
+export default Navbar;

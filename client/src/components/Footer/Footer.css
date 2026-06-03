@@ -1,0 +1,40 @@
+.footer-stitch {
+  background-color: var(--surface-container-lowest);
+  border-top: 1px solid rgba(66, 71, 84, 0.1); /* outline-variant/10 */
+}
+
+.footer-brand {
+  font-family: var(--font-heading);
+  font-size: 1.5rem; /* headline-h2 */
+  font-weight: 700;
+  color: var(--on-surface);
+}
+
+.footer-text {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--on-surface-variant);
+  max-width: 320px;
+}
+
+.footer-link {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--on-surface-variant);
+  transition: color 0.2s;
+  text-decoration: none;
+}
+
+.footer-link:hover {
+  color: var(--primary);
+}
+
+.footer-icon {
+  color: var(--on-surface-variant);
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.footer-icon:hover {
+  color: var(--primary);
+}

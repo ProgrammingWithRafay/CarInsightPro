@@ -1,0 +1,66 @@
+.admin-stat-card-stitch {
+  background-color: var(--surface-container-high);
+  border: 1px solid rgba(66, 71, 84, 0.3);
+  border-radius: var(--radius-xl);
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.admin-stat-card-stitch:hover {
+  border-color: rgba(173, 198, 255, 0.5); /* primary/50 */
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.admin-stat-icon-wrapper {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.admin-stat-trend {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius-sm);
+}
+
+.admin-stat-trend.positive {
+  background-color: rgba(16, 185, 129, 0.1); /* success bg */
+  color: var(--success);
+}
+
+.admin-table-stitch {
+  width: 100%;
+  color: var(--on-surface);
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.admin-table-stitch th {
+  background-color: var(--surface-container-highest);
+  color: var(--on-surface-variant);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 1rem;
+  border-bottom: 1px solid var(--outline-variant);
+}
+
+.admin-table-stitch td {
+  padding: 1rem;
+  border-bottom: 1px solid rgba(66, 71, 84, 0.2);
+  vertical-align: middle;
+}
+
+.admin-table-stitch tbody tr {
+  transition: background-color 0.2s;
+}
+
+.admin-table-stitch tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.02);
+}
