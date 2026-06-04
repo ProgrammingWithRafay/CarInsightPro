@@ -1,10 +1,10 @@
-# 🚗 CarInsight Pro
+#  CarInsight Pro
 
 A full-stack car research and comparison platform built with React, Node.js, Express, and MongoDB. Browse car listings, compare vehicles side-by-side, read and write reviews, explore the EV Hub, take a car recommendation quiz, and much more.
 
 ---
 
-## ✨ Features
+##  Features
 
 - **Car Listings** — Browse, search, and filter a curated database of cars
 - **Car Detail Pages** — View full specs, image galleries, and price history
@@ -24,7 +24,7 @@ A full-stack car research and comparison platform built with React, Node.js, Exp
 
 ---
 
-## 🛠️ Tech Stack
+##  Tech Stack
 
 ### Frontend (Client)
 | Technology | Purpose |
@@ -54,7 +54,7 @@ A full-stack car research and comparison platform built with React, Node.js, Exp
 
 ---
 
-## 📁 Project Structure
+##  Project Structure
 
 ```
 CarInsightPro/
@@ -102,7 +102,7 @@ CarInsightPro/
 
 ---
 
-## 🚀 Getting Started
+##  Getting Started
 
 ### Prerequisites
 
@@ -171,7 +171,7 @@ Visit **http://localhost:5173** in your browser.
 
 ---
 
-## 📡 API Endpoints
+##  API Endpoints
 
 | Route Prefix | Description |
 |---|---|
@@ -184,7 +184,7 @@ Visit **http://localhost:5173** in your browser.
 
 ---
 
-## 🏗️ Build for Production
+##  Build for Production
 
 ```bash
 # Build the client
@@ -199,7 +199,7 @@ npm start
 
 ---
 
-## 🚢 Deployment
+##  Deployment
 
 - **Frontend**: Configured for [Vercel](https://vercel.com) — see `client/vercel.json`
 - **Backend**: Configured for [Railway](https://railway.app) — see `server/railway.json`
