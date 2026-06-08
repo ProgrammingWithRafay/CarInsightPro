@@ -201,8 +201,13 @@ npm start
 
 ##  Deployment
 
-- **Frontend**: Configured for [Vercel](https://vercel.com) — see `client/vercel.json`
-- **Backend**: Configured for [Railway](https://railway.app) — see `server/railway.json`
+### Frontend (Client)
+- **Vercel** or **Netlify**: Both are excellent, completely free options for deploying the React frontend. Neither requires a credit card to sign up. Just link your GitHub repository, and they will automatically build and deploy your client.
+
+### Backend (Server)
+- **Render.com**: The best completely free option for deploying the Node.js/Express backend without requiring a debit/credit card. Note: the free tier spins down after 15 minutes of inactivity, so initial requests may take a few seconds to wake up.
+- **Railway**: While previously free, Railway now requires a credit/debit card for account verification to access their monthly free tier credits. 
+- **Database**: Use the completely free "M0 Sandbox" cluster on **MongoDB Atlas** for hosting your database (no credit card required).
 
 ---
 
