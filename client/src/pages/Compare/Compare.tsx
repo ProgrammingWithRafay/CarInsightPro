@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { carService } from '../../services/carService';
-import { Car } from '../../types';
+import { Car, FilterState } from '../../types';
 import { ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, Radar, Tooltip, Legend, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 import jsPDF from 'jspdf';
 import { generateCarReport } from '../../utils/pdfGenerator';
@@ -17,7 +17,7 @@ const Compare: React.FC = () => {
   useEffect(() => {
     const fetchCars = async () => {
       try {
-        const res = await carService.getCars({ limit: 100 } as any);
+        const res = await carService.getCars({ limit: 100 } as unknown as FilterState);
         if (res.success) {
           setAllCars(res.data);
           
@@ -35,7 +35,7 @@ const Compare: React.FC = () => {
             setSelectedCar2(res.data[1]);
           }
         }
-      } catch (error) {
+      } catch {
         console.error('Failed to load cars for comparison');
       } finally {
         setLoading(false);

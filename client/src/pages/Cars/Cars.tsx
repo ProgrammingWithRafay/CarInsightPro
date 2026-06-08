@@ -8,6 +8,7 @@ import Skeleton from '../../components/Skeleton/Skeleton';
 import { useDebounce } from '../../hooks/useDebounce';
 import { useAuth } from '../../hooks/useAuth';
 import { useToast } from '../../hooks/useToast';
+import axios from 'axios';
 import './Cars.css';
 
 const Cars: React.FC = () => {
@@ -59,7 +60,7 @@ const Cars: React.FC = () => {
     if (isAuthenticated) {
       carService.getBookmarks().then(res => {
         if (res.success && Array.isArray(res.data)) {
-          setBookmarkedIds(res.data.map((b: any) => typeof b === 'string' ? b : b._id));
+          setBookmarkedIds(res.data.map((b: string | { _id: string }) => typeof b === 'string' ? b : b._id));
         }
       }).catch(() => {});
     }
@@ -85,19 +86,7 @@ const Cars: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    fetchCars();
-  }, [
-    debouncedSearch, 
-    filters.brand, 
-    filters.priceMin, 
-    filters.priceMax, 
-    filters.fuelType, 
-    filters.sortBy, 
-    filters.page
-  ]);
-
-  const fetchCars = async () => {
+  const fetchCars = React.useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -108,12 +97,20 @@ const Cars: React.FC = () => {
       } else {
         setError('Failed to fetch data');
       }
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to fetch cars');
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        setError(err.response?.data?.message || 'Failed to fetch cars');
+      } else {
+        setError('Failed to fetch cars');
+      }
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters, debouncedSearch]);
+
+  useEffect(() => {
+    fetchCars();
+  }, [fetchCars]);
 
   const handlePageChange = (newPage: number) => {
     setFilters(prev => ({ ...prev, page: newPage }));

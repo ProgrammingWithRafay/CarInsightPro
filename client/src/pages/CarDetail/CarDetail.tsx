@@ -12,6 +12,7 @@ import ReviewForm from '../../components/Reviews/ReviewForm';
 import ReviewCard from '../../components/Reviews/ReviewCard';
 import TCOCalculator from '../../components/TCOCalculator/TCOCalculator';
 import { SubScores } from '../../types';
+import axios from 'axios';
 
 import { generateCarReport } from '../../utils/pdfGenerator';
 import './CarDetail.css';
@@ -31,13 +32,7 @@ const CarDetail: React.FC = () => {
   const { showToast } = useToast();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (id) {
-      fetchCarDetails();
-    }
-  }, [id]);
-
-  const fetchCarDetails = async () => {
+  const fetchCarDetails = React.useCallback(async () => {
     setLoading(true);
     try {
       const [carRes, reviewsRes] = await Promise.all([
@@ -50,13 +45,19 @@ const CarDetail: React.FC = () => {
         setReviews(reviewsRes.data.reviews || []);
         setAggregatedSubScores(reviewsRes.data.aggregatedSubScores);
       }
-    } catch (error) {
+    } catch {
       showToast('Failed to load vehicle telemetry', 'error');
       navigate('/cars');
     } finally {
       setLoading(false);
     }
-  };
+  }, [id, showToast, navigate]);
+
+  useEffect(() => {
+    if (id) {
+      fetchCarDetails();
+    }
+  }, [id, fetchCarDetails]);
 
   const handleAddReview = async (data: { title: string; subScores: SubScores; comment: string }) => {
     try {
@@ -66,8 +67,12 @@ const CarDetail: React.FC = () => {
         setShowReviewForm(false);
         fetchCarDetails();
       }
-    } catch (error: any) {
-      showToast(error.response?.data?.message || 'Failed to submit review', 'error');
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        showToast(error.response?.data?.message || 'Failed to submit review', 'error');
+      } else {
+        showToast('Failed to submit review', 'error');
+      }
     }
   };
 
@@ -79,8 +84,8 @@ const CarDetail: React.FC = () => {
     try {
       await reviewService.markHelpful(reviewId);
       fetchCarDetails();
-    } catch (error) {
-      console.error(error);
+    } catch {
+      console.error('Failed to mark review as helpful');
     }
   };
 
@@ -90,7 +95,7 @@ const CarDetail: React.FC = () => {
       showToast('Generating vehicle intelligence report...', 'info');
       await generateCarReport(car, reviews);
       showToast('Report downloaded successfully', 'success');
-    } catch (error) {
+    } catch {
       showToast('Failed to generate report', 'error');
     }
   };

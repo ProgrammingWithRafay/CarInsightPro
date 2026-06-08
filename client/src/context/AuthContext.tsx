@@ -4,10 +4,11 @@ import { authService } from '../services/authService';
 
 interface AuthContextType extends AuthState {
   login: (credentials: LoginCredentials) => Promise<void>;
-  register: (credentials: RegisterCredentials) => Promise<any>;
+  register: (credentials: RegisterCredentials) => Promise<unknown>;
   logout: () => Promise<void>;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
@@ -23,7 +24,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           setUser(res.data);
           setIsAuthenticated(true);
         }
-      } catch (error) {
+      } catch {
         // Not authenticated
         setUser(null);
         setIsAuthenticated(false);

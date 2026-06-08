@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { useToast } from '../../hooks/useToast';
 import { authService } from '../../services/authService';
+import axios from 'axios';
 import './Auth.css';
 
 const Login: React.FC = () => {
@@ -29,8 +30,12 @@ const Login: React.FC = () => {
       await login({ email, password });
       showToast('Authentication successful.', 'success');
       navigate(from, { replace: true });
-    } catch (error: any) {
-      showToast(error.response?.data?.message || 'Authentication failed. Verify credentials.', 'error');
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        showToast(error.response?.data?.message || 'Authentication failed. Verify credentials.', 'error');
+      } else {
+        showToast('Authentication failed. Verify credentials.', 'error');
+      }
     } finally {
       setLoading(false);
     }
@@ -44,8 +49,12 @@ const Login: React.FC = () => {
       await authService.forgotPassword(forgotEmail);
       setForgotSent(true);
       showToast('Password reset link sent! Check your email.', 'success');
-    } catch (error: any) {
-      showToast(error.response?.data?.message || 'Failed to send reset email.', 'error');
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        showToast(error.response?.data?.message || 'Failed to send reset email.', 'error');
+      } else {
+        showToast('Failed to send reset email.', 'error');
+      }
     } finally {
       setForgotLoading(false);
     }

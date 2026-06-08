@@ -21,7 +21,7 @@ const emptyCarData = {
 };
 
 const AdminCarForm: React.FC<AdminCarFormProps> = ({ car, onSuccess, onCancel }) => {
-  const [formData, setFormData] = useState<any>(emptyCarData);
+  const [formData, setFormData] = useState<Car | typeof emptyCarData>(emptyCarData);
   const [existingImages, setExistingImages] = useState<string[]>([]);
   const [newImages, setNewImages] = useState<File[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -29,9 +29,10 @@ const AdminCarForm: React.FC<AdminCarFormProps> = ({ car, onSuccess, onCancel })
 
   useEffect(() => {
     if (car) {
-      const { images, _id, createdAt, reviewCount, avgRating, views, ...rest } = car as any;
-      setFormData(rest);
-      setExistingImages(images || []);
+      const { images, ...rest } = car as unknown as Record<string, unknown>;
+      delete rest._id; delete rest.createdAt; delete rest.reviewCount; delete rest.avgRating; delete rest.views;
+      setFormData(rest as unknown as Car);
+      setExistingImages(images as string[] || []);
     }
   }, [car]);
 
@@ -42,21 +43,29 @@ const AdminCarForm: React.FC<AdminCarFormProps> = ({ car, onSuccess, onCancel })
     if (name.includes('.')) {
       const parts = name.split('.');
       if (parts.length === 2) {
-        setFormData((prev: any) => ({
-          ...prev,
-          [parts[0]]: { ...prev[parts[0]], [parts[1]]: val }
-        }));
+        setFormData(prev => {
+          const p = prev as unknown as Record<string, unknown>;
+          return {
+            ...p,
+            [parts[0]]: { ...(p[parts[0]] as Record<string, unknown>), [parts[1]]: val }
+          } as unknown as Car;
+        });
       } else if (parts.length === 3) {
-        setFormData((prev: any) => ({
-          ...prev,
-          [parts[0]]: {
-            ...prev[parts[0]],
-            [parts[1]]: { ...prev[parts[0]][parts[1]], [parts[2]]: val }
-          }
-        }));
+        setFormData(prev => {
+          const p = prev as unknown as Record<string, unknown>;
+          const p0 = p[parts[0]] as Record<string, unknown>;
+          const p1 = p0[parts[1]] as Record<string, unknown>;
+          return {
+            ...p,
+            [parts[0]]: {
+              ...p0,
+              [parts[1]]: { ...p1, [parts[2]]: val }
+            }
+          } as unknown as Car;
+        });
       }
     } else {
-      setFormData((prev: any) => ({ ...prev, [name]: val }));
+      setFormData(prev => ({ ...prev, [name]: val } as unknown as Car));
     }
   };
 
@@ -112,7 +121,7 @@ const AdminCarForm: React.FC<AdminCarFormProps> = ({ car, onSuccess, onCancel })
         showToast('Vehicle added successfully', 'success');
       }
       onSuccess();
-    } catch (error) {
+    } catch {
       showToast('Error saving vehicle', 'error');
     } finally {
       setIsSubmitting(false);

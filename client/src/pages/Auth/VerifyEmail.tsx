@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { authService } from '../../services/authService';
+import axios from 'axios';
 import './Auth.css';
 
 const VerifyEmail: React.FC = () => {
@@ -22,9 +23,13 @@ const VerifyEmail: React.FC = () => {
           setStatus('success');
           setMessage(res.message || 'Email verified successfully!');
         }
-      } catch (error: any) {
+      } catch (error: unknown) {
         setStatus('error');
-        setMessage(error.response?.data?.message || 'Verification failed. The link may have expired.');
+        if (axios.isAxiosError(error)) {
+          setMessage(error.response?.data?.message || 'Verification failed. The link may have expired.');
+        } else {
+          setMessage('Verification failed. The link may have expired.');
+        }
       }
     };
 

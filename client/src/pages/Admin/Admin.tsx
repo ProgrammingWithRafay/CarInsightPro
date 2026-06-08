@@ -9,6 +9,17 @@ import Modal from '../../components/Modal/Modal';
 import AdminCarForm from './AdminCarForm';
 import './Admin.css';
 
+interface SupportMessage {
+  _id: string;
+  name?: string;
+  email?: string;
+  user?: { name: string; email: string };
+  subject: string;
+  message: string;
+  status: 'Open' | 'Acknowledged' | 'Resolved';
+  replies?: { isAdmin: boolean; message: string; createdAt: string }[];
+}
+
 const Admin: React.FC = () => {
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [users, setUsers] = useState<User[]>([]);
@@ -16,7 +27,7 @@ const Admin: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [carsLoading, setCarsLoading] = useState(false);
   const [messagesLoading, setMessagesLoading] = useState(false);
-  const [supportMessages, setSupportMessages] = useState<any[]>([]);
+  const [supportMessages, setSupportMessages] = useState<SupportMessage[]>([]);
   const { showToast } = useToast();
 
   const [activeTab, setActiveTab] = useState('overview');
@@ -24,8 +35,32 @@ const Admin: React.FC = () => {
   const [editingCar, setEditingCar] = useState<Car | null>(null);
   
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
-  const [viewingMessage, setViewingMessage] = useState<any | null>(null);
+  const [viewingMessage, setViewingMessage] = useState<SupportMessage | null>(null);
   const [replyText, setReplyText] = useState('');
+
+  const loadCars = React.useCallback(async () => {
+    setCarsLoading(true);
+    try {
+      const res = await api.get('/cars?limit=100');
+      if (res.data.success) setAdminCars(res.data.data);
+    } catch {
+      showToast('Failed to load vehicles', 'error');
+    } finally {
+      setCarsLoading(false);
+    }
+  }, [showToast]);
+
+  const loadSupportMessages = React.useCallback(async () => {
+    setMessagesLoading(true);
+    try {
+      const res = await supportService.getAdminMessages();
+      if (res.success) setSupportMessages(res.data);
+    } catch {
+      showToast('Failed to load support messages', 'error');
+    } finally {
+      setMessagesLoading(false);
+    }
+  }, [showToast]);
 
   useEffect(() => {
     const fetchAdminData = async () => {
@@ -36,7 +71,7 @@ const Admin: React.FC = () => {
         ]);
         if (statsRes.success) setStats(statsRes.data);
         if (usersRes.success) setUsers(usersRes.data);
-      } catch (error) {
+      } catch {
         showToast('Failed to load admin data', 'error');
       } finally {
         setLoading(false);
@@ -52,31 +87,7 @@ const Admin: React.FC = () => {
     if (activeTab === 'support' && supportMessages.length === 0) {
       loadSupportMessages();
     }
-  }, [activeTab]);
-
-  const loadCars = async () => {
-    setCarsLoading(true);
-    try {
-      const res = await api.get('/cars?limit=100');
-      if (res.data.success) setAdminCars(res.data.data);
-    } catch (err) {
-      showToast('Failed to load vehicles', 'error');
-    } finally {
-      setCarsLoading(false);
-    }
-  };
-
-  const loadSupportMessages = async () => {
-    setMessagesLoading(true);
-    try {
-      const res = await supportService.getAdminMessages();
-      if (res.success) setSupportMessages(res.data);
-    } catch (err) {
-      showToast('Failed to load support messages', 'error');
-    } finally {
-      setMessagesLoading(false);
-    }
-  };
+  }, [activeTab, adminCars.length, supportMessages.length, loadCars, loadSupportMessages]);
 
   const handleUpdateMessageStatus = async (id: string, status: 'Open' | 'Acknowledged' | 'Resolved') => {
     try {
@@ -86,12 +97,12 @@ const Admin: React.FC = () => {
         setViewingMessage({ ...viewingMessage, status });
       }
       showToast(`Ticket status updated to ${status}`, 'success');
-    } catch (error) {
+    } catch {
       showToast('Failed to update ticket status', 'error');
     }
   };
 
-  const handleOpenMessageModal = (msg: any) => {
+  const handleOpenMessageModal = (msg: SupportMessage) => {
     setViewingMessage(msg);
     setReplyText('');
     setIsMessageModalOpen(true);
@@ -109,7 +120,7 @@ const Admin: React.FC = () => {
         setReplyText('');
         showToast('Reply sent successfully', 'success');
       }
-    } catch (error) {
+    } catch {
       showToast('Failed to send reply', 'error');
     }
   };
@@ -119,7 +130,7 @@ const Admin: React.FC = () => {
       await adminService.toggleBlockUser(id);
       setUsers(users.map(u => u._id === id ? { ...u, isBlocked: !u.isBlocked } : u));
       showToast('User status updated', 'success');
-    } catch (error) {
+    } catch {
       showToast('Failed to update user status', 'error');
     }
   };
@@ -131,7 +142,7 @@ const Admin: React.FC = () => {
       await adminService.deleteCar(id);
       setAdminCars(adminCars.filter(c => c._id !== id));
       showToast('Vehicle deleted permanently', 'success');
-    } catch (error) {
+    } catch {
       showToast('Failed to delete vehicle', 'error');
     }
   };
@@ -491,7 +502,7 @@ const Admin: React.FC = () => {
               <div className="mt-3">
                 <span className="font-mono small text-uppercase text-on-surface-variant d-block mb-2">Replies</span>
                 <div className="d-flex flex-column gap-2">
-                  {viewingMessage.replies.map((reply: any, i: number) => (
+                  {viewingMessage.replies?.map((reply, i: number) => (
                     <div key={i} className={`p-3 rounded ${reply.isAdmin ? 'bg-surface-container border border-primary' : 'bg-surface-container border border-secondary'}`}>
                       <div className="d-flex justify-content-between mb-1">
                         <span className="fw-bold small">{reply.isAdmin ? 'Admin Support' : 'User'}</span>

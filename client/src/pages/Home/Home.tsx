@@ -17,7 +17,7 @@ const Home: React.FC = () => {
         if (res.success) {
           setFeaturedCars(res.data);
         }
-      } catch (error) {
+      } catch {
         console.error('Failed to load featured cars');
       } finally {
         setLoading(false);

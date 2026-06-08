@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useToast } from '../../hooks/useToast';
 import { useAuth } from '../../hooks/useAuth';
 import { supportService } from '../../services/supportService';
+import axios from 'axios';
 import './StaticPages.css';
 
 const Contact: React.FC = () => {
@@ -24,7 +25,7 @@ const Contact: React.FC = () => {
     setIsSubmitting(true);
     
     try {
-      const payload: any = {
+      const payload: { subject: string; message: string; name?: string; email?: string } = {
         subject: formData.subject,
         message: formData.message
       };
@@ -41,8 +42,12 @@ const Contact: React.FC = () => {
       } else {
         showToast(res.message || 'Failed to send message.', 'error');
       }
-    } catch (error: any) {
-      showToast(error.response?.data?.message || 'An error occurred while sending your message.', 'error');
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        showToast(error.response?.data?.message || 'An error occurred while sending your message.', 'error');
+      } else {
+        showToast('An error occurred while sending your message.', 'error');
+      }
     } finally {
       setIsSubmitting(false);
     }

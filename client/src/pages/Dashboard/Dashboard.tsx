@@ -9,6 +9,15 @@ import CarCard from '../../components/CarCard/CarCard';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 import './Dashboard.css';
 
+interface SupportTicket {
+  _id: string;
+  subject: string;
+  status: string;
+  createdAt: string;
+  message: string;
+  replies?: { isAdmin: boolean; createdAt: string; message: string }[];
+}
+
 const Dashboard: React.FC = () => {
   const { user, logout } = useAuth();
   const { showToast } = useToast();
@@ -19,8 +28,36 @@ const Dashboard: React.FC = () => {
   const [priceHistoryData, setPriceHistoryData] = useState<{ date: string; price: number }[]>([]);
   const [selectedCarForHistory, setSelectedCarForHistory] = useState<Car | null>(null);
 
-  const [supportTickets, setSupportTickets] = useState<any[]>([]);
+  const [supportTickets, setSupportTickets] = useState<SupportTicket[]>([]);
   const [loadingTickets, setLoadingTickets] = useState(false);
+
+  const fetchBookmarks = React.useCallback(async () => {
+    setLoadingBookmarks(true);
+    try {
+      const res = await carService.getBookmarks();
+      if (res.success) {
+        setBookmarks(res.data as unknown as Car[]);
+      }
+    } catch {
+      showToast('Failed to load saved cars', 'error');
+    } finally {
+      setLoadingBookmarks(false);
+    }
+  }, [showToast]);
+
+  const fetchSupportTickets = React.useCallback(async () => {
+    setLoadingTickets(true);
+    try {
+      const res = await supportService.getMyMessages();
+      if (res.success) {
+        setSupportTickets(res.data);
+      }
+    } catch {
+      showToast('Failed to load support tickets', 'error');
+    } finally {
+      setLoadingTickets(false);
+    }
+  }, [showToast]);
 
   useEffect(() => {
     if (activeTab === 'saved') {
@@ -29,35 +66,7 @@ const Dashboard: React.FC = () => {
     if (activeTab === 'tickets' && supportTickets.length === 0) {
       fetchSupportTickets();
     }
-  }, [activeTab]);
-
-  const fetchBookmarks = async () => {
-    setLoadingBookmarks(true);
-    try {
-      const res = await carService.getBookmarks();
-      if (res.success) {
-        setBookmarks(res.data as unknown as Car[]);
-      }
-    } catch (error) {
-      showToast('Failed to load saved cars', 'error');
-    } finally {
-      setLoadingBookmarks(false);
-    }
-  };
-
-  const fetchSupportTickets = async () => {
-    setLoadingTickets(true);
-    try {
-      const res = await supportService.getMyMessages();
-      if (res.success) {
-        setSupportTickets(res.data);
-      }
-    } catch (error) {
-      showToast('Failed to load support tickets', 'error');
-    } finally {
-      setLoadingTickets(false);
-    }
-  };
+  }, [activeTab, fetchBookmarks, fetchSupportTickets, supportTickets.length]);
 
   const handleRemoveBookmark = async (id: string) => {
     try {
@@ -65,7 +74,7 @@ const Dashboard: React.FC = () => {
       setBookmarks(bookmarks.filter(car => car._id !== id));
       showToast('Car removed from bookmarks', 'info');
       if (selectedCarForHistory?._id === id) setSelectedCarForHistory(null);
-    } catch (error) {
+    } catch {
       showToast('Failed to remove bookmark', 'error');
     }
   };
@@ -74,9 +83,9 @@ const Dashboard: React.FC = () => {
     try {
       const res = await carService.getCarPriceHistory(car._id);
       if (res.success) {
-        const history = res.data.map((h: any) => ({
-          date: new Date(h.date).toLocaleDateString(),
-          price: h.newPrice
+        const history = res.data.map((h: Record<string, unknown>) => ({
+          date: new Date(h.date as string).toLocaleDateString(),
+          price: h.newPrice as number
         }));
         
         // Add current price if there's no history
@@ -90,7 +99,7 @@ const Dashboard: React.FC = () => {
         setPriceHistoryData(history);
         setSelectedCarForHistory(car);
       }
-    } catch (error) {
+    } catch {
       showToast('Failed to load price history', 'error');
     }
   };
@@ -288,7 +297,7 @@ const Dashboard: React.FC = () => {
                           <div className="mt-4 pt-3 border-top border-secondary">
                             <h5 className="font-heading h6 mb-3">Replies</h5>
                             <div className="d-flex flex-column gap-2">
-                              {ticket.replies.map((reply: any, idx: number) => (
+                              {ticket.replies.map((reply, idx: number) => (
                                 <div key={idx} className={`p-3 rounded ${reply.isAdmin ? 'bg-surface-container border border-primary' : 'bg-surface-container border border-secondary'}`}>
                                   <div className="d-flex justify-content-between mb-1">
                                     <span className="fw-bold small">{reply.isAdmin ? 'Support Team' : 'You'}</span>

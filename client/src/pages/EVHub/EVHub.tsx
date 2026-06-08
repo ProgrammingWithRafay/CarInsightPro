@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { carService } from '../../services/carService';
-import { Car } from '../../types';
+import { Car, FilterState } from '../../types';
 import { ResponsiveContainer, ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import './EVHub.css'; // Optional
 
@@ -12,12 +12,12 @@ const EVHub: React.FC = () => {
   useEffect(() => {
     const fetchEVs = async () => {
       try {
-        const res = await carService.getCars({ limit: 500 } as any); // we will filter on client or could fetch all
+        const res = await carService.getCars({ limit: 500 } as unknown as FilterState); // we will filter on client or could fetch all
         if (res.success) {
           const evs = res.data.filter(c => c.fuelType === 'Electric' || c.fuelType === 'Hybrid');
           setEvCars(evs);
         }
-      } catch (error) {
+      } catch {
         console.error('Failed to load EVs');
       } finally {
         setLoading(false);

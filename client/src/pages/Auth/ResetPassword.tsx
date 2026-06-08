@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { authService } from '../../services/authService';
 import { useToast } from '../../hooks/useToast';
+import axios from 'axios';
 import './Auth.css';
 
 const ResetPassword: React.FC = () => {
@@ -33,8 +34,12 @@ const ResetPassword: React.FC = () => {
       const res = await authService.resetPassword(token!, password);
       setSuccess(true);
       showToast(res.message || 'Password reset successfully!', 'success');
-    } catch (error: any) {
-      showToast(error.response?.data?.message || 'Failed to reset password. The link may be expired.', 'error');
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        showToast(error.response?.data?.message || 'Failed to reset password. The link may be expired.', 'error');
+      } else {
+        showToast('Failed to reset password. The link may be expired.', 'error');
+      }
     } finally {
       setLoading(false);
     }

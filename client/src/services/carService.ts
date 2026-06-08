@@ -6,7 +6,7 @@ export const carService = {
     const params = new URLSearchParams();
     
     if (filters.page) params.append('page', filters.page.toString());
-    if ((filters as any).limit) params.append('limit', (filters as any).limit.toString());
+    if ((filters as FilterState & { limit?: number }).limit) params.append('limit', (filters as FilterState & { limit?: number }).limit!.toString());
     if (filters.search) params.append('search', filters.search);
     if (filters.brand && filters.brand.length > 0) params.append('brand', filters.brand.join(','));
     if (filters.yearMin) params.append('yearMin', filters.yearMin.toString());

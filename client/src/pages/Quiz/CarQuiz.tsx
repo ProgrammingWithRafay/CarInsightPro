@@ -27,8 +27,8 @@ const CarQuiz: React.FC = () => {
         setResults(res.data.slice(0, 3)); 
       }
       setStep(5); 
-    } catch (error) {
-      console.error(error);
+    } catch (_error) {
+      console.error(_error);
     } finally {
       setLoading(false);
     }
@@ -40,7 +40,7 @@ const CarQuiz: React.FC = () => {
     const axes = ['Performance', 'Comfort', 'Efficiency', 'Value', 'Safety'];
     
     return axes.map(axis => {
-      const dataPoint: any = { subject: axis };
+      const dataPoint: Record<string, string | number> = { subject: axis };
       results.forEach(car => {
         let score = 50;
         if (axis === 'Performance') score = Math.min((car.specs?.horsepower || 100) / 4, 100);

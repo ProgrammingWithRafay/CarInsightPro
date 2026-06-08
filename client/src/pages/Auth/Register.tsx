@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { useToast } from '../../hooks/useToast';
 import { authService } from '../../services/authService';
+import axios from 'axios';
 import './Auth.css';
 
 const Register: React.FC = () => {
@@ -35,8 +36,12 @@ const Register: React.FC = () => {
     try {
       await register(formData);
       setEmailSent(true);
-    } catch (error: any) {
-      showToast(error.response?.data?.message || 'Registration failed.', 'error');
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        showToast(error.response?.data?.message || 'Registration failed.', 'error');
+      } else {
+        showToast('Registration failed.', 'error');
+      }
     } finally {
       setLoading(false);
     }
@@ -47,8 +52,12 @@ const Register: React.FC = () => {
     try {
       await authService.resendVerification(formData.email);
       showToast('Verification email resent! Check your inbox.', 'success');
-    } catch (error: any) {
-      showToast(error.response?.data?.message || 'Failed to resend email.', 'error');
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        showToast(error.response?.data?.message || 'Failed to resend email.', 'error');
+      } else {
+        showToast('Failed to resend email.', 'error');
+      }
     } finally {
       setResending(false);
     }
