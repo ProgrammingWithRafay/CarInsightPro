@@ -164,36 +164,6 @@
 .timeline-number.step-2 { border: 4px solid var(--secondary); color: var(--secondary); }
 .timeline-number.step-3 { border: 4px solid var(--tertiary); color: var(--tertiary); }
 
-.testimonial-card {
-  padding: 2rem;
-  border-radius: 1.5rem;
-  border: 1px solid rgba(173, 198, 255, 0.2);
-  position: relative;
-}
-
-.testimonial-quote-icon {
-  font-size: 4rem;
-  color: var(--primary);
-  opacity: 0.2;
-  position: absolute;
-  top: -1rem;
-  left: -1rem;
-}
-
-.testimonial-text {
-  font-size: 1.5rem;
-  color: var(--on-surface);
-  font-style: italic;
-  position: relative;
-  z-index: 10;
-}
-
-@media (min-width: 768px) {
-  .testimonial-text {
-    font-size: 1.875rem;
-  }
-}
-
 .cta-banner {
   background-color: var(--primary);
   border-radius: 2rem;

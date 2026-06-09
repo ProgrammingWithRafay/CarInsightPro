@@ -74,7 +74,7 @@ const Home: React.FC = () => {
       </section>
 
       {/* Features Bento Grid */}
-      <section className="py-5 my-5 px-3 px-md-5 max-w-container-max mx-auto">
+      <section className="section-padding px-3 px-md-5 max-w-container-max mx-auto">
         <div className="text-center mb-5 pb-3">
           <h2 className="font-heading display-5 fw-bold text-on-surface mb-3">What You Can Do</h2>
           <p className="text-on-surface-variant max-w-container-max mx-auto" style={{ maxWidth: '600px' }}>
@@ -105,8 +105,8 @@ const Home: React.FC = () => {
       </section>
 
       {/* Timeline Section */}
-      <section className="py-5 my-5 bg-surface-container-lowest">
-        <div className="container py-5">
+      <section className="section-padding bg-surface-container-lowest">
+        <div className="container">
           <h2 className="font-heading display-5 fw-bold text-center mb-5 pb-4">How It Works</h2>
           <div className="position-relative">
             <div className="timeline-line"></div>
@@ -161,7 +161,7 @@ const Home: React.FC = () => {
       </section>
 
       {/* Featured Cars Carousel */}
-      <section className="py-5 my-5 overflow-hidden">
+      <section className="section-padding overflow-hidden">
         <div className="px-3 px-md-5 max-w-container-max mx-auto mb-4 d-flex justify-content-between align-items-end">
           <div>
             <h2 className="font-heading display-6 fw-bold m-0">Popular Cars</h2>
@@ -190,29 +190,9 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* Testimonials */}
-      <section className="py-5 px-3">
-        <div className="max-w-container-max mx-auto" style={{ maxWidth: '900px' }}>
-          <div className="testimonial-card" style={{ backgroundColor: 'var(--surface-container)', border: '1px solid var(--outline-variant)' }}>
-            <span className="material-symbols-outlined testimonial-quote-icon">format_quote</span>
-            <p className="testimonial-text mb-5">
-              "I used to spend weeks going back and forth between different sites trying to compare cars. CarInsight Pro puts everything in one place. It honestly saved me so much time and I ended up finding a better deal than I expected."
-            </p>
-            <div className="d-flex align-items-center gap-3">
-              <div className="rounded-circle bg-surface overflow-hidden border border-secondary" style={{ width: '56px', height: '56px' }}>
-                <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuAA_Nc_tMSqSGUhf-jM73K8F0UM5rbUEtoKvc4MxWwz-YN_jc6eIRiiAiwxAUdWbJPgpeEja_WCmh3vN-5GxEMcTbMwrSyKJzWNe_kwf5Sa29XCeq0pARYNzJH2xpRwVpqxtPKmJ-8nPgZ5Qc7W8EaUbOKZ9VfYFT_4HXYfi3C09xoNd0fvEadGmLbEnub7oGXAOeHkxLJu4t1ja_hctbvSMVtCU3Riptwtcq2d8MJG78afv9wHIku0Jr1Slifrp6Ej_LHFyS-PQGtt" alt="Marcus Thorne" className="w-100 h-100 object-fit-cover" />
-              </div>
-              <div>
-                <div className="fw-bold text-on-surface">Marcus Thorne</div>
-                <div className="text-on-surface-variant data-mono text-uppercase" style={{ fontSize: '10px' }}>Car Enthusiast & First-Time Buyer</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* CTA Banner */}
-      <section className="py-5 mb-5 px-3">
+      <section className="section-padding px-3">
         <div className="max-w-container-max mx-auto cta-banner">
           <div className="position-absolute top-0 start-0 w-100 h-100 opacity-25"></div>
           <div className="position-relative z-10">
