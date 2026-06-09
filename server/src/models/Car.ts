@@ -36,7 +36,6 @@ export interface CarDocument extends Omit<Document, 'model'> {
   reviewCount: number;
   views: number;
   createdAt: Date;
-  embedding?: number[];
 }
 
 const CarSchema: Schema = new Schema({
@@ -80,8 +79,7 @@ const CarSchema: Schema = new Schema({
   images: { type: [String], default: [] },
   avgRating: { type: Number, default: 0 },
   reviewCount: { type: Number, default: 0 },
-  views: { type: Number, default: 0 },
-  embedding: { type: [Number], required: false }
+  views: { type: Number, default: 0 }
 }, {
   timestamps: true
 });

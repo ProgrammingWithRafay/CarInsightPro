@@ -1,9 +1,8 @@
 // Car Controller - Handles fetching, creating, updating, and deleting cars
 import { Request, Response } from 'express';
+import cloudinary from '../config/cloudinary';
 import Car from '../models/Car';
 import PriceHistory from '../models/PriceHistory';
-import cloudinary from '../config/cloudinary';
-import { createCarDescription, generateEmbedding } from '../utils/embedding';
 
 // Get all cars with filtering, sorting, pagination
 export const getCars = async (req: Request, res: Response) => {
@@ -13,19 +12,11 @@ export const getCars = async (req: Request, res: Response) => {
     const skip = (page - 1) * limit;
 
     let query: any = {};
-    let isVectorSearch = false;
-    let vectorQuery: number[] = [];
 
     // Search by make or model
     if (req.query.search) {
-      try {
-        vectorQuery = await generateEmbedding(req.query.search as string);
-        isVectorSearch = true;
-      } catch (err) {
-        // Fallback to regex
-        const searchRegex = new RegExp(req.query.search as string, 'i');
-        query.$or = [{ make: searchRegex }, { model: searchRegex }];
-      }
+      const searchRegex = new RegExp(req.query.search as string, 'i');
+      query.$or = [{ make: searchRegex }, { model: searchRegex }];
     }
 
     // Filter by brand
@@ -79,61 +70,19 @@ export const getCars = async (req: Request, res: Response) => {
       }
     }
 
-    if (isVectorSearch) {
-      const pipeline: any[] = [];
-      
-      pipeline.push({
-        $vectorSearch: {
-          index: "vector_index",
-          path: "embedding",
-          queryVector: vectorQuery,
-          numCandidates: 100,
-          limit: 100
-        }
-      });
+    const total = await Car.countDocuments(query);
+    const cars = await Car.find(query).sort(sort).skip(skip).limit(limit);
 
-      if (Object.keys(query).length > 0) {
-        pipeline.push({ $match: query });
+    return res.json({
+      success: true,
+      data: cars,
+      pagination: {
+        page,
+        limit,
+        total,
+        pages: Math.ceil(total / limit)
       }
-
-      pipeline.push({ $sort: Object.keys(sort).length > 0 ? sort : { _id: 1 } });
-
-      pipeline.push({
-        $facet: {
-          metadata: [ { $count: "total" } ],
-          data: [ { $skip: skip }, { $limit: limit } ]
-        }
-      });
-
-      const aggregationResult = await Car.aggregate(pipeline);
-      const total = aggregationResult[0]?.metadata[0]?.total || 0;
-      const cars = aggregationResult[0]?.data || [];
-
-      return res.json({
-        success: true,
-        data: cars,
-        pagination: {
-          page,
-          limit,
-          total,
-          pages: Math.ceil(total / limit)
-        }
-      });
-    } else {
-      const total = await Car.countDocuments(query);
-      const cars = await Car.find(query).sort(sort).skip(skip).limit(limit);
-
-      return res.json({
-        success: true,
-        data: cars,
-        pagination: {
-          page,
-          limit,
-          total,
-          pages: Math.ceil(total / limit)
-        }
-      });
-    }
+    });
   } catch (error: any) {
     return res.status(500).json({ success: false, message: error.message });
   }
@@ -200,13 +149,6 @@ export const addCar = async (req: Request, res: Response) => {
 
     carData.images = imageUrls.slice(0, MAX_IMAGES);
 
-    try {
-      const description = createCarDescription(carData);
-      carData.embedding = await generateEmbedding(description);
-    } catch (embErr) {
-      console.warn('Failed to generate embedding for new car:', embErr);
-    }
-
     const car = await Car.create(carData);
 
     res.status(201).json({ success: true, data: car });
@@ -254,15 +196,6 @@ export const updateCar = async (req: Request, res: Response) => {
     const existingCar = await Car.findById(req.params.id);
     if (!existingCar) {
       return res.status(404).json({ success: false, message: 'Car not found' });
-    }
-
-    // Generate embedding for updated data
-    const mergedData = { ...existingCar.toObject(), ...updateData };
-    try {
-      const description = createCarDescription(mergedData);
-      updateData.embedding = await generateEmbedding(description);
-    } catch (embErr) {
-      console.warn('Failed to generate embedding for updated car:', embErr);
     }
 
     if (updateData.price && existingCar.price !== Number(updateData.price)) {
