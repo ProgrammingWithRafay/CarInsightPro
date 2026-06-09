@@ -211,6 +211,6 @@ npm start
 
 ---
 
-## 📄 License
+## License
 
 This project was built with dedication and passion as a hands-on learning journey into full-stack web development. It represents countless hours of effort, problem-solving, and growth as a developer.
