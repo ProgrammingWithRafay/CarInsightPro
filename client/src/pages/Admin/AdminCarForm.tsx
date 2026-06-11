@@ -262,6 +262,7 @@ const AdminCarForm: React.FC<AdminCarFormProps> = ({ car, onSuccess, onCancel })
             <option value="Petrol">Petrol</option>
             <option value="Diesel">Diesel</option>
             <option value="Hybrid">Hybrid</option>
+            <option value="Petrol & Hybrid">Petrol & Hybrid</option>
             <option value="Electric">Electric</option>
           </select>
         </div>

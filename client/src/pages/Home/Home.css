@@ -1,6 +1,6 @@
 .hero-section {
   position: relative;
-  min-height: 800px;
+  min-height: 700px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -32,12 +32,14 @@
 
 @media (min-width: 768px) {
   .hero-title {
-    font-size: 4rem; /* display-lg */
+    font-size: 4rem;
+    /* display-lg */
   }
 }
 
 .hero-subtitle {
-  font-size: 1.125rem; /* body-lg */
+  font-size: 1.125rem;
+  /* body-lg */
   color: var(--on-surface-variant);
   max-width: 42rem;
   margin: 0 auto 2rem auto;
@@ -60,7 +62,8 @@
 }
 
 .hero-btn-secondary:hover {
-  background-color: rgba(50, 53, 60, 0.3); /* surface-container-highest/30 */
+  background-color: rgba(50, 53, 60, 0.3);
+  /* surface-container-highest/30 */
 }
 
 .stats-bar-wrapper {
@@ -111,7 +114,8 @@
 }
 
 .bento-card:hover {
-  border-color: rgba(173, 198, 255, 0.5); /* primary/50 */
+  border-color: rgba(173, 198, 255, 0.5);
+  /* primary/50 */
 }
 
 .bento-icon-wrapper {
@@ -160,9 +164,20 @@
   z-index: 10;
 }
 
-.timeline-number.step-1 { border: 4px solid var(--primary); color: var(--primary); }
-.timeline-number.step-2 { border: 4px solid var(--secondary); color: var(--secondary); }
-.timeline-number.step-3 { border: 4px solid var(--tertiary); color: var(--tertiary); }
+.timeline-number.step-1 {
+  border: 4px solid var(--primary);
+  color: var(--primary);
+}
+
+.timeline-number.step-2 {
+  border: 4px solid var(--secondary);
+  color: var(--secondary);
+}
+
+.timeline-number.step-3 {
+  border: 4px solid var(--tertiary);
+  color: var(--tertiary);
+}
 
 .cta-banner {
   background-color: var(--primary);

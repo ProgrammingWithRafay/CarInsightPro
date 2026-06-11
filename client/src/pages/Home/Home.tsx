@@ -1,45 +1,34 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { carService } from '../../services/carService';
-import { Car } from '../../types';
-import CarCard from '../../components/CarCard/CarCard';
+
 import Counter from '../../components/Counter/Counter';
 import './Home.css';
 
 const Home: React.FC = () => {
-  const [featuredCars, setFeaturedCars] = useState<Car[]>([]);
   const [stats, setStats] = useState({ totalCars: 0, totalReviews: 0 });
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [featuredRes, statsRes] = await Promise.all([
-          carService.getFeatured(),
+        const [statsRes] = await Promise.all([
           carService.getPublicStats()
         ]);
         
-        if (featuredRes.success) {
-          setFeaturedCars(featuredRes.data);
-        }
         if (statsRes.success) {
           setStats(statsRes.data);
         }
       } catch {
         console.error('Failed to load home page data');
-      } finally {
-        setLoading(false);
       }
     };
     fetchData();
   }, []);
 
   return (
-    <div className="pt-5 mt-4">
+    <div>
       {/* Hero Section */}
       <section className="hero-section">
-
-
         <div className="position-relative z-10 text-center px-3 max-w-container-max mx-auto" style={{ maxWidth: '900px' }}>
           <span className="hero-badge">CAR RESEARCH, SIMPLIFIED</span>
           <h1 className="hero-title font-heading">Find the Right Car Without the Guesswork</h1>
@@ -163,35 +152,6 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* Featured Cars Carousel */}
-      <section className="section-padding overflow-hidden">
-        <div className="px-3 px-md-5 max-w-container-max mx-auto mb-4 d-flex justify-content-between align-items-end">
-          <div>
-            <h2 className="font-heading display-6 fw-bold m-0">Popular Cars</h2>
-            <p className="text-on-surface-variant m-0">Cars people are looking at the most right now.</p>
-          </div>
-          <div className="d-flex gap-2">
-            <button className="btn btn-secondary rounded-circle p-2 d-flex"><span className="material-symbols-outlined">chevron_left</span></button>
-            <button className="btn btn-secondary rounded-circle p-2 d-flex"><span className="material-symbols-outlined">chevron_right</span></button>
-          </div>
-        </div>
-
-        <div className="d-flex gap-4 px-3 px-md-5 pb-4" style={{ overflowX: 'auto', scrollBehavior: 'smooth' }}>
-          {loading ? (
-            <div className="d-flex justify-content-center w-100 py-5">
-              <div className="spinner-border text-primary" role="status"></div>
-            </div>
-          ) : featuredCars.length > 0 ? (
-            featuredCars.map(car => (
-              <div key={car._id} style={{ minWidth: '320px', maxWidth: '400px' }}>
-                <CarCard car={car} />
-              </div>
-            ))
-          ) : (
-            <p className="text-on-surface-variant w-100 text-center">No featured cars found.</p>
-          )}
-        </div>
-      </section>
 
 
       {/* CTA Banner */}

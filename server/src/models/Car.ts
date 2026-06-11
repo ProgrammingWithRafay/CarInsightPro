@@ -9,7 +9,7 @@ export interface CarDocument extends Omit<Document, 'model'> {
   priceMax?: number;
   description?: string;
   bodyType?: string;
-  fuelType: 'Petrol' | 'Diesel' | 'Hybrid' | 'Electric';
+  fuelType: 'Petrol' | 'Diesel' | 'Hybrid' | 'Electric' | 'Petrol & Hybrid';
   transmission: 'Automatic' | 'Manual';
   specs: {
     engine: string;
