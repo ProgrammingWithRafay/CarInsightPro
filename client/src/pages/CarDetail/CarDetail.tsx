@@ -15,6 +15,7 @@ import { SubScores } from '../../types';
 import axios from 'axios';
 
 import { generateCarReport } from '../../utils/pdfGenerator';
+import { formatPriceRange, formatPKR } from '../../utils/formatPrice';
 import './CarDetail.css';
 
 const CarDetail: React.FC = () => {
@@ -92,7 +93,7 @@ const CarDetail: React.FC = () => {
   const handleDownloadReport = async () => {
     if (!car) return;
     try {
-      showToast('Generating vehicle intelligence report...', 'info');
+      showToast('Generating car report...', 'info');
       await generateCarReport(car, reviews);
       showToast('Report downloaded successfully', 'success');
     } catch {
@@ -144,11 +145,14 @@ const CarDetail: React.FC = () => {
             </div>
           </div>
           <div className="text-lg-end">
-            <span className="detail-price">${car.price.toLocaleString()}</span>
-            <p className="font-mono text-on-surface-variant text-uppercase small m-0 mt-1">Est. Market Value</p>
+            <span className="detail-price">{formatPriceRange(car.price, car.priceMax)}</span>
+            <p className="font-mono text-on-surface-variant text-uppercase small m-0 mt-1">Price in Pakistan</p>
           </div>
         </div>
       </div>
+
+
+
 
       <div className="container-fluid max-w-container-max mx-auto px-3 px-md-4">
         <div className="row g-4">
@@ -221,7 +225,7 @@ const CarDetail: React.FC = () => {
                   <span className="material-symbols-outlined">favorite</span> Save to Dashboard
                 </button>
                 <button className="btn btn-outline-secondary text-on-surface w-100 py-3 fw-bold d-flex align-items-center justify-content-center gap-2" onClick={handleDownloadReport}>
-                  <span className="material-symbols-outlined">download</span> Download Dossier
+                  <span className="material-symbols-outlined">download</span> Download Report
                 </button>
               </div>
             </div>
@@ -232,7 +236,7 @@ const CarDetail: React.FC = () => {
         <div className="border-bottom border-secondary mt-5 mb-4 d-flex overflow-auto no-scrollbar">
           <button className={`tab-btn ${activeTab === 'overview' ? 'active' : ''}`} onClick={() => setActiveTab('overview')}>Overview</button>
           <button className={`tab-btn ${activeTab === 'analytics' ? 'active' : ''}`} onClick={() => setActiveTab('analytics')}>Analytics</button>
-          <button className={`tab-btn ${activeTab === 'tco' ? 'active' : ''}`} onClick={() => setActiveTab('tco')}>TCO & Finance</button>
+          <button className={`tab-btn ${activeTab === 'tco' ? 'active' : ''}`} onClick={() => setActiveTab('tco')}>Monthly Cost</button>
           <button className={`tab-btn ${activeTab === 'reviews' ? 'active' : ''}`} onClick={() => setActiveTab('reviews')}>Reviews</button>
         </div>
 
@@ -242,25 +246,38 @@ const CarDetail: React.FC = () => {
             <div className="row g-4 fade-in-up">
               <div className="col-12 col-lg-8">
                 <div className="glass-panel p-4 p-md-5 rounded-4">
-                  <h3 className="font-heading mb-4">Vehicle Summary</h3>
+                  <h3 className="font-heading mb-4">About This Car</h3>
                   <p className="text-on-surface-variant" style={{ lineHeight: '1.8' }}>
-                    {`The ${car.year} ${car.make} ${car.model} represents a significant entry in the ${car.fuelType} segment. Equipped with a robust ${car.specs?.engine || 'engine'} and a refined ${car.transmission} transmission, it offers a balanced blend of performance and efficiency.`}
+                    {car.description || `The ${car.year} ${car.make} ${car.model} comes with a ${car.specs?.engine || ''} engine, ${car.transmission} transmission, and seats ${car.specs?.seats || 5} people comfortably.`}
                   </p>
                   
-                  <h4 className="font-heading mt-5 mb-4">Detailed Specifications</h4>
-                  <div className="row g-4">
+                  <h4 className="font-heading mt-5 mb-4">Specifications</h4>
+                  <div className="row g-3">
                     {[
-                      { label: 'Curb Weight', val: car.specs?.curbWeight ? `${car.specs.curbWeight.toLocaleString()} lbs` : 'N/A' },
-                      { label: 'Torque', val: car.specs?.torque ? `${car.specs.torque} lb-ft` : 'N/A' },
-                      { label: 'Drivetrain', val: car.specs?.drivetrain || 'N/A' },
-                      { label: 'Fuel Economy', val: car.specs?.mileage_city ? `${car.specs.mileage_city} / ${car.specs?.mileage_highway} MPG` : 'N/A' },
-                      { label: 'Cargo Space', val: car.specs?.cargoSpace ? `${car.specs.cargoSpace} cu ft` : 'N/A' },
-                      { label: 'Displacement', val: car.specs?.displacement ? `${car.specs.displacement} cc` : 'Electric' }
-                    ].map((s, i) => (
+                      { icon: 'directions_car', label: 'Body Type', val: car.bodyType || 'N/A' },
+                      { icon: 'straighten', label: 'Dimensions', val: car.specs?.dimensions ? `${car.specs.dimensions.length} x ${car.specs.dimensions.width} x ${car.specs.dimensions.height} mm` : 'N/A' },
+                      { icon: 'height', label: 'Ground Clearance', val: car.specs?.groundClearance ? `${car.specs.groundClearance} mm` : 'N/A' },
+                      { icon: 'speed', label: 'Engine', val: car.specs?.engine || 'N/A' },
+                      { icon: 'settings', label: 'Displacement', val: car.specs?.displacement ? `${car.specs.displacement} cc` : car.fuelType === 'Electric' ? 'Electric' : 'N/A' },
+                      { icon: 'swap_driving_apps_wheel', label: 'Transmission', val: car.transmission || 'N/A' },
+                      { icon: 'bolt', label: 'Horse Power', val: car.specs?.horsepower ? `${car.specs.horsepower} HP` : 'N/A' },
+                      { icon: 'rotate_right', label: 'Torque', val: car.specs?.torque ? `${car.specs.torque} Nm` : 'N/A' },
+                      { icon: 'work', label: 'Boot Space', val: car.specs?.bootSpace ? `${car.specs.bootSpace} L` : 'N/A' },
+                      { icon: 'monitor_weight', label: 'Kerb Weight', val: car.specs?.kerbWeight || 'N/A' },
+                      { icon: 'local_gas_station', label: car.fuelType === 'Electric' ? 'Battery' : 'Fuel Type', val: car.fuelType === 'Electric' ? (car.specs?.batteryCapacity ? `${car.specs.batteryCapacity} kWh` : 'N/A') : car.fuelType },
+                      { icon: 'local_gas_station', label: car.fuelType === 'Electric' ? 'Range' : 'Mileage', val: car.fuelType === 'Electric' ? (car.specs?.range ? `${car.specs.range} KM` : 'N/A') : (car.specs?.mileage || 'N/A') },
+                      { icon: 'oil_barrel', label: car.fuelType === 'Electric' ? 'Charging Time' : 'Fuel Tank', val: car.fuelType === 'Electric' ? (car.specs?.chargingTime ? `${car.specs.chargingTime} hrs` : 'N/A') : (car.specs?.fuelTankCapacity ? `${car.specs.fuelTankCapacity} L` : 'N/A') },
+                      { icon: 'event_seat', label: 'Seating Capacity', val: car.specs?.seats ? `${car.specs.seats} Persons` : 'N/A' },
+                      { icon: 'shutter_speed', label: 'Top Speed', val: car.specs?.topSpeed ? `${car.specs.topSpeed} KM/H` : 'N/A' },
+                      { icon: 'tire_repair', label: 'Tyre Size', val: car.specs?.tyreSize || 'N/A' },
+                    ].filter(s => s.val !== 'N/A').map((s, i) => (
                       <div key={i} className="col-6 col-md-4">
-                        <div className="p-3 bg-surface-container-high rounded-3 border border-secondary h-100">
-                          <span className="d-block font-mono text-on-surface-variant text-uppercase" style={{ fontSize: '10px' }}>{s.label}</span>
-                          <span className="font-body fw-bold">{s.val}</span>
+                        <div className="p-3 bg-surface-container-high rounded-3 border border-secondary h-100 d-flex align-items-center gap-3">
+                          <span className="material-symbols-outlined text-primary" style={{ fontSize: '22px' }}>{s.icon}</span>
+                          <div>
+                            <span className="d-block font-mono text-on-surface-variant text-uppercase" style={{ fontSize: '10px' }}>{s.label}</span>
+                            <span className="font-body fw-bold" style={{ fontSize: '14px' }}>{s.val}</span>
+                          </div>
                         </div>
                       </div>
                     ))}
@@ -299,7 +316,7 @@ const CarDetail: React.FC = () => {
                       ]}>
                         <CartesianGrid strokeDasharray="3 3" stroke="#424754" vertical={false} />
                         <XAxis dataKey="year" stroke="#c2c6d6" tick={{ fontFamily: 'JetBrains Mono', fontSize: 12 }} />
-                        <YAxis stroke="#c2c6d6" tickFormatter={(value) => `$${value/1000}k`} tick={{ fontFamily: 'JetBrains Mono', fontSize: 12 }} />
+                        <YAxis stroke="#c2c6d6" tickFormatter={(value) => formatPKR(value)} tick={{ fontFamily: 'JetBrains Mono', fontSize: 10 }} />
                         <Tooltip contentStyle={{ backgroundColor: '#1d2027', borderColor: '#424754', color: '#e1e2ec' }} />
                         <Bar dataKey="value" fill="var(--secondary)" radius={[4, 4, 0, 0]} />
                       </BarChart>
@@ -335,7 +352,8 @@ const CarDetail: React.FC = () => {
                 {showReviewForm && (
                   <ReviewForm 
                     onSubmit={handleAddReview} 
-                    onCancel={() => setShowReviewForm(false)} 
+                    onCancel={() => setShowReviewForm(false)}
+                    isEV={car.fuelType === 'Electric'}
                   />
                 )}
 

@@ -5,6 +5,7 @@ import { Car, FilterState } from '../../types';
 import { ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, Radar, Tooltip, Legend, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 import jsPDF from 'jspdf';
 import { generateCarReport } from '../../utils/pdfGenerator';
+import { formatPriceRange } from '../../utils/formatPrice';
 import './Compare.css';
 
 const Compare: React.FC = () => {
@@ -99,12 +100,11 @@ const Compare: React.FC = () => {
     doc.setFont('', 'normal');
     
     const specs = [
-      ['Price', `$${selectedCar1.price.toLocaleString()}`, `$${selectedCar2.price.toLocaleString()}`],
+      ['Price', formatPriceRange(selectedCar1.price, selectedCar1.priceMax), formatPriceRange(selectedCar2.price, selectedCar2.priceMax)],
       ['Engine', `${selectedCar1.specs?.engine || 'N/A'}`, `${selectedCar2.specs?.engine || 'N/A'}`],
       ['Horsepower', `${selectedCar1.specs?.horsepower || 'N/A'} HP`, `${selectedCar2.specs?.horsepower || 'N/A'} HP`],
-      ['Torque', `${selectedCar1.specs?.torque || 'N/A'} lb-ft`, `${selectedCar2.specs?.torque || 'N/A'} lb-ft`],
-      ['City MPG', `${selectedCar1.specs?.mileage_city || 'N/A'} MPG`, `${selectedCar2.specs?.mileage_city || 'N/A'} MPG`],
-      ['Safety Rating', `${selectedCar1.safetyRating}/5`, `${selectedCar2.safetyRating}/5`],
+      ['Torque', `${selectedCar1.specs?.torque || 'N/A'} Nm`, `${selectedCar2.specs?.torque || 'N/A'} Nm`],
+      ['Seats', `${selectedCar1.specs?.seats || 5}`, `${selectedCar2.specs?.seats || 5}`],
     ];
     
     specs.forEach((spec, index) => {
@@ -125,17 +125,15 @@ const Compare: React.FC = () => {
 
   const radarData = [
     { subject: 'Performance', car1: selectedCar1?.specs?.horsepower || 0, car2: selectedCar2?.specs?.horsepower || 0, fullMark: 500 },
-    { subject: 'Comfort', car1: 80, car2: 85, fullMark: 100 }, // Mocked since we don't have comfort metric in Car schema
-    { subject: 'Efficiency', car1: selectedCar1?.specs?.mileage_city || 0, car2: selectedCar2?.specs?.mileage_city || 0, fullMark: 150 },
-    { subject: 'Safety', car1: (selectedCar1?.safetyRating || 0) * 20, car2: (selectedCar2?.safetyRating || 0) * 20, fullMark: 100 },
+    { subject: 'Torque', car1: selectedCar1?.specs?.torque || 0, car2: selectedCar2?.specs?.torque || 0, fullMark: 700 },
+    { subject: 'Seats', car1: (selectedCar1?.specs?.seats || 5) * 20, car2: (selectedCar2?.specs?.seats || 5) * 20, fullMark: 160 },
     { subject: 'Value', car1: 200000 / (selectedCar1?.price || 50000), car2: 200000 / (selectedCar2?.price || 50000), fullMark: 10 },
   ];
 
   const barData = [
     { name: 'Horsepower', car1: selectedCar1?.specs?.horsepower || 0, car2: selectedCar2?.specs?.horsepower || 0 },
     { name: 'Torque', car1: selectedCar1?.specs?.torque || 0, car2: selectedCar2?.specs?.torque || 0 },
-    { name: 'City MPG', car1: selectedCar1?.specs?.mileage_city || 0, car2: selectedCar2?.specs?.mileage_city || 0 },
-    { name: 'Safety Rating', car1: selectedCar1?.safetyRating || 0, car2: selectedCar2?.safetyRating || 0 },
+    { name: 'Seats', car1: selectedCar1?.specs?.seats || 5, car2: selectedCar2?.specs?.seats || 5 },
   ];
 
   return (
@@ -163,8 +161,8 @@ const Compare: React.FC = () => {
               <div className="mt-4 text-center fade-in-up">
                 <img src={selectedCar1.images[0]} alt={selectedCar1.model} className="img-fluid rounded-4 mb-3 object-fit-cover" style={{ height: '200px', width: '100%' }} />
                 <h3 className="font-heading text-on-surface h4">{selectedCar1.make} {selectedCar1.model}</h3>
-                <span className="font-mono text-primary fw-bold fs-5 d-block mb-3">${selectedCar1.price.toLocaleString()}</span>
-                <button className="btn btn-sm btn-outline-primary" onClick={() => generateCarReport(selectedCar1, [])}>Download Dossier</button>
+                <span className="font-mono text-primary fw-bold fs-5 d-block mb-3">{formatPriceRange(selectedCar1.price, selectedCar1.priceMax)}</span>
+                <button className="btn btn-sm btn-outline-primary" onClick={() => generateCarReport(selectedCar1, [])}>Download Report</button>
               </div>
             )}
           </div>
@@ -182,8 +180,8 @@ const Compare: React.FC = () => {
               <div className="mt-4 text-center fade-in-up">
                 <img src={selectedCar2.images[0]} alt={selectedCar2.model} className="img-fluid rounded-4 mb-3 object-fit-cover" style={{ height: '200px', width: '100%' }} />
                 <h3 className="font-heading text-on-surface h4">{selectedCar2.make} {selectedCar2.model}</h3>
-                <span className="font-mono text-secondary fw-bold fs-5 d-block mb-3">${selectedCar2.price.toLocaleString()}</span>
-                <button className="btn btn-sm btn-outline-secondary" onClick={() => generateCarReport(selectedCar2, [])}>Download Dossier</button>
+                <span className="font-mono text-secondary fw-bold fs-5 d-block mb-3">{formatPriceRange(selectedCar2.price, selectedCar2.priceMax)}</span>
+                <button className="btn btn-sm btn-outline-secondary" onClick={() => generateCarReport(selectedCar2, [])}>Download Report</button>
               </div>
             )}
           </div>
@@ -212,7 +210,7 @@ const Compare: React.FC = () => {
           </div>
 
           <div className="chart-wrapper text-center mb-5">
-            <h3 className="font-heading text-on-surface mb-4">Performance Metrics Comparison</h3>
+            <h3 className="font-heading text-on-surface mb-4">Specs Comparison</h3>
             <div style={{ width: '100%', height: 350 }}>
               <ResponsiveContainer>
                 <BarChart data={barData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
@@ -277,36 +275,25 @@ const Compare: React.FC = () => {
                 <tr>
                   <th className="compare-row-header">Market Value</th>
                   <td className={`compare-cell ${isWinner(selectedCar1.price, selectedCar2.price, false) === 1 ? 'compare-winner' : ''}`}>
-                    ${selectedCar1.price.toLocaleString()}
+                    {formatPriceRange(selectedCar1.price, selectedCar1.priceMax)}
                   </td>
                   <td className={`compare-cell ${isWinner(selectedCar1.price, selectedCar2.price, false) === 2 ? 'compare-winner' : ''}`}>
-                    ${selectedCar2.price.toLocaleString()}
+                    {formatPriceRange(selectedCar2.price, selectedCar2.priceMax)}
                   </td>
                 </tr>
-                {/* Powertrain */}
+                {/* Engine */}
                 <tr>
-                  <th className="compare-row-header">Powertrain</th>
+                  <th className="compare-row-header">Engine</th>
                   <td className="compare-cell">{selectedCar1.transmission} / {selectedCar1.fuelType}</td>
                   <td className="compare-cell">{selectedCar2.transmission} / {selectedCar2.fuelType}</td>
                 </tr>
-                {/* Drivetrain */}
+                {/* Drive Type */}
                 <tr>
-                  <th className="compare-row-header">Drivetrain</th>
+                  <th className="compare-row-header">Drive Type</th>
                   <td className="compare-cell">{selectedCar1.specs?.drivetrain || 'N/A'}</td>
                   <td className="compare-cell">{selectedCar2.specs?.drivetrain || 'N/A'}</td>
                 </tr>
-                {/* Safety */}
-                <tr>
-                  <th className="compare-row-header">Safety Rating</th>
-                  <td className={`compare-cell ${isWinner(selectedCar1.safetyRating, selectedCar2.safetyRating) === 1 ? 'compare-winner' : ''}`}>
-                    {selectedCar1.safetyRating}/5
-                    {isWinner(selectedCar1.safetyRating, selectedCar2.safetyRating) === 1 && <span className="compare-winner-badge">WINNER</span>}
-                  </td>
-                  <td className={`compare-cell ${isWinner(selectedCar1.safetyRating, selectedCar2.safetyRating) === 2 ? 'compare-winner' : ''}`}>
-                    {selectedCar2.safetyRating}/5
-                    {isWinner(selectedCar1.safetyRating, selectedCar2.safetyRating) === 2 && <span className="compare-winner-badge">WINNER</span>}
-                  </td>
-                </tr>
+
               </tbody>
             </table>
           </div>

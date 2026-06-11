@@ -5,17 +5,18 @@ import './Reviews.css';
 interface ReviewFormProps {
   onSubmit: (data: { title: string; subScores: SubScores; comment: string }) => Promise<void>;
   onCancel: () => void;
+  isEV?: boolean;
 }
 
-const ReviewForm: React.FC<ReviewFormProps> = ({ onSubmit, onCancel }) => {
+const ReviewForm: React.FC<ReviewFormProps> = ({ onSubmit, onCancel, isEV }) => {
   const [title, setTitle] = useState('');
   const [comment, setComment] = useState('');
   const [subScores, setSubScores] = useState<SubScores>({
-    comfort: 5,
-    reliability: 5,
-    fuelEconomy: 5,
-    valueMoney: 5,
-    resaleValue: 5
+    style: 3,
+    comfort: 3,
+    fuelEconomy: 3,
+    performance: 3,
+    valueMoney: 3
   });
   const [loading, setLoading] = useState(false);
 
@@ -33,12 +34,12 @@ const ReviewForm: React.FC<ReviewFormProps> = ({ onSubmit, onCancel }) => {
     }
   };
 
-  const labels = {
-    comfort: 'Comfort & Tech',
-    reliability: 'Reliability',
-    fuelEconomy: 'Fuel Economy',
-    valueMoney: 'Value for Money',
-    resaleValue: 'Resale Value'
+  const labels: Record<keyof SubScores, string> = {
+    style: 'Style',
+    comfort: 'Comfort',
+    fuelEconomy: isEV ? 'Battery & Range' : 'Fuel Economy',
+    performance: 'Performance',
+    valueMoney: 'Value for Money'
   };
 
   return (
@@ -59,20 +60,20 @@ const ReviewForm: React.FC<ReviewFormProps> = ({ onSubmit, onCancel }) => {
       </div>
 
       <div className="mb-4">
-        <label className="form-label font-mono text-uppercase text-on-surface-variant small fw-bold mb-3">Rate Categories (1-10)</label>
+        <label className="form-label font-mono text-uppercase text-on-surface-variant small fw-bold mb-3">Rate Categories (1-5)</label>
         <div className="row g-3">
           {(Object.keys(subScores) as Array<keyof SubScores>).map(key => (
             <div className="col-md-6" key={key}>
               <div className="p-3 border border-secondary rounded-3">
                 <div className="d-flex justify-content-between align-items-center mb-2">
                   <span className="fw-bold">{labels[key]}</span>
-                  <span className="badge bg-primary fs-6">{subScores[key]}/10</span>
+                  <span className="badge bg-primary fs-6">{subScores[key]}/5</span>
                 </div>
                 <input 
                   type="range" 
                   className="form-range" 
                   min="1" 
-                  max="10" 
+                  max="5" 
                   value={subScores[key]} 
                   onChange={e => handleScoreChange(key, Number(e.target.value))} 
                 />

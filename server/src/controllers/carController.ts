@@ -88,6 +88,42 @@ export const getCars = async (req: Request, res: Response) => {
   }
 };
 
+// Get public stats for homepage
+export const getPublicStats = async (req: Request, res: Response) => {
+  try {
+    const totalCars = await Car.countDocuments();
+    // Assuming Review model is imported or can be queried. We need to import Review if not already imported.
+    const mongoose = require('mongoose');
+    const Review = mongoose.models.Review || mongoose.model('Review');
+    const totalReviews = await Review.countDocuments();
+    
+    // We can also count Users or anything else if needed, but let's stick to cars and reviews
+    res.json({ success: true, data: { totalCars, totalReviews } });
+  } catch (error: any) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// Get filter options (dynamic brands & fuel types from DB)
+export const getFilterOptions = async (req: Request, res: Response) => {
+  try {
+    const brands = await Car.distinct('make');
+    const fuelTypes = await Car.distinct('fuelType');
+    const bodyTypes = await Car.distinct('bodyType');
+    
+    res.json({ 
+      success: true, 
+      data: { 
+        brands: brands.sort(), 
+        fuelTypes: fuelTypes.sort(),
+        bodyTypes: bodyTypes.filter(Boolean).sort()
+      } 
+    });
+  } catch (error: any) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 // Get single car by ID
 export const getCarById = async (req: Request, res: Response) => {
   try {
@@ -149,6 +185,12 @@ export const addCar = async (req: Request, res: Response) => {
 
     carData.images = imageUrls.slice(0, MAX_IMAGES);
 
+    // Auto-set engine for EVs
+    if (carData.fuelType === 'Electric' && (!carData.specs?.engine || carData.specs.engine === '')) {
+      if (!carData.specs) carData.specs = {};
+      carData.specs.engine = 'Electric Motor';
+    }
+
     const car = await Car.create(carData);
 
     res.status(201).json({ success: true, data: car });
@@ -191,6 +233,12 @@ export const updateCar = async (req: Request, res: Response) => {
       updateData.images = [...(updateData.images || []), ...newImageUrls].slice(0, MAX_IMAGES);
     } else if (updateData.images) {
       updateData.images = updateData.images.slice(0, MAX_IMAGES);
+    }
+
+    // Auto-set engine for EVs
+    if (updateData.fuelType === 'Electric' && (!updateData.specs?.engine || updateData.specs.engine === '')) {
+      if (!updateData.specs) updateData.specs = {};
+      updateData.specs.engine = 'Electric Motor';
     }
 
     const existingCar = await Car.findById(req.params.id);

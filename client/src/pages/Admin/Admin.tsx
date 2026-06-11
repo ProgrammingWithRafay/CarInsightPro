@@ -4,9 +4,9 @@ import { supportService } from '../../services/supportService';
 import api from '../../services/api';
 import { useToast } from '../../hooks/useToast';
 import { AdminStats, User, Car } from '../../types';
-import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 import Modal from '../../components/Modal/Modal';
 import AdminCarForm from './AdminCarForm';
+import { formatPriceRange } from '../../utils/formatPrice';
 import './Admin.css';
 
 interface SupportMessage {
@@ -162,15 +162,7 @@ const Admin: React.FC = () => {
     loadCars();
   };
 
-  const trendData = [
-    { name: 'Jan', users: 400, cars: 240 },
-    { name: 'Feb', users: 300, cars: 139 },
-    { name: 'Mar', users: 200, cars: 980 },
-    { name: 'Apr', users: 278, cars: 390 },
-    { name: 'May', users: 189, cars: 480 },
-    { name: 'Jun', users: 239, cars: 380 },
-    { name: 'Jul', users: 349, cars: 430 },
-  ];
+
 
   if (loading) {
     return (
@@ -227,19 +219,16 @@ const Admin: React.FC = () => {
           {/* OVERVIEW TAB */}
           {activeTab === 'overview' && stats && (
             <div className="fade-in-up">
-              <div className="d-flex justify-content-between align-items-center mb-4">
+              <div className="mb-4">
                 <h2 className="font-heading m-0">Dashboard Overview</h2>
-                <button className="btn btn-primary d-flex align-items-center gap-2 active-glow" onClick={handleOpenAddModal}>
-                  <span className="material-symbols-outlined fs-5">add</span> Add Entry
-                </button>
               </div>
               
               <div className="row g-4 mb-4">
                 {[
-                  { title: 'Total Users', value: stats.totalUsers, trend: `+${stats.usersTrend}%`, icon: 'group', color: 'primary' },
-                  { title: 'Total Cars', value: stats.totalCars, trend: `+${stats.carsTrend}%`, icon: 'directions_car', color: 'secondary' },
-                  { title: 'Total Reviews', value: stats.totalReviews, trend: '+12%', icon: 'analytics', color: 'tertiary' },
-                  { title: 'Reports Generated', value: stats.totalReports || '15K+', trend: '+5%', icon: 'description', color: 'primary' }
+                  { title: 'Total Users', value: stats.totalUsers, icon: 'group', color: 'primary' },
+                  { title: 'Total Cars', value: stats.totalCars, icon: 'directions_car', color: 'secondary' },
+                  { title: 'Total Reviews', value: stats.totalReviews, icon: 'analytics', color: 'tertiary' },
+                  { title: 'Support Tickets', value: stats.totalTickets, icon: 'support_agent', color: 'primary' }
                 ].map((stat, i) => (
                   <div className="col-sm-6 col-lg-3" key={i}>
                     <div className="admin-stat-card-stitch h-100">
@@ -247,29 +236,12 @@ const Admin: React.FC = () => {
                         <div className={`admin-stat-icon-wrapper bg-${stat.color} bg-opacity-10 text-${stat.color}`}>
                           <span className="material-symbols-outlined">{stat.icon}</span>
                         </div>
-                        <span className="admin-stat-trend positive">{stat.trend}</span>
                       </div>
                       <h3 className="mb-1 font-heading display-6 fw-bold">{stat.value}</h3>
                       <span className="text-on-surface-variant font-mono text-uppercase" style={{ fontSize: '10px' }}>{stat.title}</span>
                     </div>
                   </div>
                 ))}
-              </div>
-
-              <div className="glass-panel p-4 rounded-4">
-                <h5 className="font-heading mb-4">Growth Telemetry</h5>
-                <div style={{ width: '100%', height: 350 }}>
-                  <ResponsiveContainer>
-                    <LineChart data={trendData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#424754" vertical={false} />
-                      <XAxis dataKey="name" stroke="#c2c6d6" tick={{ fontFamily: 'JetBrains Mono', fontSize: 12 }} />
-                      <YAxis stroke="#c2c6d6" tick={{ fontFamily: 'JetBrains Mono', fontSize: 12 }} />
-                      <Tooltip contentStyle={{ backgroundColor: '#1d2027', borderColor: '#424754' }} />
-                      <Line type="monotone" dataKey="users" stroke="var(--primary)" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} />
-                      <Line type="monotone" dataKey="cars" stroke="var(--secondary)" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
               </div>
             </div>
           )}
@@ -374,7 +346,7 @@ const Admin: React.FC = () => {
                               <small className="text-on-surface-variant">{car.model}</small>
                             </td>
                             <td>{car.year}</td>
-                            <td className="font-mono text-success">${car.price.toLocaleString()}</td>
+                            <td className="font-mono text-success">{formatPriceRange(car.price, car.priceMax)}</td>
                             <td className="text-end">
                               <button 
                                 className="btn btn-sm btn-outline-primary me-2"

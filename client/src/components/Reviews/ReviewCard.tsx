@@ -15,7 +15,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review, onHelpful, currentUserI
     const stars = [];
     for (let i = 1; i <= 5; i++) {
       stars.push(
-        <span key={i} className={`material-symbols-outlined fs-6 ${i <= (rating/2) ? 'text-warning' : 'text-on-surface-variant'}`}>
+        <span key={i} className={`material-symbols-outlined fs-6 ${i <= rating ? 'text-warning' : 'text-on-surface-variant'}`}>
           star
         </span>
       );
@@ -47,7 +47,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review, onHelpful, currentUserI
           </div>
         </div>
         <div className="text-end text-primary fw-bold fs-4">
-          {(review.rating / 2).toFixed(1)} <span className="fs-6 text-on-surface-variant fw-normal">/ 5.0</span>
+          {review.rating.toFixed(1)} <span className="fs-6 text-on-surface-variant fw-normal">/ 5.0</span>
         </div>
       </div>
 
@@ -57,24 +57,24 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review, onHelpful, currentUserI
       {review.subScores && (
         <div className="review-subscores d-flex flex-wrap gap-2 mb-3 mt-3 p-3 bg-surface-container rounded-3">
           <div className="badge border border-secondary text-on-surface px-3 py-2">
-            <span className="text-on-surface-variant small me-2">Comfort</span> 
-            <span className="fw-bold text-primary">{review.subScores.comfort}/10</span>
+            <span className="text-on-surface-variant small me-2">Style</span> 
+            <span className="fw-bold text-primary">{review.subScores.style}/5</span>
           </div>
           <div className="badge border border-secondary text-on-surface px-3 py-2">
-            <span className="text-on-surface-variant small me-2">Reliability</span> 
-            <span className="fw-bold text-primary">{review.subScores.reliability}/10</span>
+            <span className="text-on-surface-variant small me-2">Comfort</span> 
+            <span className="fw-bold text-primary">{review.subScores.comfort}/5</span>
           </div>
           <div className="badge border border-secondary text-on-surface px-3 py-2">
             <span className="text-on-surface-variant small me-2">Fuel</span> 
-            <span className="fw-bold text-primary">{review.subScores.fuelEconomy}/10</span>
+            <span className="fw-bold text-primary">{review.subScores.fuelEconomy}/5</span>
+          </div>
+          <div className="badge border border-secondary text-on-surface px-3 py-2">
+            <span className="text-on-surface-variant small me-2">Performance</span> 
+            <span className="fw-bold text-primary">{review.subScores.performance}/5</span>
           </div>
           <div className="badge border border-secondary text-on-surface px-3 py-2">
             <span className="text-on-surface-variant small me-2">Value</span> 
-            <span className="fw-bold text-primary">{review.subScores.valueMoney}/10</span>
-          </div>
-          <div className="badge border border-secondary text-on-surface px-3 py-2">
-            <span className="text-on-surface-variant small me-2">Resale</span> 
-            <span className="fw-bold text-primary">{review.subScores.resaleValue}/10</span>
+            <span className="fw-bold text-primary">{review.subScores.valueMoney}/5</span>
           </div>
         </div>
       )}

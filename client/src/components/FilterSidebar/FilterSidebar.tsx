@@ -1,21 +1,35 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { FilterState } from '../../types';
 import './FilterSidebar.css';
+import axios from 'axios';
 
 interface FilterSidebarProps {
   filters: FilterState;
   setFilters: React.Dispatch<React.SetStateAction<FilterState>>;
 }
 
-const BRANDS = [
-  'Audi', 'BMW', 'Chevrolet', 'Ford', 'Honda', 'Hyundai', 'Jeep', 'Kia',
-  'Lexus', 'Mazda', 'Mercedes', 'Nissan', 'Porsche', 'Subaru', 'Tesla',
-  'Toyota', 'Volkswagen', 'Volvo'
-];
-const FUEL_TYPES = ['Petrol', 'Diesel', 'Electric', 'Hybrid'];
-
 const FilterSidebar: React.FC<FilterSidebarProps> = ({ filters, setFilters }) => {
-  
+  const [brands, setBrands] = useState<string[]>([]);
+  const [fuelTypes, setFuelTypes] = useState<string[]>([]);
+
+  // Fetch brands & fuel types from database
+  useEffect(() => {
+    const fetchOptions = async () => {
+      try {
+        const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/cars/filter-options`);
+        if (res.data.success) {
+          setBrands(res.data.data.brands || []);
+          setFuelTypes(res.data.data.fuelTypes || []);
+        }
+      } catch {
+        // Fallback if API fails
+        setBrands([]);
+        setFuelTypes(['Petrol', 'Diesel', 'Hybrid', 'Electric', 'Petrol & Hybrid']);
+      }
+    };
+    fetchOptions();
+  }, []);
+
   const handleReset = () => {
     setFilters({
       search: '',
@@ -26,7 +40,6 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({ filters, setFilters }) =>
       priceMax: '',
       fuelType: [],
       transmission: '',
-      safetyRating: '',
       sortBy: 'price-asc',
       page: 1
     });
@@ -76,7 +89,7 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({ filters, setFilters }) =>
       <div className="d-flex flex-column gap-2">
         <h4 className="filter-section-title">BRAND</h4>
         <div className="d-flex flex-column gap-2" style={{ maxHeight: '200px', overflowY: 'auto' }}>
-          {BRANDS.map(brand => (
+          {brands.length > 0 ? brands.map(brand => (
             <label key={brand} className="filter-checkbox-label">
               <input 
                 className="filter-checkbox" 
@@ -86,7 +99,9 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({ filters, setFilters }) =>
               />
               <span>{brand}</span>
             </label>
-          ))}
+          )) : (
+            <span className="text-on-surface-variant small">Loading...</span>
+          )}
         </div>
       </div>
 
@@ -97,7 +112,7 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({ filters, setFilters }) =>
           <input 
             type="number" 
             className="filter-range-input" 
-            placeholder="Min $"
+            placeholder="Min PKR"
             value={filters.priceMin || ''}
             onChange={(e) => setFilters(prev => ({ ...prev, priceMin: e.target.value ? Number(e.target.value) : '' }))}
           />
@@ -105,7 +120,7 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({ filters, setFilters }) =>
           <input 
             type="number" 
             className="filter-range-input" 
-            placeholder="Max $"
+            placeholder="Max PKR"
             value={filters.priceMax || ''}
             onChange={(e) => setFilters(prev => ({ ...prev, priceMax: e.target.value ? Number(e.target.value) : '' }))}
           />
@@ -114,9 +129,9 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({ filters, setFilters }) =>
 
       {/* Fuel Type */}
       <div className="d-flex flex-column gap-2">
-        <h4 className="filter-section-title">POWERTRAIN</h4>
+        <h4 className="filter-section-title">FUEL TYPE</h4>
         <div className="d-flex flex-column gap-2">
-          {FUEL_TYPES.map(fuel => (
+          {fuelTypes.length > 0 ? fuelTypes.map(fuel => (
             <label key={fuel} className="filter-checkbox-label">
               <input 
                 className="filter-checkbox" 
@@ -126,7 +141,9 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({ filters, setFilters }) =>
               />
               <span>{fuel}</span>
             </label>
-          ))}
+          )) : (
+            <span className="text-on-surface-variant small">Loading...</span>
+          )}
         </div>
       </div>
 

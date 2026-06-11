@@ -22,7 +22,7 @@ const ReviewSummary: React.FC<ReviewSummaryProps> = ({ aggregatedSubScores, tota
     const stars = [];
     for (let i = 1; i <= 5; i++) {
       stars.push(
-        <span key={i} className={`material-symbols-outlined ${i <= (rating/2) ? 'text-warning' : 'text-on-surface-variant'}`}>
+        <span key={i} className={`material-symbols-outlined ${i <= rating ? 'text-warning' : 'text-on-surface-variant'}`}>
           star
         </span>
       );
@@ -30,13 +30,13 @@ const ReviewSummary: React.FC<ReviewSummaryProps> = ({ aggregatedSubScores, tota
     return stars;
   };
 
-  const getPercentage = (score: number) => `${(score / 10) * 100}%`;
+  const getPercentage = (score: number) => `${(score / 5) * 100}%`;
 
   return (
     <div className="review-summary glass-panel p-4 rounded-4">
       <div className="row g-4 align-items-center">
         <div className="col-md-4 text-center border-end border-secondary border-opacity-50">
-          <h2 className="display-3 font-heading text-primary fw-bold mb-0">{(averageRating / 2).toFixed(1)}</h2>
+          <h2 className="display-3 font-heading text-primary fw-bold mb-0">{averageRating.toFixed(1)}</h2>
           <div className="d-flex justify-content-center my-2">
             {renderStars(averageRating)}
           </div>
@@ -47,11 +47,11 @@ const ReviewSummary: React.FC<ReviewSummaryProps> = ({ aggregatedSubScores, tota
           {aggregatedSubScores && (
             <div className="d-flex flex-column gap-3">
               {[
-                { label: 'Comfort & Tech', value: aggregatedSubScores.comfort },
-                { label: 'Reliability', value: aggregatedSubScores.reliability },
+                { label: 'Style', value: aggregatedSubScores.style },
+                { label: 'Comfort', value: aggregatedSubScores.comfort },
                 { label: 'Fuel Economy', value: aggregatedSubScores.fuelEconomy },
-                { label: 'Value for Money', value: aggregatedSubScores.valueMoney },
-                { label: 'Resale Value', value: aggregatedSubScores.resaleValue }
+                { label: 'Performance', value: aggregatedSubScores.performance },
+                { label: 'Value for Money', value: aggregatedSubScores.valueMoney }
               ].map(sub => (
                 <div key={sub.label} className="d-flex align-items-center gap-3">
                   <span className="font-mono text-uppercase small" style={{ width: '130px' }}>{sub.label}</span>

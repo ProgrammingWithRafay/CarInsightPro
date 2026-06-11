@@ -31,7 +31,7 @@ const App: React.FC = () => {
         <AuthProvider>
           <div className="d-flex flex-column min-vh-100">
             <Navbar />
-            <main className="flex-grow-1">
+            <main className="flex-grow-1" style={{ paddingTop: '1rem' }}>
               <Routes>
                 {/* Public Routes */}
                 <Route path="/" element={<Home />} />
@@ -48,31 +48,31 @@ const App: React.FC = () => {
                 <Route path="/contact" element={<Contact />} />
 
                 {/* Protected User Routes */}
-                <Route 
-                  path="/dashboard" 
+                <Route
+                  path="/dashboard"
                   element={
-                    <ProtectedRoute>
+                    <ProtectedRoute userOnly={true}>
                       <Dashboard />
                     </ProtectedRoute>
-                  } 
+                  }
                 />
-                <Route 
-                  path="/matchmaker" 
+                <Route
+                  path="/matchmaker"
                   element={
-                    <ProtectedRoute>
+                    <ProtectedRoute userOnly={true}>
                       <CarQuiz />
                     </ProtectedRoute>
-                  } 
+                  }
                 />
 
                 {/* Protected Admin Routes */}
-                <Route 
-                  path="/admin" 
+                <Route
+                  path="/admin"
                   element={
                     <ProtectedRoute adminOnly={true}>
                       <Admin />
                     </ProtectedRoute>
-                  } 
+                  }
                 />
 
                 {/* 404 Catch-all */}

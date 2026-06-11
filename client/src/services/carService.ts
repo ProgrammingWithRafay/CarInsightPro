@@ -15,7 +15,7 @@ export const carService = {
     if (filters.priceMax) params.append('priceMax', filters.priceMax.toString());
     if (filters.fuelType && filters.fuelType.length > 0) params.append('fuelType', filters.fuelType.join(','));
     if (filters.transmission) params.append('transmission', filters.transmission);
-    if (filters.safetyRating) params.append('safetyRating', filters.safetyRating.toString());
+
     if (filters.sortBy) params.append('sortBy', filters.sortBy);
 
     const response = await api.get<ApiResponse<Car[]>>(`/cars?${params.toString()}`);
@@ -24,6 +24,11 @@ export const carService = {
 
   async getFeatured() {
     const response = await api.get<ApiResponse<Car[]>>('/cars?sortBy=rating-desc&limit=6');
+    return response.data;
+  },
+
+  async getPublicStats() {
+    const response = await api.get<ApiResponse<{ totalCars: number; totalReviews: number }>>('/cars/stats');
     return response.data;
   },
 

@@ -4,12 +4,15 @@ import User from '../models/User';
 import Car from '../models/Car';
 import Review from '../models/Review';
 
+import SupportMessage from '../models/SupportMessage';
+
 // Get admin stats
 export const getStats = async (req: Request, res: Response) => {
   try {
     const totalCars = await Car.countDocuments();
     const totalUsers = await User.countDocuments();
     const totalReviews = await Review.countDocuments();
+    const totalTickets = await SupportMessage.countDocuments();
 
     res.json({
       success: true,
@@ -17,9 +20,7 @@ export const getStats = async (req: Request, res: Response) => {
         totalCars,
         totalUsers,
         totalReviews,
-        totalReports: 15400, // mock static data based on requirements
-        carsTrend: 12,
-        usersTrend: 8
+        totalTickets
       }
     });
   } catch (error: any) {

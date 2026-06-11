@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { carService } from '../../services/carService';
 import { Car } from '../../types';
+import { formatPKR, formatPriceRange } from '../../utils/formatPrice';
 import { ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, Radar, Legend, Tooltip } from 'recharts';
 
 type RecommendedCar = Car & { matchScore: number; matchPercentage: number };
@@ -11,7 +12,7 @@ const CarQuiz: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<RecommendedCar[]>([]);
   
-  const [budget, setBudget] = useState<number>(50000); 
+  const [budget, setBudget] = useState<number>(5000000); 
   const [usage, setUsage] = useState<string>('');
   const [seats, setSeats] = useState<number>(0);
   const [fuelType, setFuelType] = useState<string>('');
@@ -47,7 +48,7 @@ const CarQuiz: React.FC = () => {
         if (axis === 'Comfort') score = (car.specs?.seats || 5) * 15;
         if (axis === 'Efficiency') score = car.fuelType === 'Electric' ? 95 : (car.specs?.mileage_highway || 20) * 2;
         if (axis === 'Value') score = Math.max(100 - (car.price / 1000), 40);
-        if (axis === 'Safety') score = (car.safetyRating || 4) * 20;
+        if (axis === 'Safety') score = (car.specs?.seats || 5) * 15;
         
         dataPoint[car.model] = Math.min(Math.max(score, 0), 100);
       });
@@ -71,19 +72,19 @@ const CarQuiz: React.FC = () => {
             <div className="fade-in">
               <h3 className="mb-4 font-heading">What's your maximum budget?</h3>
               <p className="text-on-surface-variant mb-4">Set your target price range.</p>
-              <h2 className="text-primary text-center mb-4">${budget.toLocaleString()}</h2>
+              <h2 className="text-primary text-center mb-4">{formatPKR(budget)}</h2>
               <input 
                 type="range" 
                 className="form-range" 
-                min="10000" 
-                max="200000" 
-                step="5000" 
+                min="1800000" 
+                max="120000000" 
+                step="500000" 
                 value={budget} 
                 onChange={e => setBudget(Number(e.target.value))} 
               />
               <div className="d-flex justify-content-between text-on-surface-variant small mt-2">
-                <span>$10,000</span>
-                <span>$200,000+</span>
+                <span>PKR 18 Lacs</span>
+                <span>PKR 12 Crore</span>
               </div>
             </div>
           )}
@@ -175,7 +176,7 @@ const CarQuiz: React.FC = () => {
                       <img src={car.images[0] || 'https://via.placeholder.com/400x300'} className="card-img-top object-fit-cover" height="200" alt={car.model} />
                       <div className="card-body p-4 d-flex flex-column">
                         <h4 className="card-title font-heading">{car.year} {car.make} {car.model}</h4>
-                        <p className="text-primary fw-bold fs-5">${car.price.toLocaleString()}</p>
+                        <p className="text-primary fw-bold fs-5">{formatPriceRange(car.price, car.priceMax)}</p>
                         <div className="mt-auto pt-3">
                           <Link to={`/cars/${car._id}`} className="btn btn-outline-primary w-100">View Details</Link>
                         </div>

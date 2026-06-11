@@ -13,7 +13,7 @@ const Footer: React.FC = () => {
               <img src="/logo.png" alt="CarInsight Pro Logo" style={{ height: '30px', width: 'auto', borderRadius: '4px' }} />
               <span className="footer-brand">CarInsight Pro</span>
             </div>
-            <span className="footer-text">© {new Date().getFullYear()} CarInsight Pro. High-Performance Automotive Analytics.</span>
+            <span className="footer-text">© {new Date().getFullYear()} CarInsight Pro. Your car research companion.</span>
           </div>
 
           <div className="d-flex flex-wrap justify-content-center gap-4">

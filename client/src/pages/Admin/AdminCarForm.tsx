@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Car } from '../../types';
 import { adminService } from '../../services/adminService';
 import { useToast } from '../../hooks/useToast';
+import { formatPKR } from '../../utils/formatPrice';
 
 interface AdminCarFormProps {
   car?: Car | null; // If provided, it's edit mode
@@ -10,21 +11,42 @@ interface AdminCarFormProps {
 }
 
 const emptyCarData = {
-  make: '', model: '', year: new Date().getFullYear(), price: 0,
-  fuelType: 'Petrol', transmission: 'Automatic', safetyRating: 5,
+  make: '', model: '', year: new Date().getFullYear(), price: '' as any, priceMax: '' as any,
+  bodyType: '', description: '',
+  fuelType: 'Petrol', transmission: 'Automatic', safetyRating: 0,
   specs: {
-    engine: '', horsepower: 0, torque: 0, displacement: 0, cylinders: 0,
-    drivetrain: 'FWD', mileage_city: 0, mileage_highway: 0,
-    dimensions: { length: 0, width: 0, height: 0, wheelbase: 0 },
-    cargoSpace: 0, curbWeight: 0
+    engine: '', horsepower: '' as any, torque: '' as any, displacement: '' as any,
+    seats: 5, mileage: '',
+    dimensions: { length: '' as any, width: '' as any, height: '' as any },
+    groundClearance: '' as any, bootSpace: '' as any, kerbWeight: '',
+    fuelTankCapacity: '' as any, topSpeed: '' as any, tyreSize: '',
+    // EV fields
+    batteryCapacity: '' as any, chargingTime: '' as any, range: '' as any,
   }
 };
+
+// Helper to convert Lacs/Crore text to raw PKR number
+function parsePriceInput(input: string): number {
+  const clean = input.trim().toLowerCase().replace(/,/g, '');
+  // e.g. "32.5 lac" or "32.5 lakh" or "32.5 lacs"
+  const lacMatch = clean.match(/^([\d.]+)\s*(lac|lacs|lakh|lakhs?)$/);
+  if (lacMatch) return Math.round(parseFloat(lacMatch[1]) * 100000);
+  // e.g. "1.2 crore" or "1.2 cr"
+  const crMatch = clean.match(/^([\d.]+)\s*(crore|crores?|cr)$/);
+  if (crMatch) return Math.round(parseFloat(crMatch[1]) * 10000000);
+  // raw number
+  const num = parseFloat(clean);
+  return isNaN(num) ? 0 : Math.round(num);
+}
 
 const AdminCarForm: React.FC<AdminCarFormProps> = ({ car, onSuccess, onCancel }) => {
   const [formData, setFormData] = useState<Car | typeof emptyCarData>(emptyCarData);
   const [existingImages, setExistingImages] = useState<string[]>([]);
   const [newImages, setNewImages] = useState<File[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [hasPriceRange, setHasPriceRange] = useState(false);
+  const [priceText, setPriceText] = useState('');
+  const [priceMaxText, setPriceMaxText] = useState('');
   const { showToast } = useToast();
 
   useEffect(() => {
@@ -33,10 +55,16 @@ const AdminCarForm: React.FC<AdminCarFormProps> = ({ car, onSuccess, onCancel })
       delete rest._id; delete rest.createdAt; delete rest.reviewCount; delete rest.avgRating; delete rest.views;
       setFormData(rest as unknown as Car);
       setExistingImages(images as string[] || []);
+      // Set price range toggle
+      if ((rest as any).priceMax && (rest as any).priceMax > 0) {
+        setHasPriceRange(true);
+        setPriceMaxText(String((rest as any).priceMax));
+      }
+      setPriceText(String((rest as any).price || 0));
     }
   }, [car]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
     const val = type === 'number' ? Number(value) : value;
 
@@ -67,6 +95,19 @@ const AdminCarForm: React.FC<AdminCarFormProps> = ({ car, onSuccess, onCancel })
     } else {
       setFormData(prev => ({ ...prev, [name]: val } as unknown as Car));
     }
+  };
+
+  // Price handlers
+  const handlePriceChange = (text: string) => {
+    setPriceText(text);
+    const parsed = parsePriceInput(text);
+    setFormData(prev => ({ ...prev, price: parsed } as unknown as Car));
+  };
+
+  const handlePriceMaxChange = (text: string) => {
+    setPriceMaxText(text);
+    const parsed = parsePriceInput(text);
+    setFormData(prev => ({ ...prev, priceMax: parsed } as unknown as Car));
   };
 
   const MAX_IMAGES = 5;
@@ -105,8 +146,11 @@ const AdminCarForm: React.FC<AdminCarFormProps> = ({ car, onSuccess, onCancel })
     try {
       const submitData = new FormData();
       
-      // Pass existing images in the payload
-      const dataToSave = { ...formData, images: existingImages };
+      const dataToSave = { 
+        ...formData, 
+        images: existingImages,
+        priceMax: hasPriceRange ? (formData as Car).priceMax : undefined
+      };
       submitData.append('data', JSON.stringify(dataToSave));
 
       newImages.forEach(file => {
@@ -128,29 +172,89 @@ const AdminCarForm: React.FC<AdminCarFormProps> = ({ car, onSuccess, onCancel })
     }
   };
 
+  const isEV = formData.fuelType === 'Electric';
+
   return (
     <form onSubmit={handleSubmit} className="d-flex flex-column gap-3" style={{ maxHeight: '70vh', overflowY: 'auto', paddingRight: '8px' }}>
       <h6 className="font-heading mb-0 text-primary">General Information</h6>
       <div className="row g-3">
-        <div className="col-md-6">
-          <label className="form-label font-mono small text-uppercase text-on-surface-variant">Make</label>
-          <input type="text" className="form-control" name="make" value={formData.make} onChange={handleChange} required />
+        <div className="col-md-4">
+          <label className="form-label font-mono small text-uppercase text-on-surface-variant">Make (Brand)</label>
+          <input type="text" className="form-control" name="make" value={formData.make} onChange={handleChange} required placeholder="e.g. Toyota" />
         </div>
-        <div className="col-md-6">
+        <div className="col-md-4">
           <label className="form-label font-mono small text-uppercase text-on-surface-variant">Model</label>
-          <input type="text" className="form-control" name="model" value={formData.model} onChange={handleChange} required />
+          <input type="text" className="form-control" name="model" value={formData.model} onChange={handleChange} required placeholder="e.g. Corolla" />
         </div>
-        <div className="col-md-3">
+        <div className="col-md-2">
           <label className="form-label font-mono small text-uppercase text-on-surface-variant">Year</label>
           <input type="number" className="form-control" name="year" value={formData.year} onChange={handleChange} required />
         </div>
-        <div className="col-md-3">
-          <label className="form-label font-mono small text-uppercase text-on-surface-variant">Price ($)</label>
-          <input type="number" className="form-control" name="price" value={formData.price} onChange={handleChange} required />
-        </div>
         <div className="col-md-2">
-          <label className="form-label font-mono small text-uppercase text-on-surface-variant">Safety</label>
-          <input type="number" className="form-control" name="safetyRating" value={formData.safetyRating} onChange={handleChange} min={1} max={5} required />
+          <label className="form-label font-mono small text-uppercase text-on-surface-variant">Body Type</label>
+          <select className="form-select" name="bodyType" value={formData.bodyType || ''} onChange={handleChange}>
+            <option value="">Select</option>
+            <option value="Sedan">Sedan</option>
+            <option value="Hatchback">Hatchback</option>
+            <option value="SUV">SUV</option>
+            <option value="Crossover">Crossover</option>
+            <option value="Compact SUV">Compact SUV</option>
+            <option value="Pickup">Pickup</option>
+            <option value="MPV">MPV</option>
+            <option value="Coupe">Coupe</option>
+            <option value="Station Wagon">Wagon</option>
+          </select>
+        </div>
+      </div>
+
+      <div className="row g-3 align-items-end">
+        <div className={hasPriceRange ? 'col-md-3' : 'col-md-4'}>
+          <label className="form-label font-mono small text-uppercase text-on-surface-variant">
+            {hasPriceRange ? 'Price Min' : 'Price (PKR)'}
+          </label>
+          <input 
+            type="text" 
+            className="form-control" 
+            value={priceText} 
+            onChange={e => handlePriceChange(e.target.value)} 
+            required 
+            placeholder="e.g. 32.5 Lac or 1.2 Crore" 
+          />
+          {formData.price > 0 && (
+            <small className="text-primary font-mono mt-1 d-block">{formatPKR(formData.price)}</small>
+          )}
+        </div>
+        {hasPriceRange && (
+          <div className="col-md-3">
+            <label className="form-label font-mono small text-uppercase text-on-surface-variant">Price Max</label>
+            <input 
+              type="text" 
+              className="form-control" 
+              value={priceMaxText} 
+              onChange={e => handlePriceMaxChange(e.target.value)} 
+              placeholder="e.g. 38 Lac" 
+            />
+            {(formData as Car).priceMax && (formData as Car).priceMax! > 0 && (
+              <small className="text-primary font-mono mt-1 d-block">{formatPKR((formData as Car).priceMax!)}</small>
+            )}
+          </div>
+        )}
+        <div className="col-md-2">
+          <label className="form-check-label font-mono small text-on-surface-variant d-flex align-items-center gap-2 mb-2">
+            <input 
+              type="checkbox" 
+              className="form-check-input" 
+              checked={hasPriceRange} 
+              onChange={e => {
+                setHasPriceRange(e.target.checked);
+                if (!e.target.checked) {
+                  setPriceMaxText('');
+                  setFormData(prev => ({ ...prev, priceMax: 0 } as unknown as Car));
+                }
+              }} 
+            />
+            Price Range?
+          </label>
         </div>
         <div className="col-md-2">
           <label className="form-label font-mono small text-uppercase text-on-surface-variant">Fuel Type</label>
@@ -162,85 +266,113 @@ const AdminCarForm: React.FC<AdminCarFormProps> = ({ car, onSuccess, onCancel })
           </select>
         </div>
         <div className="col-md-2">
-          <label className="form-label font-mono small text-uppercase text-on-surface-variant">Trans.</label>
+          <label className="form-label font-mono small text-uppercase text-on-surface-variant">Transmission</label>
           <select className="form-select" name="transmission" value={formData.transmission} onChange={handleChange}>
-            <option value="Automatic">Auto</option>
+            <option value="Automatic">Automatic</option>
             <option value="Manual">Manual</option>
+            <option value="Manual & Automatic">Manual & Automatic</option>
           </select>
+        </div>
+
+      </div>
+
+      <div className="row g-3">
+        <div className="col-12">
+          <label className="form-label font-mono small text-uppercase text-on-surface-variant">Description</label>
+          <textarea className="form-control" name="description" value={(formData as Car).description || ''} onChange={handleChange} rows={2} placeholder="Short description of the car..." />
         </div>
       </div>
 
       <hr className="border-secondary my-2" />
-      <h6 className="font-heading mb-0 text-primary">Engine & Performance</h6>
+      <h6 className="font-heading mb-0 text-primary">{isEV ? 'Motor & Performance' : 'Engine & Performance'}</h6>
       
       <div className="row g-3">
-        <div className="col-md-4">
-          <label className="form-label font-mono small text-uppercase text-on-surface-variant">Engine</label>
-          <input type="text" className="form-control" name="specs.engine" value={formData.specs.engine} onChange={handleChange} required />
+        <div className="col-md-3">
+          <label className="form-label font-mono small text-uppercase text-on-surface-variant">{isEV ? 'Motor Type' : 'Engine'}</label>
+          <input type="text" className="form-control" name="specs.engine" value={formData.specs.engine || ''} onChange={handleChange} placeholder={isEV ? 'e.g. Electric Motor' : 'e.g. 1.8L'} />
         </div>
         <div className="col-md-2">
           <label className="form-label font-mono small text-uppercase text-on-surface-variant">HP</label>
-          <input type="number" className="form-control" name="specs.horsepower" value={formData.specs.horsepower} onChange={handleChange} required />
+          <input type="number" className="form-control" name="specs.horsepower" value={formData.specs.horsepower || ''} onChange={handleChange} />
         </div>
         <div className="col-md-2">
-          <label className="form-label font-mono small text-uppercase text-on-surface-variant">Torque</label>
-          <input type="number" className="form-control" name="specs.torque" value={formData.specs.torque} onChange={handleChange} />
+          <label className="form-label font-mono small text-uppercase text-on-surface-variant">Torque (Nm)</label>
+          <input type="number" className="form-control" name="specs.torque" value={formData.specs.torque || ''} onChange={handleChange} />
         </div>
-        <div className="col-md-2">
-          <label className="form-label font-mono small text-uppercase text-on-surface-variant">Displ.</label>
-          <input type="number" className="form-control" name="specs.displacement" value={formData.specs.displacement} onChange={handleChange} />
-        </div>
-        <div className="col-md-2">
-          <label className="form-label font-mono small text-uppercase text-on-surface-variant">Cyl.</label>
-          <input type="number" className="form-control" name="specs.cylinders" value={formData.specs.cylinders} onChange={handleChange} />
+        {!isEV && (
+          <div className="col-md-2">
+            <label className="form-label font-mono small text-uppercase text-on-surface-variant">Displ. (cc)</label>
+            <input type="number" className="form-control" name="specs.displacement" value={formData.specs.displacement || ''} onChange={handleChange} />
+          </div>
+        )}
+        <div className="col-md-3">
+          <label className="form-label font-mono small text-uppercase text-on-surface-variant">Top Speed (KM/H)</label>
+          <input type="number" className="form-control" name="specs.topSpeed" value={formData.specs.topSpeed || ''} onChange={handleChange} />
         </div>
       </div>
 
       <div className="row g-3">
-        <div className="col-md-2">
-          <label className="form-label font-mono small text-uppercase text-on-surface-variant">Drivetrain</label>
-          <select className="form-select" name="specs.drivetrain" value={formData.specs.drivetrain} onChange={handleChange}>
-            <option value="FWD">FWD</option>
-            <option value="RWD">RWD</option>
-            <option value="AWD">AWD</option>
-          </select>
+        <div className="col-md-3">
+          <label className="form-label font-mono small text-uppercase text-on-surface-variant">Mileage</label>
+          <input type="text" className="form-control" name="specs.mileage" value={formData.specs.mileage || ''} onChange={handleChange} placeholder="e.g. 14 - 22 KM/L" />
         </div>
         <div className="col-md-2">
-          <label className="form-label font-mono small text-uppercase text-on-surface-variant">MPG City</label>
-          <input type="number" className="form-control" name="specs.mileage_city" value={formData.specs.mileage_city} onChange={handleChange} />
+          <label className="form-label font-mono small text-uppercase text-on-surface-variant">Seats</label>
+          <input type="number" className="form-control" name="specs.seats" value={formData.specs.seats || 5} onChange={handleChange} />
         </div>
         <div className="col-md-2">
-          <label className="form-label font-mono small text-uppercase text-on-surface-variant">MPG Hwy</label>
-          <input type="number" className="form-control" name="specs.mileage_highway" value={formData.specs.mileage_highway} onChange={handleChange} />
+          <label className="form-label font-mono small text-uppercase text-on-surface-variant">{isEV ? 'Battery (kWh)' : 'Fuel Tank (L)'}</label>
+          {isEV ? (
+            <input type="number" className="form-control" name="specs.batteryCapacity" value={formData.specs.batteryCapacity || ''} onChange={handleChange} />
+          ) : (
+            <input type="number" className="form-control" name="specs.fuelTankCapacity" value={formData.specs.fuelTankCapacity || ''} onChange={handleChange} />
+          )}
+        </div>
+        <div className="col-md-2">
+          <label className="form-label font-mono small text-uppercase text-on-surface-variant">Boot Space (L)</label>
+          <input type="number" className="form-control" name="specs.bootSpace" value={formData.specs.bootSpace || ''} onChange={handleChange} />
         </div>
         <div className="col-md-3">
-          <label className="form-label font-mono small text-uppercase text-on-surface-variant">Cargo (cu.ft)</label>
-          <input type="number" className="form-control" name="specs.cargoSpace" value={formData.specs.cargoSpace} onChange={handleChange} />
-        </div>
-        <div className="col-md-3">
-          <label className="form-label font-mono small text-uppercase text-on-surface-variant">Curb Wt (lbs)</label>
-          <input type="number" className="form-control" name="specs.curbWeight" value={formData.specs.curbWeight} onChange={handleChange} />
+          <label className="form-label font-mono small text-uppercase text-on-surface-variant">Tyre Size</label>
+          <input type="text" className="form-control" name="specs.tyreSize" value={formData.specs.tyreSize || ''} onChange={handleChange} placeholder="e.g. 195/60/R16" />
         </div>
       </div>
+
+      {isEV && (
+        <div className="row g-3">
+          <div className="col-md-3">
+            <label className="form-label font-mono small text-uppercase text-on-surface-variant">Range (KM)</label>
+            <input type="number" className="form-control" name="specs.range" value={formData.specs.range || ''} onChange={handleChange} />
+          </div>
+          <div className="col-md-3">
+            <label className="form-label font-mono small text-uppercase text-on-surface-variant">Charging Time (hrs)</label>
+            <input type="number" className="form-control" name="specs.chargingTime" value={formData.specs.chargingTime || ''} onChange={handleChange} step="0.5" />
+          </div>
+        </div>
+      )}
 
       <hr className="border-secondary my-2" />
-      <h6 className="font-heading mb-0 text-primary">Dimensions (in.)</h6>
+      <h6 className="font-heading mb-0 text-primary">Dimensions (mm) & Weight</h6>
       <div className="row g-3">
-        <div className="col-md-3">
+        <div className="col-md-2">
           <label className="form-label font-mono small text-uppercase text-on-surface-variant">Length</label>
-          <input type="number" className="form-control" name="specs.dimensions.length" value={formData.specs.dimensions.length} onChange={handleChange} />
+          <input type="number" className="form-control" name="specs.dimensions.length" value={formData.specs.dimensions?.length || ''} onChange={handleChange} />
         </div>
-        <div className="col-md-3">
+        <div className="col-md-2">
           <label className="form-label font-mono small text-uppercase text-on-surface-variant">Width</label>
-          <input type="number" className="form-control" name="specs.dimensions.width" value={formData.specs.dimensions.width} onChange={handleChange} />
+          <input type="number" className="form-control" name="specs.dimensions.width" value={formData.specs.dimensions?.width || ''} onChange={handleChange} />
         </div>
-        <div className="col-md-3">
+        <div className="col-md-2">
           <label className="form-label font-mono small text-uppercase text-on-surface-variant">Height</label>
-          <input type="number" className="form-control" name="specs.dimensions.height" value={formData.specs.dimensions.height} onChange={handleChange} />
+          <input type="number" className="form-control" name="specs.dimensions.height" value={formData.specs.dimensions?.height || ''} onChange={handleChange} />
         </div>
         <div className="col-md-3">
-          <label className="form-label font-mono small text-uppercase text-on-surface-variant">Wheelbase</label>
-          <input type="number" className="form-control" name="specs.dimensions.wheelbase" value={formData.specs.dimensions.wheelbase} onChange={handleChange} />
+          <label className="form-label font-mono small text-uppercase text-on-surface-variant">Ground Clear. (mm)</label>
+          <input type="number" className="form-control" name="specs.groundClearance" value={formData.specs.groundClearance || ''} onChange={handleChange} />
+        </div>
+        <div className="col-md-3">
+          <label className="form-label font-mono small text-uppercase text-on-surface-variant">Kerb Weight</label>
+          <input type="text" className="form-control" name="specs.kerbWeight" value={formData.specs.kerbWeight || ''} onChange={handleChange} placeholder="e.g. 1050 KG" />
         </div>
       </div>
 

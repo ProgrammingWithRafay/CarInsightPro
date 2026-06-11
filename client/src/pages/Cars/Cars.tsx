@@ -31,7 +31,6 @@ const Cars: React.FC = () => {
     priceMax: searchParams.get('priceMax') ? Number(searchParams.get('priceMax')) : '',
     fuelType: searchParams.get('fuelType') ? searchParams.get('fuelType')!.split(',') : [],
     transmission: searchParams.get('transmission') || '',
-    safetyRating: searchParams.get('safetyRating') ? Number(searchParams.get('safetyRating')) : '',
     sortBy: searchParams.get('sortBy') || 'price-asc',
     page: searchParams.get('page') ? Number(searchParams.get('page')) : 1
   }));
@@ -50,7 +49,6 @@ const Cars: React.FC = () => {
     if (filters.priceMax) params.priceMax = String(filters.priceMax);
     if (filters.fuelType.length > 0) params.fuelType = filters.fuelType.join(',');
     if (filters.transmission) params.transmission = filters.transmission;
-    if (filters.safetyRating) params.safetyRating = String(filters.safetyRating);
     if (filters.sortBy && filters.sortBy !== 'price-asc') params.sortBy = filters.sortBy;
     setSearchParams(params, { replace: true });
   }, [filters, setSearchParams]);

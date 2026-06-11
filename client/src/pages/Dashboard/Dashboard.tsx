@@ -327,7 +327,7 @@ const Dashboard: React.FC = () => {
                 <div className="glass-panel p-4 rounded-4">
                   <div className="text-center py-5 opacity-50">
                     <span className="material-symbols-outlined fs-1 mb-2">analytics</span>
-                    <p className="m-0">No analytical reviews posted.</p>
+                    <p className="m-0">No reviews yet.</p>
                   </div>
                 </div>
               </section>

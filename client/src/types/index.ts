@@ -1,24 +1,32 @@
 export interface CarSpecs {
-  engine: string;
-  horsepower: number;
-  torque: number;
-  displacement: number;
-  cylinders: number;
-  drivetrain: string;
-  mileage_city: number;
-  mileage_highway: number;
-  dimensions: {
+  engine?: string;
+  horsepower?: number;
+  torque?: number;
+  displacement?: number;
+  cylinders?: number;
+  drivetrain?: string;
+  mileage_city?: number;
+  mileage_highway?: number;
+  mileage?: string; // e.g. "14 - 22 KM/L"
+  dimensions?: {
     length: number;
     width: number;
     height: number;
-    wheelbase: number;
+    wheelbase?: number;
   };
-  cargoSpace: number;
-  curbWeight: number;
+  groundClearance?: number; // mm
+  bootSpace?: number; // liters
+  kerbWeight?: string; // e.g. "995 - 1050 KG"
+  fuelTankCapacity?: number; // liters
+  topSpeed?: number; // km/h
+  tyreSize?: string;
   seats?: number;
   batteryCapacity?: number; // kWh
   chargingTime?: number; // hours
-  range?: number; // miles
+  range?: number; // km
+  // Legacy
+  cargoSpace?: number;
+  curbWeight?: number;
 }
 
 export interface Car {
@@ -27,8 +35,11 @@ export interface Car {
   model: string;
   year: number;
   price: number;
-  fuelType: 'Petrol' | 'Diesel' | 'Hybrid' | 'Electric';
-  transmission: 'Automatic' | 'Manual';
+  priceMax?: number;
+  description?: string;
+  bodyType?: string;
+  fuelType: 'Petrol' | 'Diesel' | 'Hybrid' | 'Electric' | 'Petrol & Hybrid';
+  transmission: 'Automatic' | 'Manual' | 'Manual & Automatic';
   specs: CarSpecs;
   safetyRating: number;
   images: string[];
@@ -50,11 +61,11 @@ export interface User {
 }
 
 export interface SubScores {
+  style: number;
   comfort: number;
-  reliability: number;
   fuelEconomy: number;
+  performance: number;
   valueMoney: number;
-  resaleValue: number;
 }
 
 export interface Review {
@@ -107,7 +118,6 @@ export interface FilterState {
   priceMax: number | '';
   fuelType: string[];
   transmission: string;
-  safetyRating: number | '';
   sortBy: string;
   search: string;
   page: number;
@@ -125,7 +135,5 @@ export interface AdminStats {
   totalCars: number;
   totalUsers: number;
   totalReviews: number;
-  totalReports: number;
-  carsTrend: number;
-  usersTrend: number;
+  totalTickets: number;
 }

@@ -8,22 +8,30 @@ import './Home.css';
 
 const Home: React.FC = () => {
   const [featuredCars, setFeaturedCars] = useState<Car[]>([]);
+  const [stats, setStats] = useState({ totalCars: 0, totalReviews: 0 });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchFeatured = async () => {
+    const fetchData = async () => {
       try {
-        const res = await carService.getFeatured();
-        if (res.success) {
-          setFeaturedCars(res.data);
+        const [featuredRes, statsRes] = await Promise.all([
+          carService.getFeatured(),
+          carService.getPublicStats()
+        ]);
+        
+        if (featuredRes.success) {
+          setFeaturedCars(featuredRes.data);
+        }
+        if (statsRes.success) {
+          setStats(statsRes.data);
         }
       } catch {
-        console.error('Failed to load featured cars');
+        console.error('Failed to load home page data');
       } finally {
         setLoading(false);
       }
     };
-    fetchFeatured();
+    fetchData();
   }, []);
 
   return (
@@ -57,18 +65,13 @@ const Home: React.FC = () => {
       <section className="px-3 px-md-5 stats-bar-wrapper">
         <div className="p-4 p-md-5 rounded-4 d-flex flex-wrap justify-content-around align-items-center gap-4 max-w-container-max mx-auto" style={{ backgroundColor: 'var(--surface-container)', border: '1px solid var(--outline-variant)' }}>
           <div className="stat-item">
-            <div className="stat-value"><Counter end={150} suffix="k+" /></div>
+            <div className="stat-value"><Counter end={stats.totalCars} suffix="+" /></div>
             <div className="stat-label">Cars Listed</div>
           </div>
           <div className="stat-divider d-none d-md-block"></div>
           <div className="stat-item">
-            <div className="stat-value"><Counter end={200} suffix="k+" /></div>
+            <div className="stat-value"><Counter end={stats.totalReviews} suffix="+" /></div>
             <div className="stat-label">User Reviews</div>
-          </div>
-          <div className="stat-divider d-none d-md-block"></div>
-          <div className="stat-item">
-            <div className="stat-value"><Counter end={12} suffix="ms" /></div>
-            <div className="stat-label">Fast Loading</div>
           </div>
         </div>
       </section>

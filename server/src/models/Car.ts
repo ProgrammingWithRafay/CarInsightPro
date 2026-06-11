@@ -6,29 +6,40 @@ export interface CarDocument extends Omit<Document, 'model'> {
   model: string;
   year: number;
   price: number;
+  priceMax?: number;
+  description?: string;
+  bodyType?: string;
   fuelType: 'Petrol' | 'Diesel' | 'Hybrid' | 'Electric';
   transmission: 'Automatic' | 'Manual';
   specs: {
     engine: string;
     horsepower: number;
     torque: number;
-    displacement: number;
-    cylinders: number;
-    drivetrain: string;
-    mileage_city: number;
-    mileage_highway: number;
-    dimensions: {
+    displacement?: number;
+    cylinders?: number;
+    drivetrain?: string;
+    mileage_city?: number;
+    mileage_highway?: number;
+    mileage?: string; // e.g. "14 - 22 KM/L"
+    dimensions?: {
       length: number;
       width: number;
       height: number;
-      wheelbase: number;
+      wheelbase?: number;
     };
-    cargoSpace: number;
-    curbWeight: number;
+    groundClearance?: number; // mm
+    bootSpace?: number; // liters
+    kerbWeight?: string; // e.g. "995 - 1050 KG"
+    fuelTankCapacity?: number; // liters
+    topSpeed?: number; // km/h
+    tyreSize?: string;
     seats?: number;
     batteryCapacity?: number; // kWh
-    chargingTime?: number; // hours (Level 2)
-    range?: number; // miles
+    chargingTime?: number; // hours
+    range?: number; // km
+    // Legacy fields (kept for backward compat)
+    cargoSpace?: number;
+    curbWeight?: number;
   };
   safetyRating: number;
   images: string[];
@@ -43,39 +54,49 @@ const CarSchema: Schema = new Schema({
   model: { type: String, required: true },
   year: { type: Number, required: true },
   price: { type: Number, required: true },
+  priceMax: { type: Number, required: false },
+  description: { type: String, required: false },
+  bodyType: { type: String, required: false },
   fuelType: { 
     type: String, 
     required: true,
-    enum: ['Petrol', 'Diesel', 'Hybrid', 'Electric']
+    enum: ['Petrol', 'Diesel', 'Hybrid', 'Electric', 'Petrol & Hybrid']
   },
   transmission: {
     type: String,
     required: true,
-    enum: ['Automatic', 'Manual']
+    enum: ['Automatic', 'Manual', 'Manual & Automatic']
   },
   specs: {
-    engine: { type: String, required: true },
-    horsepower: { type: Number, required: true },
-    torque: { type: Number, required: true },
-    displacement: { type: Number, required: true },
-    cylinders: { type: Number, required: true },
-    drivetrain: { type: String, required: true },
-    mileage_city: { type: Number, required: true },
-    mileage_highway: { type: Number, required: true },
+    engine: { type: String, required: false, default: '' },
+    horsepower: { type: Number, required: false, default: 0 },
+    torque: { type: Number, required: false, default: 0 },
+    displacement: { type: Number, required: false },
+    cylinders: { type: Number, required: false },
+    drivetrain: { type: String, required: false },
+    mileage_city: { type: Number, required: false },
+    mileage_highway: { type: Number, required: false },
+    mileage: { type: String, required: false },
     dimensions: {
-      length: { type: Number, required: true },
-      width: { type: Number, required: true },
-      height: { type: Number, required: true },
-      wheelbase: { type: Number, required: true }
+      length: { type: Number, required: false },
+      width: { type: Number, required: false },
+      height: { type: Number, required: false },
+      wheelbase: { type: Number, required: false }
     },
-    cargoSpace: { type: Number, required: true },
-    curbWeight: { type: Number, required: true },
+    groundClearance: { type: Number, required: false },
+    bootSpace: { type: Number, required: false },
+    kerbWeight: { type: String, required: false },
+    fuelTankCapacity: { type: Number, required: false },
+    topSpeed: { type: Number, required: false },
+    tyreSize: { type: String, required: false },
     seats: { type: Number, default: 5 },
     batteryCapacity: { type: Number, required: false },
     chargingTime: { type: Number, required: false },
-    range: { type: Number, required: false }
+    range: { type: Number, required: false },
+    cargoSpace: { type: Number, required: false },
+    curbWeight: { type: Number, required: false }
   },
-  safetyRating: { type: Number, required: true, min: 1, max: 5 },
+  safetyRating: { type: Number, required: false, default: 0, min: 0, max: 5 },
   images: { type: [String], default: [] },
   avgRating: { type: Number, default: 0 },
   reviewCount: { type: Number, default: 0 },

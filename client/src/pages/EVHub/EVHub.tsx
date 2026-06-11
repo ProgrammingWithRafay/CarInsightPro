@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { carService } from '../../services/carService';
 import { Car, FilterState } from '../../types';
+import { formatPriceRange } from '../../utils/formatPrice';
 import { ResponsiveContainer, ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import './EVHub.css'; // Optional
 
@@ -35,6 +36,7 @@ const EVHub: React.FC = () => {
       capacity: c.specs.batteryCapacity,
       range: c.specs.range,
       price: c.price,
+      priceMax: c.priceMax,
       type: c.fuelType
     }));
 
@@ -100,7 +102,7 @@ const EVHub: React.FC = () => {
                               <p className="m-0 small text-on-surface-variant">Type: {data.type}</p>
                               <p className="m-0 small text-on-surface-variant">Battery: {data.capacity} kWh</p>
                               <p className="m-0 small text-on-surface-variant">Range: {data.range} miles</p>
-                              <p className="m-0 fw-bold mt-2">${data.price.toLocaleString()}</p>
+                              <p className="m-0 fw-bold mt-2">{formatPriceRange(data.price, data.priceMax)}</p>
                             </div>
                           );
                         }
@@ -139,7 +141,7 @@ const EVHub: React.FC = () => {
                 <div className="card-body p-4 d-flex flex-column">
                   <div className="d-flex justify-content-between align-items-start mb-2">
                     <h4 className="card-title font-heading m-0">{car.year} {car.make} {car.model}</h4>
-                    <span className="fw-bold text-primary fs-5">${car.price.toLocaleString()}</span>
+                    <span className="fw-bold text-primary fs-5">{formatPriceRange(car.price, car.priceMax)}</span>
                   </div>
                   
                   <div className="d-flex gap-3 mb-4 mt-3">

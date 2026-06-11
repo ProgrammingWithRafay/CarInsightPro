@@ -9,22 +9,22 @@ export const getReviews = async (req: Request, res: Response) => {
     const reviews = await Review.find({ car: req.params.carId }).populate('user', 'name avatar').sort('-createdAt');
     
     // Calculate aggregated subScores
-    let aggregatedSubScores = { comfort: 0, reliability: 0, fuelEconomy: 0, valueMoney: 0, resaleValue: 0 };
+    let aggregatedSubScores = { style: 0, comfort: 0, fuelEconomy: 0, performance: 0, valueMoney: 0 };
     if (reviews.length > 0) {
       reviews.forEach(r => {
         if (r.subScores) {
+          aggregatedSubScores.style += r.subScores.style || 0;
           aggregatedSubScores.comfort += r.subScores.comfort;
-          aggregatedSubScores.reliability += r.subScores.reliability;
           aggregatedSubScores.fuelEconomy += r.subScores.fuelEconomy;
+          aggregatedSubScores.performance += r.subScores.performance || 0;
           aggregatedSubScores.valueMoney += r.subScores.valueMoney;
-          aggregatedSubScores.resaleValue += r.subScores.resaleValue;
         }
       });
+      aggregatedSubScores.style /= reviews.length;
       aggregatedSubScores.comfort /= reviews.length;
-      aggregatedSubScores.reliability /= reviews.length;
       aggregatedSubScores.fuelEconomy /= reviews.length;
+      aggregatedSubScores.performance /= reviews.length;
       aggregatedSubScores.valueMoney /= reviews.length;
-      aggregatedSubScores.resaleValue /= reviews.length;
     }
 
     res.json({ success: true, data: { reviews, aggregatedSubScores } });

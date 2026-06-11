@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Car } from '../../types';
+import { formatPriceRange } from '../../utils/formatPrice';
 import './CarCard.css';
 
 interface CarCardProps {
@@ -42,7 +43,7 @@ const CarCard: React.FC<CarCardProps> = ({ car, onBookmark, isBookmarked = false
         <div className="car-card-content">
           <div className="d-flex justify-content-between align-items-start gap-2">
             <h4 className="car-card-title text-truncate">{car.year} {car.make} {car.model}</h4>
-            <span className="car-card-price">${car.price.toLocaleString()}</span>
+            <span className="car-card-price">{formatPriceRange(car.price, car.priceMax)}</span>
           </div>
           
           <div className="car-card-specs">

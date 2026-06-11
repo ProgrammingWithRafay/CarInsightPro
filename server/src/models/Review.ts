@@ -7,11 +7,11 @@ export interface ReviewDocument extends Document {
   title: string;
   rating: number;
   subScores: {
+    style: number;
     comfort: number;
-    reliability: number;
     fuelEconomy: number;
+    performance: number;
     valueMoney: number;
-    resaleValue: number;
   };
   comment: string;
   helpful: mongoose.Types.ObjectId[];
@@ -22,13 +22,13 @@ const ReviewSchema: Schema = new Schema({
   car: { type: Schema.Types.ObjectId, ref: 'Car', required: true },
   user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   title: { type: String, required: true },
-  rating: { type: Number, required: true, min: 1, max: 10 },
+  rating: { type: Number, required: true, min: 1, max: 5 },
   subScores: {
-    comfort: { type: Number, required: true, min: 1, max: 10 },
-    reliability: { type: Number, required: true, min: 1, max: 10 },
-    fuelEconomy: { type: Number, required: true, min: 1, max: 10 },
-    valueMoney: { type: Number, required: true, min: 1, max: 10 },
-    resaleValue: { type: Number, required: true, min: 1, max: 10 }
+    style: { type: Number, required: true, min: 1, max: 5 },
+    comfort: { type: Number, required: true, min: 1, max: 5 },
+    fuelEconomy: { type: Number, required: true, min: 1, max: 5 },
+    performance: { type: Number, required: true, min: 1, max: 5 },
+    valueMoney: { type: Number, required: true, min: 1, max: 5 }
   },
   comment: { type: String, required: true },
   helpful: [{ type: Schema.Types.ObjectId, ref: 'User' }]
@@ -38,8 +38,8 @@ const ReviewSchema: Schema = new Schema({
 
 ReviewSchema.pre<ReviewDocument>('validate', function(next) {
   if (this.subScores) {
-    const { comfort, reliability, fuelEconomy, valueMoney, resaleValue } = this.subScores;
-    this.rating = (comfort + reliability + fuelEconomy + valueMoney + resaleValue) / 5;
+    const { style, comfort, fuelEconomy, performance, valueMoney } = this.subScores;
+    this.rating = (style + comfort + fuelEconomy + performance + valueMoney) / 5;
   }
   next();
 });

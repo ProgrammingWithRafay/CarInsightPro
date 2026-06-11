@@ -1,5 +1,6 @@
 import jsPDF from 'jspdf';
 import { Car, Review } from '../types';
+import { formatPriceRange } from './formatPrice';
 
 export const generateCarReport = async (car: Car, reviews: Review[]) => {
   return new Promise<void>((resolve, reject) => {
@@ -13,7 +14,7 @@ export const generateCarReport = async (car: Car, reviews: Review[]) => {
       
       doc.setFontSize(16);
       doc.setTextColor(0, 0, 0);
-      doc.text('Vehicle Intelligence Report', 14, 30);
+      doc.text('Car Report', 14, 30);
       
       doc.setFontSize(10);
       doc.setTextColor(100, 100, 100);
@@ -28,7 +29,7 @@ export const generateCarReport = async (car: Car, reviews: Review[]) => {
       
       doc.setFontSize(14);
       doc.setTextColor(30, 99, 255);
-      doc.text(`Estimated Value: $${car.price.toLocaleString()}`, 14, 65);
+      doc.text(`Price: ${formatPriceRange(car.price, car.priceMax)}`, 14, 65);
 
       let currentY = 80;
 
@@ -44,11 +45,11 @@ export const generateCarReport = async (car: Car, reviews: Review[]) => {
         ['Engine', car.specs?.engine || 'N/A'],
         ['Power', car.specs?.horsepower ? `${car.specs.horsepower} HP / ${car.specs.torque} lb-ft` : 'N/A'],
         ['Transmission', car.transmission],
-        ['Drivetrain', car.specs?.drivetrain || 'N/A'],
+        ['Drive Type', car.specs?.drivetrain || 'N/A'],
         ['Fuel Economy', car.specs?.mileage_city ? `${car.specs.mileage_city} City / ${car.specs.mileage_highway} Hwy MPG` : 'N/A'],
         ['Fuel Type', car.fuelType],
         ['Weight', car.specs?.curbWeight ? `${car.specs.curbWeight} lbs` : 'N/A'],
-        ['Safety Rating', `${car.safetyRating} / 5 Stars`]
+        ['Seats', car.specs?.seats ? `${car.specs.seats} Persons` : 'N/A']
       ];
 
       if (car.fuelType === 'Electric' || car.fuelType === 'Hybrid') {

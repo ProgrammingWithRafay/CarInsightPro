@@ -24,15 +24,15 @@ const Navbar: React.FC = () => {
           <Link to="/cars" className={`text-decoration-none nav-link-stitch ${isActive('/cars')}`}>Cars</Link>
           <Link to="/compare" className={`text-decoration-none nav-link-stitch ${isActive('/compare')}`}>Compare</Link>
           <Link to="/ev-hub" className={`text-decoration-none nav-link-stitch ${isActive('/ev-hub')}`}>EV Hub</Link>
-          {user && <Link to="/matchmaker" className={`text-decoration-none nav-link-stitch ${isActive('/matchmaker')}`}>Matchmaker</Link>}
-          {user && <Link to="/dashboard" className={`text-decoration-none nav-link-stitch ${isActive('/dashboard')}`}>Dashboard</Link>}
-          {user?.role === 'admin' && <Link to="/admin" className={`text-decoration-none nav-link-stitch ${isActive('/admin')}`}>Admin</Link>}
+          {user?.role === 'user' && <Link to="/matchmaker" className={`text-decoration-none nav-link-stitch ${isActive('/matchmaker')}`}>Matchmaker</Link>}
+          {user?.role === 'user' && <Link to="/dashboard" className={`text-decoration-none nav-link-stitch ${isActive('/dashboard')}`}>Dashboard</Link>}
+          {user?.role === 'admin' && <Link to="/admin" className={`text-decoration-none nav-link-stitch ${isActive('/admin')}`}>Admin Panel</Link>}
         </nav>
 
         <div className="d-flex align-items-center gap-3">
           {user ? (
             <>
-              <Link to="/dashboard" className="icon-btn text-decoration-none">
+              <Link to={user.role === 'admin' ? '/admin' : '/dashboard'} className="icon-btn text-decoration-none">
                 <span className="material-symbols-outlined">account_circle</span>
               </Link>
               <button className="btn-signin bg-transparent border border-secondary text-on-surface" onClick={logout}>
@@ -68,9 +68,9 @@ const Navbar: React.FC = () => {
           <Link to="/cars" className="text-decoration-none text-on-surface fs-5 font-heading" data-bs-dismiss="offcanvas">Cars</Link>
           <Link to="/compare" className="text-decoration-none text-on-surface fs-5 font-heading" data-bs-dismiss="offcanvas">Compare</Link>
           <Link to="/ev-hub" className="text-decoration-none text-on-surface fs-5 font-heading" data-bs-dismiss="offcanvas">EV Hub</Link>
-          {user && <Link to="/matchmaker" className="text-decoration-none text-on-surface fs-5 font-heading" data-bs-dismiss="offcanvas">Matchmaker</Link>}
-          {user && <Link to="/dashboard" className="text-decoration-none text-on-surface fs-5 font-heading" data-bs-dismiss="offcanvas">Dashboard</Link>}
-          {user?.role === 'admin' && <Link to="/admin" className="text-decoration-none text-on-surface fs-5 font-heading" data-bs-dismiss="offcanvas">Admin</Link>}
+          {user?.role === 'user' && <Link to="/matchmaker" className="text-decoration-none text-on-surface fs-5 font-heading" data-bs-dismiss="offcanvas">Matchmaker</Link>}
+          {user?.role === 'user' && <Link to="/dashboard" className="text-decoration-none text-on-surface fs-5 font-heading" data-bs-dismiss="offcanvas">Dashboard</Link>}
+          {user?.role === 'admin' && <Link to="/admin" className="text-decoration-none text-on-surface fs-5 font-heading" data-bs-dismiss="offcanvas">Admin Panel</Link>}
         </div>
       </div>
     </header>
