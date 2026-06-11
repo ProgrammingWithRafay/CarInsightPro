@@ -5,6 +5,7 @@ import { ToastProvider } from './context/ToastContext';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 import Navbar from './components/Navbar/Navbar';
 import Footer from './components/Footer/Footer';
+import ScrollToTop from './components/ScrollToTop';
 
 // Pages
 import Home from './pages/Home/Home';
@@ -27,6 +28,7 @@ import NotFound from './pages/NotFound/NotFound';
 const App: React.FC = () => {
   return (
     <Router>
+      <ScrollToTop />
       <ToastProvider>
         <AuthProvider>
           <div className="d-flex flex-column min-vh-100">

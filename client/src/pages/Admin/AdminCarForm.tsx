@@ -11,17 +11,17 @@ interface AdminCarFormProps {
 }
 
 const emptyCarData = {
-  make: '', model: '', year: new Date().getFullYear(), price: '' as any, priceMax: '' as any,
+  make: '', model: '', year: new Date().getFullYear(), price: '' as unknown as number, priceMax: '' as unknown as number,
   bodyType: '', description: '',
   fuelType: 'Petrol', transmission: 'Automatic', safetyRating: 0,
   specs: {
-    engine: '', horsepower: '' as any, torque: '' as any, displacement: '' as any,
+    engine: '', horsepower: '' as unknown as number, torque: '' as unknown as number, displacement: '' as unknown as number,
     seats: 5, mileage: '',
-    dimensions: { length: '' as any, width: '' as any, height: '' as any },
-    groundClearance: '' as any, bootSpace: '' as any, kerbWeight: '',
-    fuelTankCapacity: '' as any, topSpeed: '' as any, tyreSize: '',
+    dimensions: { length: '' as unknown as number, width: '' as unknown as number, height: '' as unknown as number },
+    groundClearance: '' as unknown as number, bootSpace: '' as unknown as number, kerbWeight: '',
+    fuelTankCapacity: '' as unknown as number, topSpeed: '' as unknown as number, tyreSize: '',
     // EV fields
-    batteryCapacity: '' as any, chargingTime: '' as any, range: '' as any,
+    batteryCapacity: '' as unknown as number, chargingTime: '' as unknown as number, range: '' as unknown as number,
   }
 };
 
@@ -56,11 +56,11 @@ const AdminCarForm: React.FC<AdminCarFormProps> = ({ car, onSuccess, onCancel })
       setFormData(rest as unknown as Car);
       setExistingImages(images as string[] || []);
       // Set price range toggle
-      if ((rest as any).priceMax && (rest as any).priceMax > 0) {
+      if ((rest as Record<string, unknown>).priceMax && ((rest as Record<string, unknown>).priceMax as number) > 0) {
         setHasPriceRange(true);
-        setPriceMaxText(String((rest as any).priceMax));
+        setPriceMaxText(String((rest as Record<string, unknown>).priceMax));
       }
-      setPriceText(String((rest as any).price || 0));
+      setPriceText(String((rest as Record<string, unknown>).price || 0));
     }
   }, [car]);
 
