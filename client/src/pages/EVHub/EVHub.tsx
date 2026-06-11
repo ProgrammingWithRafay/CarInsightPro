@@ -155,7 +155,7 @@ const EVHub: React.FC = () => {
                     </div>
                     <div className="text-center border-start border-secondary ps-3">
                       <div className="font-mono text-on-surface-variant small text-uppercase">0-60 mph</div>
-                      <div className="fw-bold">{car.specs?.horsepower > 300 ? 'Fast' : 'Avg'}</div>
+                      <div className="fw-bold">{(car.specs?.horsepower || 0) > 300 ? 'Fast' : 'Avg'}</div>
                     </div>
                   </div>
 
