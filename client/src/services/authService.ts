@@ -22,6 +22,16 @@ export const authService = {
     return response.data;
   },
 
+  async updateProfile(name: string, email: string) {
+    const response = await api.put<ApiResponse<User>>('/auth/profile', { name, email });
+    return response.data;
+  },
+
+  async evaluateRank(reportsCount: number) {
+    const response = await api.put<ApiResponse<{ rank: 'Bronze'|'Silver'|'Gold', updated: boolean }>>('/auth/evaluate-rank', { reportsCount });
+    return response.data;
+  },
+
   async verifyEmail(token: string) {
     const response = await api.get<ApiResponse<null>>(`/auth/verify/${token}`);
     return response.data;

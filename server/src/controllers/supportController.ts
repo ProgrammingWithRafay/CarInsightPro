@@ -1,11 +1,20 @@
 import { Request, Response } from 'express';
 import SupportMessage from '../models/SupportMessage';
+import User from '../models/User';
 import { sendSupportTicketUpdateEmail, sendSupportTicketCreatedEmail } from '../utils/emailService';
 
 export const createMessage = async (req: Request, res: Response) => {
   try {
     const { name, email, subject, message } = req.body;
-    const userId = req.user?._id; // optionalProtect middleware will set this if logged in
+    let userId = req.user?._id; // optionalProtect middleware will set this if logged in
+
+    // If not logged in but provided an email, check if they are a registered user
+    if (!userId && email) {
+      const existingUser = await User.findOne({ email: email.toLowerCase() });
+      if (existingUser) {
+        userId = existingUser._id;
+      }
+    }
 
     if (!userId && (!name || !email)) {
        return res.status(400).json({ success: false, message: 'Name and email are required for unauthenticated users' });
@@ -19,8 +28,11 @@ export const createMessage = async (req: Request, res: Response) => {
       message
     });
 
-    if (!userId && email) {
-      await sendSupportTicketCreatedEmail(email, name || 'Guest', subject);
+    const targetEmail = userId ? req.user?.email || email : email;
+    const targetName = userId ? req.user?.name || name : (name || 'Guest');
+
+    if (targetEmail) {
+      await sendSupportTicketCreatedEmail(targetEmail, targetName, subject);
     }
 
     res.status(201).json({ success: true, data: newMessage });
@@ -57,16 +69,19 @@ export const updateMessageStatus = async (req: Request, res: Response) => {
        return res.status(400).json({ success: false, message: 'Invalid status' });
     }
 
-    const message = await SupportMessage.findByIdAndUpdate(req.params.id, { status }, { new: true, runValidators: true });
+    const message = await SupportMessage.findByIdAndUpdate(req.params.id, { status }, { new: true, runValidators: true }).populate('user', 'name email');
     
     if (!message) {
       return res.status(404).json({ success: false, message: 'Message not found' });
     }
 
-    if (!message.user && message.email) {
+    const targetEmail = message.user ? (message.user as any).email : message.email;
+    const targetName = message.user ? (message.user as any).name : (message.name || 'Guest');
+
+    if (targetEmail) {
       await sendSupportTicketUpdateEmail(
-        message.email,
-        message.name || 'Guest',
+        targetEmail,
+        targetName,
         message.subject,
         message.status
       );
@@ -82,7 +97,7 @@ export const updateMessageStatus = async (req: Request, res: Response) => {
 export const addReply = async (req: Request, res: Response) => {
   try {
     const { message, status } = req.body;
-    const supportMsg = await SupportMessage.findById(req.params.id);
+    const supportMsg = await SupportMessage.findById(req.params.id).populate('user', 'name email');
     
     if (!supportMsg) {
       return res.status(404).json({ success: false, message: 'Message not found' });
@@ -104,10 +119,13 @@ export const addReply = async (req: Request, res: Response) => {
 
     await supportMsg.save();
 
-    if (!supportMsg.user && supportMsg.email) {
+    const targetEmail = supportMsg.user ? (supportMsg.user as any).email : supportMsg.email;
+    const targetName = supportMsg.user ? (supportMsg.user as any).name : (supportMsg.name || 'Guest');
+
+    if (targetEmail) {
       await sendSupportTicketUpdateEmail(
-        supportMsg.email,
-        supportMsg.name || 'Guest',
+        targetEmail,
+        targetName,
         supportMsg.subject,
         supportMsg.status,
         message
@@ -115,6 +133,19 @@ export const addReply = async (req: Request, res: Response) => {
     }
 
     res.status(200).json({ success: true, data: supportMsg });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: 'Server Error' });
+  }
+};
+
+export const deleteMessage = async (req: Request, res: Response) => {
+  try {
+    const message = await SupportMessage.findByIdAndDelete(req.params.id);
+    if (!message) {
+      return res.status(404).json({ success: false, message: 'Message not found' });
+    }
+    res.status(200).json({ success: true, message: 'Ticket deleted successfully' });
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, message: 'Server Error' });

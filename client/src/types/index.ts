@@ -54,6 +54,7 @@ export interface User {
   name: string;
   email: string;
   role: 'user' | 'admin';
+  rank: 'Bronze' | 'Silver' | 'Gold';
   avatar: string;
   bookmarks: string[];
   isBlocked: boolean;

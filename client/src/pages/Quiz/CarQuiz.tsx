@@ -12,7 +12,7 @@ const CarQuiz: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<RecommendedCar[]>([]);
   
-  const [budget, setBudget] = useState<number>(5000000); 
+  const [budget, setBudget] = useState<number>(2000000); 
   const [usage, setUsage] = useState<string>('');
   const [seats, setSeats] = useState<number>(0);
   const [fuelType, setFuelType] = useState<string>('');
@@ -76,15 +76,15 @@ const CarQuiz: React.FC = () => {
               <input 
                 type="range" 
                 className="form-range" 
-                min="1800000" 
-                max="120000000" 
-                step="500000" 
+                min="300000" 
+                max="100000000" 
+                step="100000" 
                 value={budget} 
                 onChange={e => setBudget(Number(e.target.value))} 
               />
               <div className="d-flex justify-content-between text-on-surface-variant small mt-2">
-                <span>PKR 18 Lacs</span>
-                <span>PKR 12 Crore</span>
+                <span>PKR 3 Lacs</span>
+                <span>PKR 10 Crore</span>
               </div>
             </div>
           )}
@@ -93,13 +93,18 @@ const CarQuiz: React.FC = () => {
             <div className="fade-in">
               <h3 className="mb-4 font-heading">Primary usage?</h3>
               <div className="d-flex flex-column gap-3">
-                {['City', 'Highway', 'Mixed'].map(u => (
+                {[
+                  { value: 'city', label: 'City', desc: 'Daily commute & heavy traffic' },
+                  { value: 'highway', label: 'Highway', desc: 'Long routes & motorways' },
+                  { value: 'mixed', label: 'Mixed', desc: 'All-rounder usage' }
+                ].map(u => (
                   <button 
-                    key={u}
-                    className={`btn p-3 text-start border ${usage === u.toLowerCase() ? 'btn-primary' : 'btn-outline-secondary text-on-surface'}`}
-                    onClick={() => setUsage(u.toLowerCase())}
+                    key={u.value}
+                    className={`btn p-3 text-start border ${usage === u.value ? 'btn-primary' : 'btn-outline-secondary text-on-surface'}`}
+                    onClick={() => setUsage(u.value)}
                   >
-                    <span className="fw-bold">{u} Driving</span>
+                    <span className="fw-bold d-block">{u.label} Driving</span>
+                    <small className={usage === u.value ? 'text-white-50' : 'text-on-surface-variant'}>{u.desc}</small>
                   </button>
                 ))}
               </div>
@@ -110,14 +115,19 @@ const CarQuiz: React.FC = () => {
             <div className="fade-in">
               <h3 className="mb-4 font-heading">Minimum seats required?</h3>
               <div className="row g-3">
-                {[2, 4, 5, 7].map(s => (
-                  <div className="col-6" key={s}>
+                {[
+                  { seats: 4, label: 'Small / Hatchback' },
+                  { seats: 5, label: 'Standard / Sedan' },
+                  { seats: 7, label: 'Large Family / SUV' },
+                  { seats: 8, label: 'Van / Multi-purpose' }
+                ].map(s => (
+                  <div className="col-6" key={s.seats}>
                     <button 
-                      className={`btn w-100 p-4 border ${seats === s ? 'btn-primary' : 'btn-outline-secondary text-on-surface'}`}
-                      onClick={() => setSeats(s)}
+                      className={`btn w-100 p-4 border ${seats === s.seats ? 'btn-primary' : 'btn-outline-secondary text-on-surface'}`}
+                      onClick={() => setSeats(s.seats)}
                     >
-                      <h3 className="m-0 font-heading">{s}{s === 7 ? '+' : ''}</h3>
-                      <span className="small">Seats</span>
+                      <h3 className="m-0 font-heading">{s.seats}{s.seats === 8 ? '+' : ''}</h3>
+                      <span className="small">{s.label}</span>
                     </button>
                   </div>
                 ))}
@@ -129,13 +139,19 @@ const CarQuiz: React.FC = () => {
             <div className="fade-in">
               <h3 className="mb-4 font-heading">Preferred fuel type?</h3>
               <div className="d-flex flex-column gap-3">
-                {['Petrol', 'Diesel', 'Hybrid', 'Electric'].map(f => (
+                {[
+                  { value: 'Petrol', desc: 'Standard choice, easy maintenance' },
+                  { value: 'Hybrid', desc: 'Excellent fuel economy for city' },
+                  { value: 'Diesel', desc: 'Better torque for SUVs & loaders' },
+                  { value: 'Electric', desc: 'Zero emissions, growing trend' }
+                ].map(f => (
                   <button 
-                    key={f}
-                    className={`btn p-3 text-start border ${fuelType === f ? 'btn-primary' : 'btn-outline-secondary text-on-surface'}`}
-                    onClick={() => setFuelType(f)}
+                    key={f.value}
+                    className={`btn p-3 text-start border ${fuelType === f.value ? 'btn-primary' : 'btn-outline-secondary text-on-surface'}`}
+                    onClick={() => setFuelType(f.value)}
                   >
-                    <span className="fw-bold">{f}</span>
+                    <span className="fw-bold d-block">{f.value}</span>
+                    <small className={fuelType === f.value ? 'text-white-50' : 'text-on-surface-variant'}>{f.desc}</small>
                   </button>
                 ))}
               </div>

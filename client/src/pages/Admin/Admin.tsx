@@ -102,6 +102,21 @@ const Admin: React.FC = () => {
     }
   };
 
+  const handleDeleteTicket = async (id: string) => {
+    if (!window.confirm('Are you sure you want to delete this ticket? This action cannot be undone.')) return;
+    
+    try {
+      await supportService.deleteTicket(id);
+      setSupportMessages(supportMessages.filter(m => m._id !== id));
+      if (viewingMessage && viewingMessage._id === id) {
+        setIsMessageModalOpen(false);
+      }
+      showToast('Ticket deleted permanently', 'success');
+    } catch {
+      showToast('Failed to delete ticket', 'error');
+    }
+  };
+
   const handleOpenMessageModal = (msg: SupportMessage) => {
     setViewingMessage(msg);
     setReplyText('');
@@ -419,8 +434,9 @@ const Admin: React.FC = () => {
                                 <button className="btn btn-sm btn-outline-primary me-2" onClick={() => handleUpdateMessageStatus(msg._id, 'Acknowledged')}>Ack</button>
                               )}
                               {msg.status !== 'Resolved' && (
-                                <button className="btn btn-sm btn-outline-success" onClick={() => handleUpdateMessageStatus(msg._id, 'Resolved')}>Resolve</button>
+                                <button className="btn btn-sm btn-outline-success me-2" onClick={() => handleUpdateMessageStatus(msg._id, 'Resolved')}>Resolve</button>
                               )}
+                              <button className="btn btn-sm btn-outline-danger" onClick={() => handleDeleteTicket(msg._id)}>Delete</button>
                             </td>
                           </tr>
                         ))}
@@ -516,6 +532,7 @@ const Admin: React.FC = () => {
                 {viewingMessage.status !== 'Resolved' && (
                   <button className="btn btn-outline-success" onClick={() => handleUpdateMessageStatus(viewingMessage._id, 'Resolved')}>Resolve</button>
                 )}
+                <button className="btn btn-outline-danger" onClick={() => handleDeleteTicket(viewingMessage._id)}>Delete</button>
                 <button className="btn btn-outline-secondary" onClick={() => setIsMessageModalOpen(false)}>Close</button>
               </div>
             </div>

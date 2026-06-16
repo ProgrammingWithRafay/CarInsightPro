@@ -40,10 +40,11 @@ export const registerUser = async (req: Request, res: Response) => {
 
       res.status(201).json({
         success: true,
-        message: 'Registration successful! Please check your email to verify your account.',
+        message: 'Registration successful. Please check your email to verify your account.',
         data: {
           email: user.email,
           requiresVerification: true,
+          rank: user.rank
         }
       });
     } else {
@@ -82,6 +83,7 @@ export const loginUser = async (req: Request, res: Response) => {
           name: user.name,
           email: user.email,
           role: user.role,
+          rank: user.rank,
           avatar: user.avatar,
         }
       });
@@ -190,6 +192,107 @@ export const getMe = async (req: Request, res: Response) => {
       res.status(404);
       throw new Error('User not found');
     }
+  } catch (error: any) {
+    res.status(res.statusCode === 200 ? 500 : res.statusCode).json({ success: false, message: error.message });
+  }
+};
+
+// Update user profile
+export const updateProfile = async (req: Request, res: Response) => {
+  try {
+    const user = await User.findById(req.user?._id);
+    if (!user) {
+      res.status(404);
+      throw new Error('User not found');
+    }
+
+    const { name, email } = req.body;
+
+    // Validate email format if provided
+    if (email) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        res.status(400);
+        throw new Error('Please provide a valid email address.');
+      }
+
+      // Check if email is already taken by another user
+      if (email !== user.email) {
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+          res.status(400);
+          throw new Error('This email address is already registered to another account.');
+        }
+      }
+    }
+
+    user.name = name || user.name;
+    user.email = email || user.email;
+    
+    const updatedUser = await user.save();
+    
+    res.json({
+      success: true,
+      data: {
+        _id: updatedUser._id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        role: updatedUser.role,
+        rank: updatedUser.rank,
+        avatar: updatedUser.avatar,
+      }
+    });
+  } catch (error: any) {
+    res.status(res.statusCode === 200 ? 500 : res.statusCode).json({ success: false, message: error.message });
+  }
+};
+
+// Evaluate and permanently upgrade user rank
+export const evaluateRank = async (req: Request, res: Response) => {
+  try {
+    const user = await User.findById(req.user?._id);
+    if (!user) {
+      res.status(404);
+      throw new Error('User not found');
+    }
+
+    const { reportsCount } = req.body;
+    const numReports = parseInt(reportsCount) || 0;
+    
+    const mongoose = require('mongoose');
+    const Review = mongoose.models.Review || mongoose.model('Review');
+    const reviewsCount = await Review.countDocuments({ user: user._id });
+
+    const bookmarksCount = user.bookmarks.length;
+
+    const rankValues = { 'Bronze': 1, 'Silver': 2, 'Gold': 3 };
+    let currentRankValue = rankValues[user.rank as keyof typeof rankValues] || 1;
+    let newRankValue = currentRankValue;
+
+    if (reviewsCount >= 2) {
+      newRankValue = Math.max(newRankValue, 3);
+    } else if (numReports >= 3 || bookmarksCount >= 5) {
+      newRankValue = Math.max(newRankValue, 2);
+    }
+
+    let updated = false;
+    if (newRankValue > currentRankValue) {
+      const newRankName = Object.keys(rankValues).find(key => rankValues[key as keyof typeof rankValues] === newRankValue);
+      if (newRankName) {
+        user.rank = newRankName as 'Bronze' | 'Silver' | 'Gold';
+        await user.save();
+        updated = true;
+      }
+    }
+
+    res.json({
+      success: true,
+      message: updated ? `Rank upgraded to ${user.rank}!` : 'No upgrade needed.',
+      data: {
+        rank: user.rank,
+        updated
+      }
+    });
   } catch (error: any) {
     res.status(res.statusCode === 200 ? 500 : res.statusCode).json({ success: false, message: error.message });
   }

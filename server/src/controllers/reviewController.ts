@@ -3,6 +3,16 @@ import { Request, Response } from 'express';
 import Review from '../models/Review';
 import Car from '../models/Car';
 
+// Get reviews for current user
+export const getUserReviews = async (req: Request, res: Response) => {
+  try {
+    const reviews = await Review.find({ user: req.user?._id }).populate('car', 'make model year images').sort('-createdAt');
+    res.json({ success: true, data: reviews });
+  } catch (error: any) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 // Get reviews for a specific car
 export const getReviews = async (req: Request, res: Response) => {
   try {

@@ -10,14 +10,11 @@ const updateAdmin = async () => {
   await connectDB();
 
   try {
-    const adminEmail = process.env.SEED_ADMIN_EMAIL || 'admin@carinsight.com';
-
-    if (!process.env.SEED_ADMIN_PASSWORD) {
-      throw new Error('SEED_ADMIN_PASSWORD is missing in .env file!');
-    }
+    const adminEmail = process.env.SEED_ADMIN_EMAIL || 'admin@example.com';
+    const passwordToSet = process.env.SEED_ADMIN_PASSWORD || 'password123';
 
     const salt = await bcrypt.genSalt(10);
-    const adminPassword = await bcrypt.hash(process.env.SEED_ADMIN_PASSWORD, salt);
+    const adminPassword = await bcrypt.hash(passwordToSet, salt);
 
     const user = await User.findOneAndUpdate(
       { email: adminEmail },

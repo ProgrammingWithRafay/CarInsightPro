@@ -6,6 +6,8 @@ interface AuthContextType extends AuthState {
   login: (credentials: LoginCredentials) => Promise<void>;
   register: (credentials: RegisterCredentials) => Promise<unknown>;
   logout: () => Promise<void>;
+  updateProfile: (name: string, email: string) => Promise<void>;
+  evaluateRank: (reportsCount: number) => Promise<void>;
 }
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -56,8 +58,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setIsAuthenticated(false);
   };
 
+  const updateProfile = async (name: string, email: string) => {
+    const res = await authService.updateProfile(name, email);
+    if (res.success) {
+      setUser(res.data);
+    }
+  };
+
+  const evaluateRank = async (reportsCount: number) => {
+    if (!user) return;
+    const res = await authService.evaluateRank(reportsCount);
+    if (res.success && res.data?.updated) {
+      setUser(prev => prev ? { ...prev, rank: res.data!.rank } : null);
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, isLoading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, isLoading, login, register, logout, updateProfile, evaluateRank }}>
       {children}
     </AuthContext.Provider>
   );

@@ -25,6 +25,8 @@ const CarDetail: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [isBookmarked, setIsBookmarked] = useState(false);
+  const [bookmarkLoading, setBookmarkLoading] = useState(false);
 
   const [aggregatedSubScores, setAggregatedSubScores] = useState<SubScores | undefined>();
   const [showReviewForm, setShowReviewForm] = useState(false);
@@ -36,15 +38,20 @@ const CarDetail: React.FC = () => {
   const fetchCarDetails = React.useCallback(async () => {
     setLoading(true);
     try {
-      const [carRes, reviewsRes] = await Promise.all([
+      const [carRes, reviewsRes, bookmarksRes] = await Promise.all([
         carService.getCarById(id!),
-        reviewService.getReviews(id!)
+        reviewService.getReviews(id!),
+        user ? carService.getBookmarks() : Promise.resolve({ success: false, data: [] })
       ]);
       
       if (carRes.success) setCar(carRes.data);
       if (reviewsRes.success && reviewsRes.data) {
         setReviews(reviewsRes.data.reviews || []);
         setAggregatedSubScores(reviewsRes.data.aggregatedSubScores);
+      }
+      if (bookmarksRes.success && bookmarksRes.data) {
+        const bookmarked = bookmarksRes.data.some((b: any) => b._id === id || b === id);
+        setIsBookmarked(bookmarked);
       }
     } catch {
       showToast('Failed to load vehicle telemetry', 'error');
@@ -74,6 +81,30 @@ const CarDetail: React.FC = () => {
       } else {
         showToast('Failed to submit review', 'error');
       }
+    }
+  };
+
+  const handleToggleBookmark = async () => {
+    if (!user) {
+      showToast('Please login to save cars', 'warning');
+      return;
+    }
+    
+    setBookmarkLoading(true);
+    try {
+      if (isBookmarked) {
+        await carService.removeBookmark(id!);
+        setIsBookmarked(false);
+        showToast('Removed from Dashboard', 'info');
+      } else {
+        await carService.addBookmark(id!);
+        setIsBookmarked(true);
+        showToast('Saved to Dashboard', 'success');
+      }
+    } catch {
+      showToast('Failed to update bookmarks', 'error');
+    } finally {
+      setBookmarkLoading(false);
     }
   };
 
@@ -221,8 +252,13 @@ const CarDetail: React.FC = () => {
               </div>
 
               <div className="mt-4 pt-4 border-top border-secondary d-flex flex-column gap-3">
-                <button className="btn btn-primary w-100 py-3 fw-bold d-flex align-items-center justify-content-center gap-2 active-glow">
-                  <span className="material-symbols-outlined">favorite</span> Save to Dashboard
+                <button 
+                  className={`btn w-100 py-3 fw-bold d-flex align-items-center justify-content-center gap-2 active-glow ${isBookmarked ? 'btn-outline-primary text-on-surface' : 'btn-primary'}`}
+                  onClick={handleToggleBookmark}
+                  disabled={bookmarkLoading}
+                >
+                  <span className={`material-symbols-outlined ${isBookmarked ? 'text-primary' : ''}`} style={isBookmarked ? { fontVariationSettings: "'FILL' 1" } : {}}>favorite</span> 
+                  {bookmarkLoading ? 'Updating...' : isBookmarked ? 'Saved to Dashboard' : 'Save to Dashboard'}
                 </button>
                 <button className="btn btn-outline-secondary text-on-surface w-100 py-3 fw-bold d-flex align-items-center justify-content-center gap-2" onClick={handleDownloadReport}>
                   <span className="material-symbols-outlined">download</span> Download Report

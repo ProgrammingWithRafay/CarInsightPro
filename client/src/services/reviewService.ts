@@ -12,6 +12,11 @@ export const reviewService = {
     return response.data;
   },
 
+  async getMyReviews() {
+    const response = await api.get<ApiResponse<Review[]>>('/reviews/user/me');
+    return response.data;
+  },
+
   async addReview(carId: string, data: { title: string; subScores: SubScores; comment: string }) {
     const response = await api.post<ApiResponse<Review>>(`/reviews/${carId}`, data);
     return response.data;

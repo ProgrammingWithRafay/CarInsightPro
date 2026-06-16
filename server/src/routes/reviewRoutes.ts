@@ -1,9 +1,10 @@
 import express from 'express';
-import { getReviews, addReview, updateReview, deleteReview, markHelpful } from '../controllers/reviewController';
+import { getReviews, addReview, updateReview, deleteReview, markHelpful, getUserReviews } from '../controllers/reviewController';
 import { protect } from '../middleware/authMiddleware';
 
 const router = express.Router();
 
+router.get('/user/me', protect, getUserReviews);
 router.get('/:carId', getReviews);
 router.post('/:carId', protect, addReview);
 router.put('/:id', protect, updateReview);

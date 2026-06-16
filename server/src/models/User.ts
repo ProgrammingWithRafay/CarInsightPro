@@ -7,6 +7,7 @@ export interface UserDocument extends Document {
   email: string;
   password?: string;
   role: 'user' | 'admin';
+  rank: 'Bronze' | 'Silver' | 'Gold';
   avatar: string;
   bookmarks: mongoose.Types.ObjectId[];
   isBlocked: boolean;
@@ -24,6 +25,7 @@ const UserSchema: Schema = new Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true, select: false },
   role: { type: String, enum: ['user', 'admin'], default: 'user' },
+  rank: { type: String, enum: ['Bronze', 'Silver', 'Gold'], default: 'Bronze' },
   avatar: { type: String, default: '' },
   bookmarks: [{ type: Schema.Types.ObjectId, ref: 'Car' }],
   isBlocked: { type: Boolean, default: false },

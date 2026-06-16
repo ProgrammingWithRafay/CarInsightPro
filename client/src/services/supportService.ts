@@ -24,5 +24,10 @@ export const supportService = {
   replyToMessage: async (id: string, message: string, status?: 'Open' | 'Acknowledged' | 'Resolved') => {
     const res = await api.post(`/support/${id}/reply`, { message, status });
     return res.data;
+  },
+
+  deleteTicket: async (id: string) => {
+    const res = await api.delete(`/support/${id}`);
+    return res.data;
   }
 };

@@ -112,6 +112,19 @@ export const generateCarReport = async (car: Car, reviews: Review[]) => {
       }
 
       doc.save(`${car.make}_${car.model}_Report.pdf`);
+
+      // Log report to localStorage for the Dashboard
+      const reportLog = {
+        id: Date.now().toString(),
+        carId: car._id,
+        carName: `${car.year} ${car.make} ${car.model}`,
+        date: new Date().toISOString()
+      };
+      
+      const existingReports = JSON.parse(localStorage.getItem('carinsight_reports') || '[]');
+      existingReports.unshift(reportLog);
+      localStorage.setItem('carinsight_reports', JSON.stringify(existingReports.slice(0, 20)));
+
       resolve();
     } catch (error) {
       console.error(error);

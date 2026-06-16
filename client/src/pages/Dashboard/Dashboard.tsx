@@ -4,9 +4,9 @@ import { useAuth } from '../../hooks/useAuth';
 import { useToast } from '../../hooks/useToast';
 import { carService } from '../../services/carService';
 import { supportService } from '../../services/supportService';
+import { reviewService } from '../../services/reviewService';
 import { Car } from '../../types';
 import CarCard from '../../components/CarCard/CarCard';
-import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 import './Dashboard.css';
 
 interface SupportTicket {
@@ -19,17 +19,20 @@ interface SupportTicket {
 }
 
 const Dashboard: React.FC = () => {
-  const { user, logout } = useAuth();
+  const { user, logout, updateProfile, evaluateRank } = useAuth();
   const { showToast } = useToast();
   
   const [activeTab, setActiveTab] = useState('saved');
   const [bookmarks, setBookmarks] = useState<Car[]>([]);
   const [loadingBookmarks, setLoadingBookmarks] = useState(false);
-  const [priceHistoryData, setPriceHistoryData] = useState<{ date: string; price: number }[]>([]);
-  const [selectedCarForHistory, setSelectedCarForHistory] = useState<Car | null>(null);
 
   const [supportTickets, setSupportTickets] = useState<SupportTicket[]>([]);
   const [loadingTickets, setLoadingTickets] = useState(false);
+  
+  const [myReviews, setMyReviews] = useState<any[]>([]);
+  const [loadingReviews, setLoadingReviews] = useState(false);
+  
+  const [reports, setReports] = useState<{id: string, carId: string, carName: string, date: string}[]>([]);
 
   const fetchBookmarks = React.useCallback(async () => {
     setLoadingBookmarks(true);
@@ -59,6 +62,20 @@ const Dashboard: React.FC = () => {
     }
   }, [showToast]);
 
+  const fetchMyReviews = React.useCallback(async () => {
+    setLoadingReviews(true);
+    try {
+      const res = await reviewService.getMyReviews();
+      if (res.success) {
+        setMyReviews(res.data);
+      }
+    } catch {
+      showToast('Failed to load your reviews', 'error');
+    } finally {
+      setLoadingReviews(false);
+    }
+  }, [showToast]);
+
   useEffect(() => {
     if (activeTab === 'saved') {
       fetchBookmarks();
@@ -66,47 +83,69 @@ const Dashboard: React.FC = () => {
     if (activeTab === 'tickets' && supportTickets.length === 0) {
       fetchSupportTickets();
     }
-  }, [activeTab, fetchBookmarks, fetchSupportTickets, supportTickets.length]);
+    if (activeTab === 'reviews' && myReviews.length === 0) {
+      fetchMyReviews();
+    }
+  }, [activeTab, fetchBookmarks, fetchSupportTickets, fetchMyReviews, supportTickets.length, myReviews.length]);
+
+  useEffect(() => {
+    const savedReports = JSON.parse(localStorage.getItem('carinsight_reports') || '[]');
+    setReports(savedReports);
+  }, [activeTab]); // Refresh reports when tab changes
+
+  // Trigger permanent rank evaluation if metrics change
+  useEffect(() => {
+    if (evaluateRank && reports.length >= 0) {
+      evaluateRank(reports.length);
+    }
+  }, [bookmarks.length, myReviews.length, reports.length]);
 
   const handleRemoveBookmark = async (id: string) => {
     try {
+      // Optimistically update the UI immediately
+      setBookmarks(prev => prev.filter(car => car._id !== id));
       await carService.removeBookmark(id);
-      setBookmarks(bookmarks.filter(car => car._id !== id));
       showToast('Car removed from bookmarks', 'info');
-      if (selectedCarForHistory?._id === id) setSelectedCarForHistory(null);
     } catch {
+      // If it fails, we should ideally revert, but a page refresh will sync state
       showToast('Failed to remove bookmark', 'error');
     }
   };
 
-  const handleViewHistory = async (car: Car) => {
-    try {
-      const res = await carService.getCarPriceHistory(car._id);
-      if (res.success) {
-        const history = res.data.map((h: Record<string, unknown>) => ({
-          date: new Date(h.date as string).toLocaleDateString(),
-          price: h.newPrice as number
-        }));
-        
-        // Add current price if there's no history
-        if (history.length === 0) {
-          history.push({
-            date: new Date().toLocaleDateString(),
-            price: car.price
-          });
-        }
-        
-        setPriceHistoryData(history);
-        setSelectedCarForHistory(car);
-      }
-    } catch {
-      showToast('Failed to load price history', 'error');
+  const [profileLoading, setProfileLoading] = useState(false);
+  
+  const userRank = user?.rank || 'Bronze';
+
+  const getRankColor = (rank: string) => {
+    switch (rank) {
+      case 'Gold': return '#FFD700';
+      case 'Silver': return '#C0C0C0';
+      case 'Bronze': return '#CD7F32';
+      default: return 'var(--on-surface-variant)';
     }
   };
 
-  const handleUpdateProfile = (e: React.FormEvent) => {
+  const handleUpdateProfile = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    showToast('Profile updated successfully!', 'success');
+    const form = e.currentTarget;
+    const nameInput = form.elements.namedItem('name') as HTMLInputElement;
+    const emailInput = form.elements.namedItem('email') as HTMLInputElement;
+    
+    if (!nameInput.value || !emailInput.value) {
+      return showToast('Name and email are required', 'error');
+    }
+    
+    setProfileLoading(true);
+    try {
+      if (updateProfile) {
+        await updateProfile(nameInput.value, emailInput.value);
+        showToast('Profile updated successfully!', 'success');
+      }
+    } catch (err: any) {
+      showToast(err.response?.data?.message || 'Failed to update profile', 'error');
+    } finally {
+      setProfileLoading(false);
+    }
   };
 
   return (
@@ -189,11 +228,13 @@ const Dashboard: React.FC = () => {
               </div>
               <div className="d-flex flex-column">
                 <span className="dashboard-stat-label">REPORTS</span>
-                <span className="dashboard-stat-value">0</span>
+                <span className="dashboard-stat-value">{reports.length}</span>
               </div>
               <div className="d-flex flex-column">
                 <span className="dashboard-stat-label">RANK</span>
-                <span className="dashboard-stat-value text-tertiary">Gold</span>
+                <span className="dashboard-stat-value fw-bold" style={{ color: getRankColor(userRank), textShadow: '0 0 10px rgba(0,0,0,0.1)' }}>
+                  {userRank}
+                </span>
               </div>
             </div>
           </header>
@@ -218,10 +259,6 @@ const Dashboard: React.FC = () => {
                           onBookmark={() => handleRemoveBookmark(car._id)} 
                           isBookmarked={true} 
                         />
-                        <button className="btn btn-sm btn-outline-primary w-100 mt-2" onClick={() => handleViewHistory(car)}>
-                          <span className="material-symbols-outlined fs-6 align-middle me-1">trending_up</span>
-                          View Price Trend
-                        </button>
                       </div>
                     ))}
                   </div>
@@ -232,40 +269,34 @@ const Dashboard: React.FC = () => {
                   </div>
                 )}
 
-                {selectedCarForHistory && (
-                  <div className="glass-panel p-4 rounded-4 mt-4 fade-in-up">
-                    <div className="d-flex justify-content-between align-items-center mb-4">
-                      <h4 className="font-heading m-0">Price Trend: {selectedCarForHistory.year} {selectedCarForHistory.make} {selectedCarForHistory.model}</h4>
-                      <button className="btn btn-sm btn-outline-secondary" onClick={() => setSelectedCarForHistory(null)}>Close</button>
-                    </div>
-                    <div style={{ width: '100%', height: 300 }}>
-                      <ResponsiveContainer>
-                        <LineChart data={priceHistoryData} margin={{ top: 10, right: 20, left: 20, bottom: 10 }}>
-                          <CartesianGrid strokeDasharray="3 3" stroke="var(--outline-variant)" />
-                          <XAxis dataKey="date" stroke="var(--on-surface-variant)" />
-                          <YAxis domain={['auto', 'auto']} stroke="var(--on-surface-variant)" tickFormatter={value => `$${value/1000}k`} />
-                          <Tooltip 
-                            contentStyle={{ backgroundColor: 'var(--surface-container-highest)', borderColor: 'var(--outline-variant)', color: 'var(--on-surface)' }}
-                            formatter={(value: number) => `$${value.toLocaleString()}`}
-                          />
-                          <Line type="monotone" dataKey="price" stroke="var(--primary)" strokeWidth={3} dot={{ r: 4, fill: 'var(--primary)' }} activeDot={{ r: 6 }} />
-                        </LineChart>
-                      </ResponsiveContainer>
-                    </div>
-                  </div>
-                )}
               </section>
             )}
 
             {activeTab === 'reports' && (
               <section className="d-flex flex-column gap-3">
                 <h3 className="font-heading h4 m-0">Recent Reports</h3>
-                <div className="glass-panel p-4 rounded-4">
-                  <div className="text-center py-5 opacity-50">
-                    <span className="material-symbols-outlined fs-1 mb-2">history_edu</span>
-                    <p className="m-0">No reports generated yet.</p>
+                {reports.length > 0 ? (
+                  <div className="d-flex flex-column gap-3">
+                    {reports.map(report => (
+                      <div key={report.id} className="glass-panel p-4 rounded-4 d-flex justify-content-between align-items-center">
+                        <div>
+                          <h4 className="font-heading h5 mb-1">{report.carName}</h4>
+                          <span className="text-on-surface-variant small">Generated on {new Date(report.date).toLocaleString()}</span>
+                        </div>
+                        <Link to={`/cars/${report.carId}`} className="btn btn-sm btn-outline-primary">
+                          View Vehicle
+                        </Link>
+                      </div>
+                    ))}
                   </div>
-                </div>
+                ) : (
+                  <div className="glass-panel p-4 rounded-4">
+                    <div className="text-center py-5 opacity-50">
+                      <span className="material-symbols-outlined fs-1 mb-2">history_edu</span>
+                      <p className="m-0">No reports generated yet.</p>
+                    </div>
+                  </div>
+                )}
               </section>
             )}
 
@@ -323,13 +354,44 @@ const Dashboard: React.FC = () => {
 
             {activeTab === 'reviews' && (
               <section className="d-flex flex-column gap-3">
-                <h3 className="font-heading h4 m-0">Analytics & Reviews</h3>
-                <div className="glass-panel p-4 rounded-4">
-                  <div className="text-center py-5 opacity-50">
-                    <span className="material-symbols-outlined fs-1 mb-2">analytics</span>
-                    <p className="m-0">No reviews yet.</p>
+                <h3 className="font-heading h4 m-0">My Analytics & Reviews</h3>
+                {loadingReviews ? (
+                  <div className="text-center py-5">
+                    <div className="spinner-border text-primary" role="status"></div>
                   </div>
-                </div>
+                ) : myReviews.length > 0 ? (
+                  <div className="d-flex flex-column gap-4">
+                    {myReviews.map((review: any) => (
+                      <div key={review._id} className="glass-panel p-4 rounded-4">
+                        <div className="d-flex justify-content-between align-items-start mb-3">
+                          <div className="d-flex align-items-center gap-3">
+                            {review.car?.images?.[0] && (
+                              <img src={review.car.images[0]} alt="car" width="60" height="40" className="rounded object-fit-cover" />
+                            )}
+                            <div>
+                              <h4 className="font-heading h5 m-0 mb-1">{review.car?.year} {review.car?.make} {review.car?.model}</h4>
+                              <div className="d-flex align-items-center gap-1">
+                                <span className="material-symbols-outlined text-tertiary" style={{ fontSize: '16px', fontVariationSettings: "'FILL' 1" }}>star</span>
+                                <span className="fw-bold">{(review.rating / 2).toFixed(1)}</span>
+                                <span className="text-on-surface-variant small ms-2">{new Date(review.createdAt).toLocaleDateString()}</span>
+                              </div>
+                            </div>
+                          </div>
+                          <Link to={`/cars/${review.car?._id}`} className="btn btn-sm btn-outline-secondary">View Car</Link>
+                        </div>
+                        <h5 className="h6 fw-bold mb-2">{review.title}</h5>
+                        <p className="text-on-surface mb-0">{review.comment}</p>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="glass-panel p-4 rounded-4">
+                    <div className="text-center py-5 opacity-50">
+                      <span className="material-symbols-outlined fs-1 mb-2">analytics</span>
+                      <p className="m-0">You haven't logged any reviews yet.</p>
+                    </div>
+                  </div>
+                )}
               </section>
             )}
 
@@ -340,16 +402,18 @@ const Dashboard: React.FC = () => {
                   <div className="row g-4">
                     <div className="col-md-6 d-flex flex-column gap-2">
                       <label className="font-mono text-on-surface-variant text-uppercase fw-bold" style={{ fontSize: '12px' }}>FULL NAME</label>
-                      <input type="text" className="settings-input" defaultValue={user?.name} />
+                      <input type="text" name="name" className="settings-input" defaultValue={user?.name} required />
                     </div>
                     <div className="col-md-6 d-flex flex-column gap-2">
                       <label className="font-mono text-on-surface-variant text-uppercase fw-bold" style={{ fontSize: '12px' }}>EMAIL ADDRESS</label>
-                      <input type="email" className="settings-input" defaultValue={user?.email} />
+                      <input type="email" name="email" className="settings-input" defaultValue={user?.email} required />
                     </div>
                   </div>
                   <div className="d-flex justify-content-end gap-3 mt-3">
                     <button type="button" className="btn btn-outline-secondary px-4">Discard</button>
-                    <button type="submit" className="btn btn-primary px-4 active-glow">Update Protocol</button>
+                    <button type="submit" className="btn btn-primary px-4 active-glow" disabled={profileLoading}>
+                      {profileLoading ? 'Updating...' : 'Update Protocol'}
+                    </button>
                   </div>
                 </form>
               </section>

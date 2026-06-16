@@ -108,23 +108,33 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({ filters, setFilters }) =>
       {/* Price Range */}
       <div className="d-flex flex-column gap-2">
         <h4 className="filter-section-title">PRICE RANGE</h4>
-        <div className="filter-range-wrapper">
-          <input 
-            type="number" 
-            className="filter-range-input" 
-            placeholder="Min PKR"
-            value={filters.priceMin || ''}
-            onChange={(e) => setFilters(prev => ({ ...prev, priceMin: e.target.value ? Number(e.target.value) : '' }))}
-          />
-          <span className="text-on-surface-variant">-</span>
-          <input 
-            type="number" 
-            className="filter-range-input" 
-            placeholder="Max PKR"
-            value={filters.priceMax || ''}
-            onChange={(e) => setFilters(prev => ({ ...prev, priceMax: e.target.value ? Number(e.target.value) : '' }))}
-          />
-        </div>
+        <select 
+          className="filter-search-input w-100"
+          value={`${filters.priceMin || ''}-${filters.priceMax || ''}`}
+          onChange={(e) => {
+            const val = e.target.value;
+            if (val === '-') {
+              setFilters(prev => ({ ...prev, priceMin: '', priceMax: '' }));
+              return;
+            }
+            const [min, max] = val.split('-');
+            setFilters(prev => ({ 
+              ...prev, 
+              priceMin: min ? Number(min) : '', 
+              priceMax: max ? Number(max) : '' 
+            }));
+          }}
+          style={{ appearance: 'auto' }}
+        >
+          <option value="-">Any Price</option>
+          <option value="-1000000">Under 10 Lacs</option>
+          <option value="1000000-2000000">10 Lacs - 20 Lacs</option>
+          <option value="2000000-5000000">20 Lacs - 50 Lacs</option>
+          <option value="5000000-10000000">50 Lacs - 1 Crore</option>
+          <option value="10000000-30000000">1 Crore - 3 Crore</option>
+          <option value="30000000-50000000">3 Crore - 5 Crore</option>
+          <option value="50000000-">Above 5 Crore</option>
+        </select>
       </div>
 
       {/* Fuel Type */}
