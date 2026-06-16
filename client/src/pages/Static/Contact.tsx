@@ -111,7 +111,7 @@ const Contact: React.FC = () => {
                 </div>
                 <div>
                   <div className="font-mono small text-uppercase text-on-surface-variant">Email</div>
-                  <div className="text-on-surface fw-bold">support@carinsightpro.com</div>
+                  <div className="text-on-surface fw-bold">carinsight.app@gmail.com</div>
                 </div>
               </div>
             </div>
@@ -135,7 +135,7 @@ const Contact: React.FC = () => {
                 </div>
                 <div>
                   <div className="font-mono small text-uppercase text-on-surface-variant">Live Support</div>
-                  <div className="text-on-surface fw-bold">Mon - Fri, 9AM - 6PM EST</div>
+                  <div className="text-on-surface fw-bold">Mon - Fri, 9AM - 6PM PKT</div>
                 </div>
               </div>
             </div>

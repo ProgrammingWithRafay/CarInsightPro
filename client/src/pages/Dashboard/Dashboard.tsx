@@ -34,6 +34,10 @@ const Dashboard: React.FC = () => {
   
   const [reports, setReports] = useState<{id: string, carId: string, carName: string, date: string}[]>([]);
 
+  /**
+   * Fetches the user's bookmarked cars.
+   * Wrapped in useCallback to safely include it in the dependency array of useEffect.
+   */
   const fetchBookmarks = React.useCallback(async () => {
     setLoadingBookmarks(true);
     try {
@@ -48,6 +52,9 @@ const Dashboard: React.FC = () => {
     }
   }, [showToast]);
 
+  /**
+   * Fetches the user's support tickets.
+   */
   const fetchSupportTickets = React.useCallback(async () => {
     setLoadingTickets(true);
     try {
@@ -62,6 +69,9 @@ const Dashboard: React.FC = () => {
     }
   }, [showToast]);
 
+  /**
+   * Fetches the user's previously submitted reviews.
+   */
   const fetchMyReviews = React.useCallback(async () => {
     setLoadingReviews(true);
     try {
@@ -76,6 +86,12 @@ const Dashboard: React.FC = () => {
     }
   }, [showToast]);
 
+  /**
+   * Tab-based Data Fetching Logic:
+   * Instead of loading all data at once on mount, we lazy-load the data
+   * based on which tab the user navigates to. This improves initial load performance.
+   * We also check if the data array is empty before fetching to prevent redundant calls.
+   */
   useEffect(() => {
     if (activeTab === 'saved') {
       fetchBookmarks();
@@ -100,6 +116,11 @@ const Dashboard: React.FC = () => {
     }
   }, [bookmarks.length, myReviews.length, reports.length, evaluateRank]);
 
+  /**
+   * Handles removing a car from the user's bookmarks.
+   * Uses optimistic UI updating to immediately remove the car from the screen
+   * before the API call finishes, providing a snappier user experience.
+   */
   const handleRemoveBookmark = async (id: string) => {
     try {
       // Optimistically update the UI immediately
@@ -125,6 +146,11 @@ const Dashboard: React.FC = () => {
     }
   };
 
+  /**
+   * Submits profile updates (name, email) to the backend.
+   * Prevents default form submission, extracts values from the form elements,
+   * and displays a toast notification upon success or failure.
+   */
   const handleUpdateProfile = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const form = e.currentTarget;
@@ -217,7 +243,7 @@ const Dashboard: React.FC = () => {
               <div>
                 <h2 className="font-heading h3 m-0">{user?.name}</h2>
                 <p className="font-mono text-primary text-uppercase m-0 mt-1" style={{ fontSize: '12px' }}>
-                  {user?.role === 'admin' ? 'System Administrator' : 'Premium Member'}
+                  {user?.role === 'admin' ? 'System Administrator' : 'Member'}
                 </p>
               </div>
             </div>
@@ -366,19 +392,27 @@ const Dashboard: React.FC = () => {
                       <div key={review._id} className="glass-panel p-4 rounded-4">
                         <div className="d-flex justify-content-between align-items-start mb-3">
                           <div className="d-flex align-items-center gap-3">
-                            {(review.car as Car)?.images?.[0] && (
+                            {(review.car as Car)?.images?.[0] ? (
                               <img src={(review.car as Car).images[0]} alt="car" width="60" height="40" className="rounded object-fit-cover" />
+                            ) : (
+                              <div className="bg-secondary rounded d-flex align-items-center justify-content-center" style={{ width: 60, height: 40 }}>
+                                <span className="material-symbols-outlined text-white small">directions_car</span>
+                              </div>
                             )}
                             <div>
-                              <h4 className="font-heading h5 m-0 mb-1">{(review.car as Car)?.year} {(review.car as Car)?.make} {(review.car as Car)?.model}</h4>
+                              <h4 className="font-heading h5 m-0 mb-1">
+                                {(review.car as Car) ? `${(review.car as Car).year} ${(review.car as Car).make} ${(review.car as Car).model}` : 'Deleted Car'}
+                              </h4>
                               <div className="d-flex align-items-center gap-1">
                                 <span className="material-symbols-outlined text-tertiary" style={{ fontSize: '16px', fontVariationSettings: "'FILL' 1" }}>star</span>
-                                <span className="fw-bold">{(review.rating / 2).toFixed(1)}</span>
+                                <span className="fw-bold">{(review.rating).toFixed(1)}</span>
                                 <span className="text-on-surface-variant small ms-2">{new Date(review.createdAt).toLocaleDateString()}</span>
                               </div>
                             </div>
                           </div>
-                          <Link to={`/cars/${(review.car as Car)?._id}`} className="btn btn-sm btn-outline-secondary">View Car</Link>
+                          {(review.car as Car)?._id && (
+                            <Link to={`/cars/${(review.car as Car)?._id}`} className="btn btn-sm btn-outline-secondary">View Car</Link>
+                          )}
                         </div>
                         <h5 className="h6 fw-bold mb-2">{review.title}</h5>
                         <p className="text-on-surface mb-0">{review.comment}</p>

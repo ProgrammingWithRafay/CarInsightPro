@@ -8,7 +8,7 @@ Browse dynamic car listings, compare vehicles side-by-side, read community revie
 ## Features
 
 - **Dynamic Car Listings** — Browse, search, and filter a curated database of cars directly from the database.
-- **Car Detail Pages** — View full specs, telemetry data, and premium image galleries.
+- **Car Detail Pages** — View full specs and premium image galleries.
 - **Side-by-Side Comparison** — Compare up to 3 vehicles across key metrics (Engine, Range, Price, etc.).
 - **Reviews & Ratings** — Community-driven car reviews with a 1-5 star rating system across Style, Comfort, Fuel Economy/Battery, Performance, and Value.
 - **EV & Hybrid Hub** — Dedicated section for electric and hybrid vehicle information.
@@ -30,7 +30,6 @@ Browse dynamic car listings, compare vehicles side-by-side, read community revie
 | Vite | Lightning-fast build tool |
 | React Router v6 | Client-side routing with automatic scroll management |
 | Bootstrap 5 & Custom CSS | Layouts, grids, and premium dark-mode styling |
-| Recharts | Data visualization (Telemetry charts) |
 | jsPDF | PDF generation for comparison reports |
 
 ### Backend (Server)

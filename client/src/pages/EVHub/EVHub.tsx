@@ -3,12 +3,13 @@ import { Link } from 'react-router-dom';
 import { carService } from '../../services/carService';
 import { Car, FilterState } from '../../types';
 import { formatPriceRange } from '../../utils/formatPrice';
-import { ResponsiveContainer, ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import './EVHub.css'; // Optional
 
 const EVHub: React.FC = () => {
   const [evCars, setEvCars] = useState<Car[]>([]);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const limit = 9;
 
   useEffect(() => {
     const fetchEVs = async () => {
@@ -27,18 +28,22 @@ const EVHub: React.FC = () => {
     fetchEVs();
   }, []);
 
-  // Data for scatter chart: Battery Capacity vs Range
-  const chartData = evCars
-    .filter(c => c.specs?.batteryCapacity && c.specs?.range)
-    .map(c => ({
-      id: c._id,
-      name: `${c.make} ${c.model}`,
-      capacity: c.specs.batteryCapacity,
-      range: c.specs.range,
-      price: c.price,
-      priceMax: c.priceMax,
-      type: c.fuelType
-    }));
+
+
+  const totalPages = Math.ceil(evCars.length / limit);
+  const paginatedCars = evCars.slice((page - 1) * limit, page * limit);
+
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+    const el = document.getElementById('fleet-section');
+    if (el) {
+      // Offset slightly for navbar
+      const y = el.getBoundingClientRect().top + window.scrollY - 100;
+      window.scrollTo({ top: y, behavior: 'smooth' });
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
 
   return (
     <div className="container-fluid max-w-container-max mx-auto px-3 px-md-4 pt-5 mt-4 pb-5">
@@ -54,82 +59,44 @@ const EVHub: React.FC = () => {
       </div>
 
       <div className="row g-4 mb-5">
-        <div className="col-lg-4">
-          <div className="glass-panel p-4 rounded-4 h-100 fade-in-up" style={{ animationDelay: '0.1s' }}>
+        <div className="col-12">
+          <div className="glass-panel p-4 rounded-4 fade-in-up" style={{ animationDelay: '0.1s' }}>
             <h4 className="font-heading text-primary mb-3">
               <span className="material-symbols-outlined align-middle me-2">electric_car</span>
               Why Go Electric?
             </h4>
-            <ul className="list-unstyled d-flex flex-column gap-3 text-on-surface-variant">
-              <li className="d-flex gap-3">
-                <span className="material-symbols-outlined text-success">check_circle</span>
-                <span>Significantly lower operating and maintenance costs over the vehicle lifespan.</span>
-              </li>
-              <li className="d-flex gap-3">
-                <span className="material-symbols-outlined text-success">check_circle</span>
-                <span>Instant torque delivery for unparalleled acceleration performance.</span>
-              </li>
-              <li className="d-flex gap-3">
-                <span className="material-symbols-outlined text-success">check_circle</span>
-                <span>Zero tailpipe emissions, contributing to cleaner urban air quality.</span>
-              </li>
-              <li className="d-flex gap-3">
-                <span className="material-symbols-outlined text-success">check_circle</span>
-                <span>Access to federal and state tax incentives and HOV lane privileges.</span>
-              </li>
-            </ul>
-          </div>
-        </div>
-        
-        <div className="col-lg-8">
-          <div className="glass-panel p-4 rounded-4 h-100 fade-in-up" style={{ animationDelay: '0.2s' }}>
-            <h4 className="font-heading mb-4 text-center">Range vs. Battery Capacity Analysis</h4>
-            {chartData.length > 0 ? (
-              <div style={{ width: '100%', height: 350 }}>
-                <ResponsiveContainer>
-                  <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="var(--outline-variant)" />
-                    <XAxis type="number" dataKey="capacity" name="Battery (kWh)" unit=" kWh" stroke="var(--on-surface-variant)" />
-                    <YAxis type="number" dataKey="range" name="Range (mi)" unit=" mi" stroke="var(--on-surface-variant)" />
-                    <Tooltip 
-                      cursor={{ strokeDasharray: '3 3' }}
-                      content={({ active, payload }) => {
-                        if (active && payload && payload.length) {
-                          const data = payload[0].payload;
-                          return (
-                            <div className="bg-surface-container-highest p-3 border border-secondary rounded-3 shadow">
-                              <p className="fw-bold m-0 mb-2 text-primary font-heading">{data.name}</p>
-                              <p className="m-0 small text-on-surface-variant">Type: {data.type}</p>
-                              <p className="m-0 small text-on-surface-variant">Battery: {data.capacity} kWh</p>
-                              <p className="m-0 small text-on-surface-variant">Range: {data.range} miles</p>
-                              <p className="m-0 fw-bold mt-2">{formatPriceRange(data.price, data.priceMax)}</p>
-                            </div>
-                          );
-                        }
-                        return null;
-                      }}
-                    />
-                    <Scatter name="EVs" data={chartData.filter(d => d.type === 'Electric')} fill="var(--primary)" />
-                    <Scatter name="Hybrids" data={chartData.filter(d => d.type === 'Hybrid')} fill="var(--secondary)" />
-                    <Legend />
-                  </ScatterChart>
-                </ResponsiveContainer>
+            <div className="row text-on-surface-variant">
+              <div className="col-md-6 mb-3 mb-md-0">
+                <ul className="text-on-surface-variant d-flex flex-column gap-3 m-0 ps-3">
+                  <li>
+                    Significantly lower operating and maintenance costs over the vehicle lifespan.
+                  </li>
+                  <li>
+                    Instant torque delivery for unparalleled acceleration performance.
+                  </li>
+                </ul>
               </div>
-            ) : (
-              <div className="d-flex align-items-center justify-content-center h-100">
-                {loading ? <p>Loading telemetry data...</p> : <p>Insufficient data points for scatter plot.</p>}
+              <div className="col-md-6">
+                <ul className="text-on-surface-variant d-flex flex-column gap-3 m-0 ps-3">
+                  <li>
+                    Zero tailpipe emissions, contributing to cleaner urban air quality.
+                  </li>
+                  <li>
+                    Access to federal and state tax incentives and HOV lane privileges.
+                  </li>
+                </ul>
               </div>
-            )}
+            </div>
           </div>
         </div>
       </div>
 
-      <h3 className="font-heading mb-4 fade-in-up">Electrified Fleet</h3>
+      <h3 id="fleet-section" className="font-heading mb-4 fade-in-up">Electrified Fleet</h3>
       <div className="row g-4">
         {loading ? (
           <div className="text-center py-5 w-100"><div className="spinner-border text-primary" role="status"></div></div>
         ) : evCars.length > 0 ? (
-          evCars.map((car, idx) => (
+          paginatedCars.map((car, idx) => (
             <div className="col-md-6 col-lg-4 fade-in-up" style={{ animationDelay: `${idx * 0.1}s` }} key={car._id}>
               <div className="card h-100 bg-surface-container border-secondary position-relative overflow-hidden">
                 <div className="position-absolute top-0 end-0 m-3 z-3">
@@ -137,7 +104,7 @@ const EVHub: React.FC = () => {
                     {car.fuelType}
                   </span>
                 </div>
-                <img src={car.images[0] || 'https://via.placeholder.com/400x300'} className="card-img-top object-fit-cover" height="220" alt={car.model} />
+                <img src={car.images[0] || '/placeholder.png'} className="card-img-top object-fit-cover" height="220" alt={car.model} />
                 <div className="card-body p-4 d-flex flex-column">
                   <div className="d-flex justify-content-between align-items-start mb-2">
                     <h4 className="card-title font-heading m-0">{car.year} {car.make} {car.model}</h4>
@@ -155,7 +122,7 @@ const EVHub: React.FC = () => {
                     </div>
                     <div className="text-center border-start border-secondary ps-3">
                       <div className="font-mono text-on-surface-variant small text-uppercase">0-60 mph</div>
-                      <div className="fw-bold">{(car.specs?.horsepower || 0) > 300 ? 'Fast' : 'Avg'}</div>
+                      <div className="fw-bold">{parseInt(car.specs?.horsepower as string || '0') > 300 ? 'Fast' : 'Avg'}</div>
                     </div>
                   </div>
 
@@ -172,6 +139,33 @@ const EVHub: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Pagination Controls */}
+      {!loading && totalPages > 1 && (
+        <div className="d-flex justify-content-center align-items-center mt-5 fade-in-up">
+          <div className="pagination-controls glass-panel p-2 rounded-pill d-flex gap-2">
+            <button 
+              className="btn btn-sm btn-icon border-0" 
+              disabled={page === 1}
+              onClick={() => handlePageChange(page - 1)}
+            >
+              <span className="material-symbols-outlined">chevron_left</span>
+            </button>
+            
+            <div className="d-flex align-items-center px-3 font-mono fw-bold text-on-surface-variant">
+              Page {page} of {totalPages}
+            </div>
+
+            <button 
+              className="btn btn-sm btn-icon border-0" 
+              disabled={page === totalPages}
+              onClick={() => handlePageChange(page + 1)}
+            >
+              <span className="material-symbols-outlined">chevron_right</span>
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

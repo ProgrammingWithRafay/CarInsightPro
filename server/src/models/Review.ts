@@ -1,4 +1,8 @@
-// Mongoose model for Review
+/**
+ * Mongoose model for User Reviews.
+ * Stores individual ratings, granular sub-scores, and textual comments for specific cars.
+ * Includes a validation hook to automatically compute the overall rating from the sub-scores.
+ */
 import mongoose, { Schema, Document } from 'mongoose';
 
 export interface ReviewDocument extends Document {
@@ -36,6 +40,14 @@ const ReviewSchema: Schema = new Schema({
   timestamps: true
 });
 
+// Index for hot query (fetching reviews by car ID)
+ReviewSchema.index({ car: 1 });
+
+/**
+ * Pre-validate middleware.
+ * Automatically calculates the overall 'rating' as the mathematical average
+ * of the 5 individual sub-scores before the document is saved to the database.
+ */
 ReviewSchema.pre<ReviewDocument>('validate', function(next) {
   if (this.subScores) {
     const { style, comfort, fuelEconomy, performance, valueMoney } = this.subScores;

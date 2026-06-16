@@ -2,7 +2,11 @@
 import { Request, Response } from 'express';
 import User from '../models/User';
 
-// Get user bookmarks
+/**
+ * Retrieves the authenticated user's bookmarked cars.
+ * 
+ * Uses Mongoose's populate to return the full car objects instead of just their IDs.
+ */
 export const getBookmarks = async (req: Request, res: Response) => {
   try {
     const user = await User.findById(req.user?._id).populate('bookmarks');
@@ -12,7 +16,11 @@ export const getBookmarks = async (req: Request, res: Response) => {
   }
 };
 
-// Add bookmark
+/**
+ * Adds a car to the user's bookmark list.
+ * 
+ * Prevents duplicates by checking if the car ID already exists in the bookmarks array.
+ */
 export const addBookmark = async (req: Request, res: Response) => {
   try {
     const user = await User.findById(req.user?._id);
@@ -32,7 +40,11 @@ export const addBookmark = async (req: Request, res: Response) => {
   }
 };
 
-// Remove bookmark
+/**
+ * Removes a car from the user's bookmark list.
+ * 
+ * Filters out the provided car ID from the user's bookmarks array and saves the updated list.
+ */
 export const removeBookmark = async (req: Request, res: Response) => {
   try {
     const user = await User.findById(req.user?._id);

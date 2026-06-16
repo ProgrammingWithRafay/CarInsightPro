@@ -5,17 +5,15 @@ import { reviewService } from '../../services/reviewService';
 import { Car, Review } from '../../types';
 import { useAuth } from '../../hooks/useAuth';
 import { useToast } from '../../hooks/useToast';
-import { ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, Radar, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 import Skeleton from '../../components/Skeleton/Skeleton';
 import ReviewSummary from '../../components/Reviews/ReviewSummary';
 import ReviewForm from '../../components/Reviews/ReviewForm';
 import ReviewCard from '../../components/Reviews/ReviewCard';
-import TCOCalculator from '../../components/TCOCalculator/TCOCalculator';
 import { SubScores } from '../../types';
 import axios from 'axios';
 
 import { generateCarReport } from '../../utils/pdfGenerator';
-import { formatPriceRange, formatPKR } from '../../utils/formatPrice';
+import { formatPriceRange } from '../../utils/formatPrice';
 import './CarDetail.css';
 
 const CarDetail: React.FC = () => {
@@ -35,6 +33,11 @@ const CarDetail: React.FC = () => {
   const { showToast } = useToast();
   const navigate = useNavigate();
 
+  /**
+   * Fetches all necessary data for the car detail page in parallel.
+   * This includes the core car info, all reviews, and the user's bookmark status.
+   * Uses Promise.all to reduce waterfall loading times.
+   */
   const fetchCarDetails = React.useCallback(async () => {
     setLoading(true);
     try {
@@ -67,6 +70,10 @@ const CarDetail: React.FC = () => {
     }
   }, [id, fetchCarDetails]);
 
+  /**
+   * Handles the submission of a new user review.
+   * On success, it hides the form and re-fetches the car details to update the average rating.
+   */
   const handleAddReview = async (data: { title: string; subScores: SubScores; comment: string }) => {
     try {
       const res = await reviewService.addReview(id!, data);
@@ -84,6 +91,11 @@ const CarDetail: React.FC = () => {
     }
   };
 
+  /**
+   * Toggles the bookmark state of the current car.
+   * Checks if the user is authenticated first, and then either adds or removes
+   * the car from their saved list, updating the UI accordingly.
+   */
   const handleToggleBookmark = async () => {
     if (!user) {
       showToast('Please login to save cars', 'warning');
@@ -121,6 +133,10 @@ const CarDetail: React.FC = () => {
     }
   };
 
+  /**
+   * Generates and downloads a comprehensive PDF report for the car.
+   * Uses the client-side PDF generation utility (pdfGenerator.ts).
+   */
   const handleDownloadReport = async () => {
     if (!car) return;
     try {
@@ -146,15 +162,6 @@ const CarDetail: React.FC = () => {
 
   if (!car) return null;
 
-  // Mock Radar Data based on car specs
-  const radarData = [
-    { subject: 'Performance', A: car.specs?.horsepower ? Math.min(car.specs.horsepower / 5, 100) : 80, fullMark: 100 },
-    { subject: 'Efficiency', A: car.fuelType === 'Electric' ? 98 : (car.fuelType === 'Hybrid' ? 85 : 60), fullMark: 100 },
-    { subject: 'Comfort', A: 85, fullMark: 100 },
-    { subject: 'Reliability', A: 90, fullMark: 100 },
-    { subject: 'Technology', A: car.year >= 2022 ? 95 : 75, fullMark: 100 },
-    { subject: 'Value', A: 88, fullMark: 100 },
-  ];
 
   return (
     <div className="pt-5 mt-4 pb-5 bg-surface text-on-surface" id="car-report-content">
@@ -193,7 +200,7 @@ const CarDetail: React.FC = () => {
             <div className="d-flex flex-column gap-3">
               <div className="detail-gallery-main" style={{ height: '500px', overflow: 'hidden' }}>
                 <img 
-                  src={car.images[activeImageIndex] || 'https://via.placeholder.com/800x600'} 
+                  src={car.images[activeImageIndex] || '/placeholder.png'} 
                   alt={car.model} 
                   className="detail-gallery-img"
                 />
@@ -236,7 +243,7 @@ const CarDetail: React.FC = () => {
                   </div>
                   <div>
                     <div className="spec-label">Power Output</div>
-                    <div className="spec-value">{car.specs?.horsepower ? `${car.specs.horsepower} HP` : 'N/A'} / {car.specs?.torque ? `${car.specs.torque} lb-ft` : 'N/A'}</div>
+                    <div className="spec-value">{car.specs?.horsepower ? `${car.specs.horsepower} HP` : 'N/A'} / {car.specs?.torque ? `${car.specs.torque} Nm` : 'N/A'}</div>
                   </div>
                 </div>
 
@@ -246,7 +253,7 @@ const CarDetail: React.FC = () => {
                   </div>
                   <div>
                     <div className="spec-label">Dimensions</div>
-                    <div className="spec-value">{car.specs?.dimensions?.length || 'N/A'}L x {car.specs?.dimensions?.width || 'N/A'}W</div>
+                    <div className="spec-value">{car.specs?.dimensions || 'N/A'}</div>
                   </div>
                 </div>
               </div>
@@ -271,8 +278,6 @@ const CarDetail: React.FC = () => {
         {/* Tab Navigation */}
         <div className="border-bottom border-secondary mt-5 mb-4 d-flex overflow-auto no-scrollbar">
           <button className={`tab-btn ${activeTab === 'overview' ? 'active' : ''}`} onClick={() => setActiveTab('overview')}>Overview</button>
-          <button className={`tab-btn ${activeTab === 'analytics' ? 'active' : ''}`} onClick={() => setActiveTab('analytics')}>Analytics</button>
-          <button className={`tab-btn ${activeTab === 'tco' ? 'active' : ''}`} onClick={() => setActiveTab('tco')}>Monthly Cost</button>
           <button className={`tab-btn ${activeTab === 'reviews' ? 'active' : ''}`} onClick={() => setActiveTab('reviews')}>Reviews</button>
         </div>
 
@@ -291,7 +296,7 @@ const CarDetail: React.FC = () => {
                   <div className="row g-3">
                     {[
                       { icon: 'directions_car', label: 'Body Type', val: car.bodyType || 'N/A' },
-                      { icon: 'straighten', label: 'Dimensions', val: car.specs?.dimensions ? `${car.specs.dimensions.length} x ${car.specs.dimensions.width} x ${car.specs.dimensions.height} mm` : 'N/A' },
+                      { icon: 'straighten', label: 'Dimensions', val: car.specs?.dimensions ? `${car.specs.dimensions} mm` : 'N/A' },
                       { icon: 'height', label: 'Ground Clearance', val: car.specs?.groundClearance ? `${car.specs.groundClearance} mm` : 'N/A' },
                       { icon: 'speed', label: 'Engine', val: car.specs?.engine || 'N/A' },
                       { icon: 'settings', label: 'Displacement', val: car.specs?.displacement ? `${car.specs.displacement} cc` : car.fuelType === 'Electric' ? 'Electric' : 'N/A' },
@@ -323,49 +328,6 @@ const CarDetail: React.FC = () => {
             </div>
           )}
 
-          {activeTab === 'analytics' && (
-            <div className="row g-4 fade-in-up">
-              <div className="col-lg-6">
-                <div className="chart-container-card h-100">
-                  <h4 className="font-heading mb-4">Performance Matrix</h4>
-                  <div style={{ width: '100%', height: 350 }}>
-                    <ResponsiveContainer>
-                      <RadarChart cx="50%" cy="50%" outerRadius="70%" data={radarData}>
-                        <PolarGrid stroke="#424754" />
-                        <PolarAngleAxis dataKey="subject" tick={{ fill: '#c2c6d6', fontSize: 12, fontFamily: 'JetBrains Mono' }} />
-                        <Radar name={car.model} dataKey="A" stroke="var(--primary)" fill="var(--primary)" fillOpacity={0.4} />
-                      </RadarChart>
-                    </ResponsiveContainer>
-                  </div>
-                </div>
-              </div>
-              <div className="col-lg-6">
-                <div className="chart-container-card h-100">
-                  <h4 className="font-heading mb-4">Depreciation Curve (Projected)</h4>
-                  <div style={{ width: '100%', height: 350 }}>
-                    <ResponsiveContainer>
-                      <BarChart data={[
-                        { year: 'Year 1', value: car.price * 0.85 },
-                        { year: 'Year 3', value: car.price * 0.65 },
-                        { year: 'Year 5', value: car.price * 0.45 },
-                        { year: 'Year 7', value: car.price * 0.30 },
-                      ]}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#424754" vertical={false} />
-                        <XAxis dataKey="year" stroke="#c2c6d6" tick={{ fontFamily: 'JetBrains Mono', fontSize: 12 }} />
-                        <YAxis stroke="#c2c6d6" tickFormatter={(value) => formatPKR(value)} tick={{ fontFamily: 'JetBrains Mono', fontSize: 10 }} />
-                        <Tooltip contentStyle={{ backgroundColor: '#1d2027', borderColor: '#424754', color: '#e1e2ec' }} />
-                        <Bar dataKey="value" fill="var(--secondary)" radius={[4, 4, 0, 0]} />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {activeTab === 'tco' && (
-            <TCOCalculator car={car} />
-          )}
 
           {activeTab === 'reviews' && (
             <div className="row fade-in-up">

@@ -1,6 +1,9 @@
 import api from './api';
 import { User, LoginCredentials, RegisterCredentials, ApiResponse } from '../types';
 
+/**
+ * Service to handle all authentication and user-profile related API calls.
+ */
 export const authService = {
   async register(credentials: RegisterCredentials) {
     const response = await api.post<ApiResponse<{ email: string; requiresVerification: boolean }>>('/auth/register', credentials);

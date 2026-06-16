@@ -4,7 +4,13 @@ import cloudinary from '../config/cloudinary';
 import Car from '../models/Car';
 import PriceHistory from '../models/PriceHistory';
 
-// Get all cars with filtering, sorting, pagination
+/**
+ * Retrieves a paginated list of cars based on various filter criteria.
+ * 
+ * Supports filtering by search terms (make/model), brand, year range, price range,
+ * fuel type, EV/Hybrid range, transmission, and safety rating. Also handles sorting
+ * and returns the total count and pagination metadata alongside the car data.
+ */
 export const getCars = async (req: Request, res: Response) => {
   try {
     const page = parseInt(req.query.page as string) || 1;
@@ -88,7 +94,12 @@ export const getCars = async (req: Request, res: Response) => {
   }
 };
 
-// Get public stats for homepage
+/**
+ * Fetches high-level statistics intended for public display (e.g., on the homepage).
+ * 
+ * Currently gathers the total number of cars in the inventory and the total number
+ * of reviews left by users to showcase platform activity.
+ */
 export const getPublicStats = async (req: Request, res: Response) => {
   try {
     const totalCars = await Car.countDocuments();
@@ -104,18 +115,27 @@ export const getPublicStats = async (req: Request, res: Response) => {
   }
 };
 
-// Get filter options (dynamic brands & fuel types from DB)
+/**
+ * Extracts unique values for dynamic filter dropdowns on the client side.
+ * 
+ * Queries the database for all distinct brands (makes), fuel types, and body types
+ * currently available in the car inventory, returning sorted arrays for the UI.
+ */
 export const getFilterOptions = async (req: Request, res: Response) => {
   try {
     const brands = await Car.distinct('make');
     const fuelTypes = await Car.distinct('fuelType');
     const bodyTypes = await Car.distinct('bodyType');
     
+    // Post-process to ensure clean distinct arrays even if dirty data exists
+    const toTitleCase = (str: string) => str.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
+    const cleanBrands = [...new Set(brands.filter(Boolean).map(b => toTitleCase(b.trim())))].sort();
+    
     res.json({ 
       success: true, 
       data: { 
-        brands: brands.sort(), 
-        fuelTypes: fuelTypes.sort(),
+        brands: cleanBrands, 
+        fuelTypes: fuelTypes.filter(Boolean).sort(),
         bodyTypes: bodyTypes.filter(Boolean).sort()
       } 
     });
@@ -124,7 +144,12 @@ export const getFilterOptions = async (req: Request, res: Response) => {
   }
 };
 
-// Get single car by ID
+/**
+ * Retrieves the full details of a single car by its database ID.
+ * 
+ * Automatically increments the car's 'views' counter by 1 every time this endpoint
+ * is successfully hit, allowing us to track the most popular vehicles.
+ */
 export const getCarById = async (req: Request, res: Response) => {
   try {
     const car = await Car.findById(req.params.id);
@@ -142,7 +167,12 @@ export const getCarById = async (req: Request, res: Response) => {
   }
 };
 
-// Compare multiple cars
+/**
+ * Fetches multiple cars simultaneously for a side-by-side comparison.
+ * 
+ * Expects a comma-separated list of car IDs in the query parameters.
+ * Returns an array of car documents matching those IDs.
+ */
 export const compareCars = async (req: Request, res: Response) => {
   try {
     const ids = req.query.ids ? (req.query.ids as string).split(',') : [];
@@ -159,7 +189,13 @@ export const compareCars = async (req: Request, res: Response) => {
 
 const MAX_IMAGES = 5;
 
-// Add new car (Admin only)
+/**
+ * Creates a new car listing in the database (Admin only).
+ * 
+ * Handles the upload of up to 5 images to Cloudinary, linking their URLs to the car document.
+ * Also contains business logic to automatically set the engine type to 'Electric Motor'
+ * for EVs if no engine spec was explicitly provided.
+ */
 export const addCar = async (req: Request, res: Response) => {
   try {
     const carData = JSON.parse(req.body.data);
@@ -191,6 +227,10 @@ export const addCar = async (req: Request, res: Response) => {
       carData.specs.engine = 'Electric Motor';
     }
 
+    if (carData.make) {
+      carData.make = carData.make.trim().replace(/\w\S*/g, (txt: string) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
+    }
+
     const car = await Car.create(carData);
 
     res.status(201).json({ success: true, data: car });
@@ -199,7 +239,13 @@ export const addCar = async (req: Request, res: Response) => {
   }
 };
 
-// Update car (Admin only)
+/**
+ * Updates an existing car listing and manages price history tracking (Admin only).
+ * 
+ * Can handle new image uploads, appending them to existing images up to the MAX_IMAGES limit.
+ * Crucially, if the price is changed during the update, it automatically creates a new 
+ * PriceHistory record to track market depreciation/appreciation over time.
+ */
 export const updateCar = async (req: Request, res: Response) => {
   try {
     let updateData = req.body;
@@ -207,6 +253,11 @@ export const updateCar = async (req: Request, res: Response) => {
     // If formData was used, data will be a JSON string in req.body.data
     if (req.body.data) {
       updateData = JSON.parse(req.body.data);
+    }
+
+    // Clean make if present
+    if (updateData.make) {
+      updateData.make = updateData.make.trim().replace(/\w\S*/g, (txt: string) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
     }
 
     let newImageUrls: string[] = [];
@@ -261,13 +312,33 @@ export const updateCar = async (req: Request, res: Response) => {
   }
 };
 
-// Delete car (Admin only)
+/**
+ * Removes a car from the inventory (Admin only).
+ * 
+ * Permanently deletes the car document from the database based on the provided ID.
+ */
 export const deleteCar = async (req: Request, res: Response) => {
   try {
     const car = await Car.findById(req.params.id);
     if (!car) {
       return res.status(404).json({ success: false, message: 'Car not found' });
     }
+    // Extract public_id and delete images from Cloudinary
+    if (car.images && car.images.length > 0) {
+      const deletePromises = car.images.map((url: string) => {
+        // e.g. https://res.cloudinary.com/cloud/image/upload/v123/carinsight_pro/abc.jpg -> carinsight_pro/abc
+        const parts = url.split('/');
+        const filename = parts.pop()?.split('.')[0];
+        const folder = parts.pop();
+        if (folder && filename) {
+          const publicId = `${folder}/${filename}`;
+          return cloudinary.uploader.destroy(publicId);
+        }
+        return Promise.resolve();
+      });
+      await Promise.all(deletePromises);
+    }
+
     await car.deleteOne();
     res.json({ success: true, message: 'Car removed' });
   } catch (error: any) {
@@ -275,7 +346,13 @@ export const deleteCar = async (req: Request, res: Response) => {
   }
 };
 
-// Recommend cars
+/**
+ * Generates personalized car recommendations based on user preferences.
+ * 
+ * Evaluates the inventory against constraints like budget, required seats, intended usage 
+ * (city vs highway), and fuel type preferences. Uses a custom scoring algorithm to calculate
+ * a 'matchPercentage' for each viable car, returning the top 5 matches.
+ */
 export const recommendCars = async (req: Request, res: Response) => {
   try {
     const { budget, usage, seats, fuelType } = req.query;
@@ -302,9 +379,9 @@ export const recommendCars = async (req: Request, res: Response) => {
         maxScore += 40;
         if (usage === 'city') {
           if ((car.specs?.mileage_city || 0) >= 15 || ['Electric', 'Hybrid'].includes(car.fuelType)) score += 40;
-          else if ((car.specs?.dimensions?.length || 200) < 180) score += 20;
+          else if ((parseInt(car.specs?.dimensions as string) || 4500) < 4500) score += 20;
         } else if (usage === 'highway') {
-          if ((car.specs?.horsepower || 0) >= 150) score += 20;
+          if ((parseInt(car.specs?.horsepower as string) || 0) >= 150) score += 20;
           if ((car.specs?.mileage_highway || 0) >= 18) score += 20;
         } else if (usage === 'mixed') {
           score += 20;
@@ -332,6 +409,12 @@ export const recommendCars = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * Retrieves the historical price changes for a specific car.
+ * 
+ * Queries the PriceHistory collection by car ID, sorting the results chronologically
+ * so the client can render a price trend graph.
+ */
 export const getCarPriceHistory = async (req: Request, res: Response) => {
   try {
     const history = await PriceHistory.find({ car: req.params.id }).sort({ date: 1 });

@@ -1,29 +1,24 @@
 export interface CarSpecs {
   engine?: string;
-  horsepower?: number;
-  torque?: number;
+  horsepower?: string;
+  torque?: string;
   displacement?: number;
   cylinders?: number;
   drivetrain?: string;
   mileage_city?: number;
   mileage_highway?: number;
   mileage?: string; // e.g. "14 - 22 KM/L"
-  dimensions?: {
-    length: number;
-    width: number;
-    height: number;
-    wheelbase?: number;
-  };
-  groundClearance?: number; // mm
-  bootSpace?: number; // liters
+  dimensions?: string; // e.g. "4500 x 1800 x 1450 mm"
+  groundClearance?: string; // mm
+  bootSpace?: string; // liters
   kerbWeight?: string; // e.g. "995 - 1050 KG"
-  fuelTankCapacity?: number; // liters
-  topSpeed?: number; // km/h
+  fuelTankCapacity?: string; // liters
+  topSpeed?: string; // km/h
   tyreSize?: string;
   seats?: number;
-  batteryCapacity?: number; // kWh
+  batteryCapacity?: string; // kWh
   chargingTime?: number; // hours
-  range?: number; // km
+  range?: string; // km
   // Legacy
   cargoSpace?: number;
   curbWeight?: number;

@@ -1,4 +1,8 @@
-// Mongoose model for User
+/**
+ * Mongoose model for User accounts.
+ * Handles authentication credentials, roles, user ranks, and linked data like bookmarked cars.
+ * Includes pre-save hooks for password hashing.
+ */
 import mongoose, { Schema, Document } from 'mongoose';
 import bcrypt from 'bcryptjs';
 
@@ -38,7 +42,10 @@ const UserSchema: Schema = new Schema({
   timestamps: true
 });
 
-// Hash password before saving
+/**
+ * Pre-save middleware to automatically hash passwords.
+ * Only runs if the password field has been modified to prevent double-hashing on other profile updates.
+ */
 UserSchema.pre<UserDocument>('save', async function(next) {
   if (!this.isModified('password')) {
     return next();
@@ -47,7 +54,9 @@ UserSchema.pre<UserDocument>('save', async function(next) {
   this.password = await bcrypt.hash(this.password as string, salt);
 });
 
-// Compare password
+/**
+ * Instance method to safely verify a provided password against the stored hash.
+ */
 UserSchema.methods.comparePassword = async function(enteredPassword: string) {
   return await bcrypt.compare(enteredPassword, this.password);
 };

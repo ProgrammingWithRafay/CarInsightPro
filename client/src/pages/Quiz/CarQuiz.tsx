@@ -3,19 +3,27 @@ import { Link } from 'react-router-dom';
 import { carService } from '../../services/carService';
 import { Car } from '../../types';
 import { formatPKR, formatPriceRange } from '../../utils/formatPrice';
-import { ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, Radar, Legend, Tooltip } from 'recharts';
-
 type RecommendedCar = Car & { matchScore: number; matchPercentage: number };
 
 const CarQuiz: React.FC = () => {
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState<number>(() => Number(sessionStorage.getItem('quiz_step')) || 1);
   const [loading, setLoading] = useState(false);
-  const [results, setResults] = useState<RecommendedCar[]>([]);
+  const [results, setResults] = useState<RecommendedCar[]>(() => JSON.parse(sessionStorage.getItem('quiz_results') || '[]'));
   
-  const [budget, setBudget] = useState<number>(2000000); 
-  const [usage, setUsage] = useState<string>('');
-  const [seats, setSeats] = useState<number>(0);
-  const [fuelType, setFuelType] = useState<string>('');
+  const [budget, setBudget] = useState<number>(() => Number(sessionStorage.getItem('quiz_budget')) || 2000000); 
+  const [usage, setUsage] = useState<string>(() => sessionStorage.getItem('quiz_usage') || '');
+  const [seats, setSeats] = useState<number>(() => Number(sessionStorage.getItem('quiz_seats')) || 0);
+  const [fuelType, setFuelType] = useState<string>(() => sessionStorage.getItem('quiz_fuelType') || '');
+
+  // Save to sessionStorage whenever state changes
+  React.useEffect(() => {
+    sessionStorage.setItem('quiz_step', step.toString());
+    sessionStorage.setItem('quiz_budget', budget.toString());
+    sessionStorage.setItem('quiz_usage', usage);
+    sessionStorage.setItem('quiz_seats', seats.toString());
+    sessionStorage.setItem('quiz_fuelType', fuelType);
+    sessionStorage.setItem('quiz_results', JSON.stringify(results));
+  }, [step, budget, usage, seats, fuelType, results]);
 
   const handleNext = () => setStep(prev => prev + 1);
   const handlePrev = () => setStep(prev => prev - 1);
@@ -35,28 +43,7 @@ const CarQuiz: React.FC = () => {
     }
   };
 
-  const getRadarData = () => {
-    if (results.length === 0) return [];
-    
-    const axes = ['Performance', 'Comfort', 'Efficiency', 'Value', 'Safety'];
-    
-    return axes.map(axis => {
-      const dataPoint: Record<string, string | number> = { subject: axis };
-      results.forEach(car => {
-        let score = 50;
-        if (axis === 'Performance') score = Math.min((car.specs?.horsepower || 100) / 4, 100);
-        if (axis === 'Comfort') score = (car.specs?.seats || 5) * 15;
-        if (axis === 'Efficiency') score = car.fuelType === 'Electric' ? 95 : (car.specs?.mileage_highway || 20) * 2;
-        if (axis === 'Value') score = Math.max(100 - (car.price / 1000), 40);
-        if (axis === 'Safety') score = (car.specs?.seats || 5) * 15;
-        
-        dataPoint[car.model] = Math.min(Math.max(score, 0), 100);
-      });
-      return dataPoint;
-    });
-  };
 
-  const radarColors = ['#1E63FF', '#00C853', '#FF6D00'];
 
   return (
     <div className="container-fluid max-w-container-max mx-auto px-3 py-5 mt-5">
@@ -189,7 +176,7 @@ const CarQuiz: React.FC = () => {
                           {car.matchPercentage}% Match
                         </span>
                       </div>
-                      <img src={car.images[0] || 'https://via.placeholder.com/400x300'} className="card-img-top object-fit-cover" height="200" alt={car.model} />
+                      <img src={car.images[0] || '/placeholder.png'} className="card-img-top object-fit-cover" height="200" alt={car.model} />
                       <div className="card-body p-4 d-flex flex-column">
                         <h4 className="card-title font-heading">{car.year} {car.make} {car.model}</h4>
                         <p className="text-primary fw-bold fs-5">{formatPriceRange(car.price, car.priceMax)}</p>
@@ -200,23 +187,6 @@ const CarQuiz: React.FC = () => {
                     </div>
                   </div>
                 ))}
-              </div>
-
-              <div className="glass-panel p-4 p-md-5 rounded-4 mt-5">
-                <h3 className="font-heading mb-4 text-center">Comparative Analysis</h3>
-                <div style={{ width: '100%', height: 400 }}>
-                  <ResponsiveContainer>
-                    <RadarChart cx="50%" cy="50%" outerRadius="75%" data={getRadarData()}>
-                      <PolarGrid stroke="#424754" />
-                      <PolarAngleAxis dataKey="subject" tick={{ fill: '#c2c6d6', fontFamily: 'JetBrains Mono', fontSize: 12 }} />
-                      <Tooltip contentStyle={{ backgroundColor: '#1d2027', borderColor: '#424754', color: '#fff' }} />
-                      <Legend wrapperStyle={{ paddingTop: '20px' }} />
-                      {results.map((car, idx) => (
-                        <Radar key={car._id} name={car.model} dataKey={car.model} stroke={radarColors[idx]} fill={radarColors[idx]} fillOpacity={0.4} />
-                      ))}
-                    </RadarChart>
-                  </ResponsiveContainer>
-                </div>
               </div>
             </>
           ) : (

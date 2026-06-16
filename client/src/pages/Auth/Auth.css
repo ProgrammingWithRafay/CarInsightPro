@@ -6,6 +6,8 @@
   position: relative;
   overflow: hidden;
   background-color: var(--surface);
+  padding-top: 100px;
+  padding-bottom: 40px;
 }
 
 .auth-bg-glow {

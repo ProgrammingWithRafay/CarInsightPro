@@ -6,7 +6,11 @@ import Review from '../models/Review';
 
 import SupportMessage from '../models/SupportMessage';
 
-// Get admin stats
+/**
+ * Aggregates high-level platform statistics for the admin dashboard.
+ * 
+ * Returns the total count of cars, users, reviews, and support tickets in the system.
+ */
 export const getStats = async (req: Request, res: Response) => {
   try {
     const totalCars = await Car.countDocuments();
@@ -28,7 +32,12 @@ export const getStats = async (req: Request, res: Response) => {
   }
 };
 
-// Get all users
+/**
+ * Retrieves a list of all registered users on the platform.
+ * 
+ * Used by admins to manage the user base. Excludes sensitive fields like passwords
+ * and sorts the users by creation date (newest first).
+ */
 export const getAllUsers = async (req: Request, res: Response) => {
   try {
     const users = await User.find().select('-password').sort('-createdAt');
@@ -38,7 +47,12 @@ export const getAllUsers = async (req: Request, res: Response) => {
   }
 };
 
-// Toggle block status of user
+/**
+ * Toggles the 'isBlocked' status of a user account.
+ * 
+ * A blocked user will not be able to log in. This function prevents admins
+ * from accidentally or maliciously blocking other admins.
+ */
 export const toggleBlockUser = async (req: Request, res: Response) => {
   try {
     const user = await User.findById(req.params.id);
@@ -59,7 +73,12 @@ export const toggleBlockUser = async (req: Request, res: Response) => {
   }
 };
 
-// Delete user
+/**
+ * Permanently deletes a user account from the system.
+ * 
+ * Ensures that admins cannot be deleted. Also cleans up the database by
+ * cascade-deleting all reviews associated with the deleted user.
+ */
 export const deleteUser = async (req: Request, res: Response) => {
   try {
     const user = await User.findById(req.params.id);

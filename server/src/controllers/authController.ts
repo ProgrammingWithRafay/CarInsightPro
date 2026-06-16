@@ -5,7 +5,13 @@ import User from '../models/User';
 import { generateToken } from '../utils/generateToken';
 import { sendVerificationEmail, sendPasswordResetEmail } from '../utils/emailService';
 
-// Register user
+/**
+ * Handles the registration of a new user.
+ * 
+ * This function checks if the email is already in use. If not, it creates a new user account,
+ * generates a unique verification token that expires in 24 hours, and sends a verification email.
+ * The user is created in an unverified state and cannot log in until they click the link in the email.
+ */
 export const registerUser = async (req: Request, res: Response) => {
   try {
     const { name, email, password } = req.body;
@@ -56,7 +62,13 @@ export const registerUser = async (req: Request, res: Response) => {
   }
 };
 
-// Login user
+/**
+ * Authenticates a user and issues a JWT token.
+ * 
+ * Verifies the user's email and password against the database. It enforces that the user must
+ * be email-verified and must not be blocked by an admin before allowing them to log in.
+ * On success, it returns the user's profile data along with the auth token.
+ */
 export const loginUser = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
@@ -96,7 +108,12 @@ export const loginUser = async (req: Request, res: Response) => {
   }
 };
 
-// Verify email
+/**
+ * Verifies a user's email address using a token sent to their inbox.
+ * 
+ * Validates the token provided in the URL params. If the token is valid and hasn't expired,
+ * it marks the user's `isVerified` status as true, enabling them to log in.
+ */
 export const verifyEmail = async (req: Request, res: Response) => {
   try {
     const { token } = req.params;
@@ -137,7 +154,12 @@ export const verifyEmail = async (req: Request, res: Response) => {
   }
 };
 
-// Resend verification email
+/**
+ * Resends the verification email for an unverified account.
+ * 
+ * Useful when the original verification email was lost or expired. Generates a new 
+ * verification token, updates the user record, and sends out a fresh email.
+ */
 export const resendVerification = async (req: Request, res: Response) => {
   try {
     const { email } = req.body;
@@ -173,7 +195,12 @@ export const resendVerification = async (req: Request, res: Response) => {
   }
 };
 
-// Logout user
+/**
+ * Logs out the currently authenticated user.
+ * 
+ * Achieves logout by clearing the HttpOnly 'jwt' cookie on the client side,
+ * setting its expiration date to a time in the past.
+ */
 export const logoutUser = async (req: Request, res: Response) => {
   res.cookie('jwt', '', {
     httpOnly: true,
@@ -182,7 +209,12 @@ export const logoutUser = async (req: Request, res: Response) => {
   res.json({ success: true, message: 'Logged out successfully' });
 };
 
-// Get current user profile
+/**
+ * Fetches the currently authenticated user's profile.
+ * 
+ * Uses the user ID attached to the request (via authMiddleware) to retrieve the user's details,
+ * purposefully excluding sensitive information like the password hash.
+ */
 export const getMe = async (req: Request, res: Response) => {
   try {
     const user = await User.findById(req.user?._id).select('-password');
@@ -197,7 +229,12 @@ export const getMe = async (req: Request, res: Response) => {
   }
 };
 
-// Update user profile
+/**
+ * Updates the profile information (name and/or email) for the authenticated user.
+ * 
+ * If an email update is requested, this function validates the new email format
+ * and ensures it isn't already claimed by another user before saving the changes.
+ */
 export const updateProfile = async (req: Request, res: Response) => {
   try {
     const user = await User.findById(req.user?._id);
@@ -247,7 +284,13 @@ export const updateProfile = async (req: Request, res: Response) => {
   }
 };
 
-// Evaluate and permanently upgrade user rank
+/**
+ * Evaluates and upgrades a user's rank (Bronze -> Silver -> Gold).
+ * 
+ * The rank is determined dynamically based on the user's activity metrics,
+ * such as the number of reviews they've written, cars they've bookmarked,
+ * or reports they've generated.
+ */
 export const evaluateRank = async (req: Request, res: Response) => {
   try {
     const user = await User.findById(req.user?._id);
@@ -298,7 +341,13 @@ export const evaluateRank = async (req: Request, res: Response) => {
   }
 };
 
-// Forgot password - send reset email
+/**
+ * Initiates the password reset flow.
+ * 
+ * Generates a short-lived (1 hour) reset token and emails it to the user.
+ * For security reasons, it always returns a success message to prevent 
+ * malicious actors from enumerating valid email addresses on the platform.
+ */
 export const forgotPassword = async (req: Request, res: Response) => {
   try {
     const { email } = req.body;
@@ -341,7 +390,12 @@ export const forgotPassword = async (req: Request, res: Response) => {
   }
 };
 
-// Reset password using token
+/**
+ * Resets the user's password using a valid reset token.
+ * 
+ * Expects the token in the URL params and the new password in the request body.
+ * If the token is valid, it updates the user's password and clears the token fields.
+ */
 export const resetPassword = async (req: Request, res: Response) => {
   try {
     const { token } = req.params;

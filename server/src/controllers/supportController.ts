@@ -3,6 +3,13 @@ import SupportMessage from '../models/SupportMessage';
 import User from '../models/User';
 import { sendSupportTicketUpdateEmail, sendSupportTicketCreatedEmail } from '../utils/emailService';
 
+/**
+ * Submits a new support ticket/message.
+ * 
+ * Can handle both authenticated users (using their JWT token) and unauthenticated guests 
+ * (requiring them to provide a name and email). Sends an automated email confirmation 
+ * once the ticket is successfully created.
+ */
 export const createMessage = async (req: Request, res: Response) => {
   try {
     const { name, email, subject, message } = req.body;
@@ -42,6 +49,11 @@ export const createMessage = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * Retrieves all support tickets across the platform (Admin only).
+ * 
+ * Returns messages sorted by creation date (newest first), populated with basic user details.
+ */
 export const getMessages = async (req: Request, res: Response) => {
   try {
     const messages = await SupportMessage.find().populate('user', 'name email').sort('-createdAt');
@@ -52,6 +64,11 @@ export const getMessages = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * Fetches the support tickets created by the authenticated user.
+ * 
+ * Used for the user dashboard to let them track their ongoing support requests.
+ */
 export const getUserMessages = async (req: Request, res: Response) => {
   try {
     const messages = await SupportMessage.find({ user: req.user?._id }).sort('-createdAt');
@@ -62,6 +79,12 @@ export const getUserMessages = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * Updates the status of a specific support ticket (Admin only).
+ * 
+ * Validates the status against allowed values ('Open', 'Acknowledged', 'Resolved').
+ * Sends an email notification to the user informing them of the status change.
+ */
 export const updateMessageStatus = async (req: Request, res: Response) => {
   try {
     const { status } = req.body;
@@ -94,6 +117,12 @@ export const updateMessageStatus = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * Adds an admin reply to a support ticket.
+ * 
+ * Allows an admin to respond to a user's ticket and optionally update its status simultaneously.
+ * Currently restricts replies to one per ticket. Sends the reply content to the user via email.
+ */
 export const addReply = async (req: Request, res: Response) => {
   try {
     const { message, status } = req.body;
@@ -139,6 +168,11 @@ export const addReply = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * Permanently deletes a support ticket (Admin only).
+ * 
+ * Removes the ticket document from the database entirely.
+ */
 export const deleteMessage = async (req: Request, res: Response) => {
   try {
     const message = await SupportMessage.findByIdAndDelete(req.params.id);

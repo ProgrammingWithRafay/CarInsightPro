@@ -3,6 +3,11 @@ import { Response } from 'express';
 import jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
 
+/**
+ * Cryptographically signs a new JSON Web Token using the user's ID and the server's secret.
+ * Instead of returning the token in the JSON body, it securely attaches it to an HttpOnly
+ * cookie on the response, mitigating XSS risks.
+ */
 export const generateToken = (res: Response, userId: mongoose.Types.ObjectId | string) => {
   const token = jwt.sign({ id: userId }, process.env.JWT_SECRET as jwt.Secret, {
     expiresIn: (process.env.JWT_EXPIRE || '7d') as any,

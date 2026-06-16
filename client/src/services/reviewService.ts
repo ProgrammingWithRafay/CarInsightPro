@@ -6,6 +6,10 @@ export interface ReviewResponse {
   aggregatedSubScores?: SubScores;
 }
 
+/**
+ * Service to manage all API interactions related to car reviews.
+ * Handles fetching, adding, updating, and deleting user reviews, as well as voting on helpfulness.
+ */
 export const reviewService = {
   async getReviews(carId: string) {
     const response = await api.get<ApiResponse<ReviewResponse>>(`/reviews/${carId}`);

@@ -7,6 +7,11 @@ interface JwtPayload {
   id: string;
 }
 
+/**
+ * Primary authentication middleware.
+ * Intercepts requests to protected routes, verifies the JWT token from the cookies,
+ * and attaches the full user object to the request. Also blocks users with an 'isBlocked' status.
+ */
 export const protect = async (req: Request, res: Response, next: NextFunction) => {
   let token;
 
@@ -42,6 +47,12 @@ export const protect = async (req: Request, res: Response, next: NextFunction) =
   }
 };
 
+/**
+ * Soft authentication middleware.
+ * Used for routes that can be accessed by both guests and authenticated users
+ * (e.g., submitting a support ticket). Attaches the user object if a valid token
+ * is present, but allows the request to proceed normally if it isn't.
+ */
 export const optionalProtect = async (req: Request, res: Response, next: NextFunction) => {
   let token;
 

@@ -350,7 +350,7 @@ const Admin: React.FC = () => {
                           <tr key={car._id}>
                             <td>
                               <img 
-                                src={car.images[0] || 'https://via.placeholder.com/80x50'} 
+                                src={car.images[0] || '/placeholder.png'} 
                                 alt={car.model} 
                                 className="rounded object-fit-cover border border-secondary"
                                 style={{ width: '80px', height: '50px' }}

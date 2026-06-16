@@ -188,32 +188,28 @@ const Cars: React.FC = () => {
 
           {/* Pagination */}
           {!loading && carsData && carsData.pagination && carsData.pagination.pages > 1 && (
-            <div className="d-flex justify-content-center gap-2 mt-5">
-              <button 
-                className="pagination-btn"
-                disabled={filters.page === 1}
-                onClick={() => handlePageChange(filters.page! - 1)}
-              >
-                <span className="material-symbols-outlined fs-6">chevron_left</span>
-              </button>
-              
-              {[...Array(carsData.pagination.pages)].map((_, i) => (
+            <div className="d-flex justify-content-center align-items-center mt-5 fade-in-up">
+              <div className="pagination-controls glass-panel p-2 rounded-pill d-flex gap-2">
                 <button 
-                  key={i + 1}
-                  className={`pagination-btn ${filters.page === i + 1 ? 'active' : ''}`}
-                  onClick={() => handlePageChange(i + 1)}
+                  className="btn btn-sm btn-icon border-0" 
+                  disabled={filters.page === 1}
+                  onClick={() => handlePageChange(filters.page! - 1)}
                 >
-                  {i + 1}
+                  <span className="material-symbols-outlined">chevron_left</span>
                 </button>
-              ))}
+                
+                <div className="d-flex align-items-center px-3 font-mono fw-bold text-on-surface-variant">
+                  Page {filters.page} of {carsData.pagination.pages}
+                </div>
 
-              <button 
-                className="pagination-btn"
-                disabled={filters.page === carsData.pagination.pages}
-                onClick={() => handlePageChange(filters.page! + 1)}
-              >
-                <span className="material-symbols-outlined fs-6">chevron_right</span>
-              </button>
+                <button 
+                  className="btn btn-sm btn-icon border-0" 
+                  disabled={filters.page === carsData.pagination.pages}
+                  onClick={() => handlePageChange(filters.page! + 1)}
+                >
+                  <span className="material-symbols-outlined">chevron_right</span>
+                </button>
+              </div>
             </div>
           )}
         </div>

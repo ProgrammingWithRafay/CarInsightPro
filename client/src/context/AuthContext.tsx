@@ -10,6 +10,12 @@ interface AuthContextType extends AuthState {
   evaluateRank: (reportsCount: number) => Promise<void>;
 }
 
+/**
+ * React Context for global authentication state.
+ * 
+ * Provides the current user data, loading state, and helper functions (login, logout, etc.)
+ * to any component wrapped inside the AuthProvider.
+ */
 // eslint-disable-next-line react-refresh/only-export-components
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -18,6 +24,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
+  /**
+   * On initial mount, we ping the /auth/me endpoint to see if the user has a valid session.
+   * This ensures the user stays logged in across page reloads.
+   */
   useEffect(() => {
     const checkAuth = async () => {
       try {

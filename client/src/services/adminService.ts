@@ -1,6 +1,10 @@
 import api from './api';
 import { AdminStats, User, Car, ApiResponse } from '../types';
 
+/**
+ * Admin-specific API service.
+ * Handles administrative actions like user management, moderation, and fetching dashboard statistics.
+ */
 export const adminService = {
   async getStats() {
     const response = await api.get<ApiResponse<AdminStats>>('/admin/stats');

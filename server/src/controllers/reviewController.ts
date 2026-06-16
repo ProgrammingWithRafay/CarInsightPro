@@ -3,7 +3,12 @@ import { Request, Response } from 'express';
 import Review from '../models/Review';
 import Car from '../models/Car';
 
-// Get reviews for current user
+/**
+ * Retrieves all reviews created by the currently authenticated user.
+ * 
+ * Used for the user dashboard. Populates the related car data so the frontend
+ * can display what car each review belongs to.
+ */
 export const getUserReviews = async (req: Request, res: Response) => {
   try {
     const reviews = await Review.find({ user: req.user?._id }).populate('car', 'make model year images').sort('-createdAt');
@@ -13,7 +18,12 @@ export const getUserReviews = async (req: Request, res: Response) => {
   }
 };
 
-// Get reviews for a specific car
+/**
+ * Fetches all reviews for a specific car and calculates aggregated sub-scores.
+ * 
+ * Returns both the list of individual reviews and an aggregated average of the sub-scores
+ * (e.g., style, comfort, performance) across all reviews for that specific car.
+ */
 export const getReviews = async (req: Request, res: Response) => {
   try {
     const reviews = await Review.find({ car: req.params.carId }).populate('user', 'name avatar').sort('-createdAt');
@@ -43,7 +53,13 @@ export const getReviews = async (req: Request, res: Response) => {
   }
 };
 
-// Add a review
+/**
+ * Submits a new review for a car.
+ * 
+ * Validates that the user hasn't already reviewed the car. Upon successful creation,
+ * it dynamically recalculates the car's average overall rating and review count,
+ * updating the Car document in the process.
+ */
 export const addReview = async (req: Request, res: Response) => {
   try {
     const { title, subScores, comment } = req.body;
@@ -82,7 +98,12 @@ export const addReview = async (req: Request, res: Response) => {
   }
 };
 
-// Update a review
+/**
+ * Modifies an existing review.
+ * 
+ * Ensures the requesting user actually owns the review before allowing updates.
+ * Recalculates the parent car's average rating if the review's rating changes.
+ */
 export const updateReview = async (req: Request, res: Response) => {
   try {
     const review = await Review.findById(req.params.id);
@@ -112,7 +133,12 @@ export const updateReview = async (req: Request, res: Response) => {
   }
 };
 
-// Delete a review
+/**
+ * Deletes a review from the system.
+ * 
+ * Can be performed by the review author or an admin. Once deleted, it updates
+ * the parent car's average rating and review count to reflect the removal.
+ */
 export const deleteReview = async (req: Request, res: Response) => {
   try {
     const review = await Review.findById(req.params.id);
@@ -142,7 +168,12 @@ export const deleteReview = async (req: Request, res: Response) => {
   }
 };
 
-// Mark review as helpful
+/**
+ * Toggles a 'helpful' vote on a specific review.
+ * 
+ * If the user has already voted, it removes their ID from the helpful array (un-vote).
+ * If they haven't voted, it pushes their ID to the array.
+ */
 export const markHelpful = async (req: Request, res: Response) => {
   try {
     const review = await Review.findById(req.params.id);

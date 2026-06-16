@@ -42,19 +42,22 @@ export const generateCarReport = async (car: Car, reviews: Review[]) => {
 
       doc.setFontSize(11);
       const specsData = [
+        ['Body Type', car.bodyType || 'N/A'],
         ['Engine', car.specs?.engine || 'N/A'],
-        ['Power', car.specs?.horsepower ? `${car.specs.horsepower} HP / ${car.specs.torque} lb-ft` : 'N/A'],
+        ['Power', car.specs?.horsepower ? `${car.specs.horsepower} HP / ${car.specs.torque} Nm` : 'N/A'],
         ['Transmission', car.transmission],
-        ['Drive Type', car.specs?.drivetrain || 'N/A'],
-        ['Fuel Economy', car.specs?.mileage_city ? `${car.specs.mileage_city} City / ${car.specs.mileage_highway} Hwy MPG` : 'N/A'],
+        ['Mileage', car.specs?.mileage || 'N/A'],
         ['Fuel Type', car.fuelType],
-        ['Weight', car.specs?.curbWeight ? `${car.specs.curbWeight} lbs` : 'N/A'],
+        ['Dimensions', car.specs?.dimensions ? `${car.specs.dimensions}` : 'N/A'],
+        ['Ground Clearance', car.specs?.groundClearance ? `${car.specs.groundClearance} mm` : 'N/A'],
+        ['Boot Space', car.specs?.bootSpace ? `${car.specs.bootSpace} L` : 'N/A'],
+        ['Kerb Weight', car.specs?.kerbWeight || 'N/A'],
         ['Seats', car.specs?.seats ? `${car.specs.seats} Persons` : 'N/A']
       ];
 
       if (car.fuelType === 'Electric' || car.fuelType === 'Hybrid') {
         if (car.specs?.batteryCapacity) specsData.push(['Battery', `${car.specs.batteryCapacity} kWh`]);
-        if (car.specs?.range) specsData.push(['Range', `${car.specs.range} miles`]);
+        if (car.specs?.range) specsData.push(['Range', `${car.specs.range} km`]);
       }
 
       specsData.forEach((row, index) => {
@@ -81,7 +84,7 @@ export const generateCarReport = async (car: Car, reviews: Review[]) => {
       currentY += 10;
 
       doc.setFontSize(12);
-      doc.text(`Average Rating: ${(car.avgRating / 2).toFixed(1)} / 5.0 (Based on ${reviews.length} reviews)`, 14, currentY);
+      doc.text(`Average Rating: ${(car.avgRating).toFixed(1)} / 5.0 (Based on ${reviews.length} reviews)`, 14, currentY);
       currentY += 10;
 
       if (reviews.length > 0) {
@@ -98,7 +101,7 @@ export const generateCarReport = async (car: Car, reviews: Review[]) => {
           doc.setFont('', 'bold');
           doc.text(review.title || 'Review', 14, currentY);
           doc.setFont('', 'normal');
-          doc.text(`Rating: ${(review.rating / 2).toFixed(1)}/5`, 160, currentY);
+          doc.text(`Rating: ${(review.rating).toFixed(1)}/5`, 160, currentY);
           currentY += 6;
           
           doc.setFontSize(10);

@@ -1,6 +1,10 @@
 import api from './api';
 import { Car, ApiResponse, FilterState } from '../types';
 
+/**
+ * Service to handle all car-related API calls.
+ * Includes fetching inventory, getting single car details, comparisons, recommendations, and bookmarks.
+ */
 export const carService = {
   async getCars(filters: Partial<FilterState>) {
     const params = new URLSearchParams();

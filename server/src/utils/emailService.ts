@@ -1,5 +1,9 @@
 import nodemailer from 'nodemailer';
 
+/**
+ * Initializes the Nodemailer transporter instance based on environment variables.
+ * Automatically switches to Gmail-specific settings if the host includes 'gmail'.
+ */
 const createTransporter = () => {
   const isGmail = process.env.SMTP_HOST?.includes('gmail');
   
@@ -24,6 +28,10 @@ const createTransporter = () => {
   });
 };
 
+/**
+ * Sends a welcome/verification email containing a unique confirmation link.
+ * Essential for the registration flow to ensure users own the provided email address.
+ */
 export const sendVerificationEmail = async (email: string, name: string, token: string) => {
   const transporter = createTransporter();
   const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
@@ -84,6 +92,10 @@ export const sendVerificationEmail = async (email: string, name: string, token: 
   return info;
 };
 
+/**
+ * Notifies a user via email when an admin updates their support ticket status
+ * or adds a new reply to their inquiry.
+ */
 export const sendSupportTicketUpdateEmail = async (email: string, name: string, subject: string, status: string, newReply?: string) => {
   const transporter = createTransporter();
   
@@ -137,6 +149,10 @@ export const sendSupportTicketUpdateEmail = async (email: string, name: string, 
   }
 };
 
+/**
+ * Sends an automated confirmation email immediately after a user (or guest)
+ * submits a new support ticket.
+ */
 export const sendSupportTicketCreatedEmail = async (email: string, name: string, subject: string) => {
   const transporter = createTransporter();
   
@@ -181,6 +197,10 @@ export const sendSupportTicketCreatedEmail = async (email: string, name: string,
   }
 };
 
+/**
+ * Delivers a secure password reset link to the user.
+ * The link contains a short-lived token to prevent unauthorized access.
+ */
 export const sendPasswordResetEmail = async (email: string, name: string, token: string) => {
   const transporter = createTransporter();
   const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';

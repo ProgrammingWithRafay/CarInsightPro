@@ -1,3 +1,8 @@
+/**
+ * Mongoose model for Support Tickets.
+ * Used for the customer support system. Tracks ticket status and stores a history of replies.
+ * Handles both authenticated users (via ObjectId reference) and guests (via raw name/email strings).
+ */
 import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IReply {

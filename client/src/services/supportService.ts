@@ -1,5 +1,9 @@
 import api from './api';
 
+/**
+ * Service responsible for the support ticket system.
+ * Allows users to submit, view, and reply to support messages.
+ */
 export const supportService = {
   createMessage: async (data: { subject: string; message: string; name?: string; email?: string }) => {
     const res = await api.post('/support', data);

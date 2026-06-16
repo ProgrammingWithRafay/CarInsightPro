@@ -11,6 +11,11 @@ interface CarCardProps {
 }
 
 const CarCard: React.FC<CarCardProps> = ({ car, onBookmark, isBookmarked = false }) => {
+  /**
+   * Handles clicks on the bookmark heart icon.
+   * stopPropagation prevents the click from triggering the Link navigation wrapper,
+   * allowing the user to bookmark without leaving the current page.
+   */
   const handleBookmarkClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -22,7 +27,7 @@ const CarCard: React.FC<CarCardProps> = ({ car, onBookmark, isBookmarked = false
       <div className="glass-panel car-card-stitch group">
         <div className="car-card-img-container">
           <img 
-            src={car.images[0] || 'https://via.placeholder.com/400x300?text=No+Image'} 
+            src={car.images[0] || '/placeholder.png'} 
             alt={`${car.make} ${car.model}`} 
             className="car-card-img"
           />
