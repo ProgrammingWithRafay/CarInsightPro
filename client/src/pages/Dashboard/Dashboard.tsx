@@ -5,7 +5,7 @@ import { useToast } from '../../hooks/useToast';
 import { carService } from '../../services/carService';
 import { supportService } from '../../services/supportService';
 import { reviewService } from '../../services/reviewService';
-import { Car } from '../../types';
+import { Car, Review } from '../../types';
 import CarCard from '../../components/CarCard/CarCard';
 import './Dashboard.css';
 
@@ -29,7 +29,7 @@ const Dashboard: React.FC = () => {
   const [supportTickets, setSupportTickets] = useState<SupportTicket[]>([]);
   const [loadingTickets, setLoadingTickets] = useState(false);
   
-  const [myReviews, setMyReviews] = useState<any[]>([]);
+  const [myReviews, setMyReviews] = useState<Review[]>([]);
   const [loadingReviews, setLoadingReviews] = useState(false);
   
   const [reports, setReports] = useState<{id: string, carId: string, carName: string, date: string}[]>([]);
@@ -98,7 +98,7 @@ const Dashboard: React.FC = () => {
     if (evaluateRank && reports.length >= 0) {
       evaluateRank(reports.length);
     }
-  }, [bookmarks.length, myReviews.length, reports.length]);
+  }, [bookmarks.length, myReviews.length, reports.length, evaluateRank]);
 
   const handleRemoveBookmark = async (id: string) => {
     try {
@@ -141,8 +141,9 @@ const Dashboard: React.FC = () => {
         await updateProfile(nameInput.value, emailInput.value);
         showToast('Profile updated successfully!', 'success');
       }
-    } catch (err: any) {
-      showToast(err.response?.data?.message || 'Failed to update profile', 'error');
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
+      showToast(error.response?.data?.message || 'Failed to update profile', 'error');
     } finally {
       setProfileLoading(false);
     }
@@ -361,15 +362,15 @@ const Dashboard: React.FC = () => {
                   </div>
                 ) : myReviews.length > 0 ? (
                   <div className="d-flex flex-column gap-4">
-                    {myReviews.map((review: any) => (
+                    {myReviews.map((review: Review) => (
                       <div key={review._id} className="glass-panel p-4 rounded-4">
                         <div className="d-flex justify-content-between align-items-start mb-3">
                           <div className="d-flex align-items-center gap-3">
-                            {review.car?.images?.[0] && (
-                              <img src={review.car.images[0]} alt="car" width="60" height="40" className="rounded object-fit-cover" />
+                            {(review.car as Car)?.images?.[0] && (
+                              <img src={(review.car as Car).images[0]} alt="car" width="60" height="40" className="rounded object-fit-cover" />
                             )}
                             <div>
-                              <h4 className="font-heading h5 m-0 mb-1">{review.car?.year} {review.car?.make} {review.car?.model}</h4>
+                              <h4 className="font-heading h5 m-0 mb-1">{(review.car as Car)?.year} {(review.car as Car)?.make} {(review.car as Car)?.model}</h4>
                               <div className="d-flex align-items-center gap-1">
                                 <span className="material-symbols-outlined text-tertiary" style={{ fontSize: '16px', fontVariationSettings: "'FILL' 1" }}>star</span>
                                 <span className="fw-bold">{(review.rating / 2).toFixed(1)}</span>
@@ -377,7 +378,7 @@ const Dashboard: React.FC = () => {
                               </div>
                             </div>
                           </div>
-                          <Link to={`/cars/${review.car?._id}`} className="btn btn-sm btn-outline-secondary">View Car</Link>
+                          <Link to={`/cars/${(review.car as Car)?._id}`} className="btn btn-sm btn-outline-secondary">View Car</Link>
                         </div>
                         <h5 className="h6 fw-bold mb-2">{review.title}</h5>
                         <p className="text-on-surface mb-0">{review.comment}</p>

@@ -50,7 +50,7 @@ const CarDetail: React.FC = () => {
         setAggregatedSubScores(reviewsRes.data.aggregatedSubScores);
       }
       if (bookmarksRes.success && bookmarksRes.data) {
-        const bookmarked = bookmarksRes.data.some((b: any) => b._id === id || b === id);
+        const bookmarked = bookmarksRes.data.some((b: { _id?: string } | string) => typeof b === 'string' ? b === id : b._id === id);
         setIsBookmarked(bookmarked);
       }
     } catch {
@@ -59,7 +59,7 @@ const CarDetail: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [id, showToast, navigate]);
+  }, [id, showToast, navigate, user]);
 
   useEffect(() => {
     if (id) {
