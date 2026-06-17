@@ -181,7 +181,7 @@ export const resendVerification = async (req: Request, res: Response) => {
     user.verificationTokenExpires = verificationTokenExpires;
     await user.save();
 
-    await sendVerificationEmail(email, user.name, verificationToken);
+    sendVerificationEmail(email, user.name, verificationToken).catch((err) => console.error(err));
 
     res.json({
       success: true,
@@ -365,18 +365,10 @@ export const forgotPassword = async (req: Request, res: Response) => {
     user.resetPasswordExpires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
     await user.save();
 
-    // Send email
-    try {
-      await sendPasswordResetEmail(email, user.name, resetToken);
-    } catch (emailError: any) {
-      console.error('Failed to send password reset email:', emailError.message);
-      // Clear tokens if email fails
-      user.resetPasswordToken = undefined;
-      user.resetPasswordExpires = undefined;
-      await user.save();
-      res.status(500);
-      throw new Error('Failed to send password reset email. Please try again later.');
-    }
+    // Send email asynchronously
+    sendPasswordResetEmail(email, user.name, resetToken).catch((emailError: any) => {
+      console.error('Failed to send password reset email (async):', emailError.message);
+    });
 
     res.json({
       success: true,
