@@ -36,13 +36,10 @@ export const registerUser = async (req: Request, res: Response) => {
     });
 
     if (user) {
-      // Send verification email
-      try {
-        await sendVerificationEmail(email, name, verificationToken);
-      } catch (emailError: any) {
-        console.error('Failed to send verification email:', emailError.message);
-        // Don't block registration if email fails, but log it
-      }
+      // Send verification email asynchronously so it doesn't block the response
+      sendVerificationEmail(email, name, verificationToken).catch((emailError: any) => {
+        console.error('Failed to send verification email (async):', emailError.message);
+      });
 
       res.status(201).json({
         success: true,
