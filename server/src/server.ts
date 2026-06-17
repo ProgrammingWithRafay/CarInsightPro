@@ -26,6 +26,7 @@ connectDB();
 // allow requests from frontend
 const allowedOrigins = [
   'http://localhost:5173',
+  'https://car-insight-pro-ten.vercel.app',
   process.env.CLIENT_URL || ''
 ].filter(Boolean);
 
