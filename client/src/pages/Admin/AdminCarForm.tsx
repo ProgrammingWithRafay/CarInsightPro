@@ -279,26 +279,26 @@ const AdminCarForm: React.FC<AdminCarFormProps> = ({ car, onSuccess, onCancel })
       <div className="row g-3">
         <div className="col-md-3">
           <label className="form-label font-mono small text-uppercase text-on-surface-variant">{isEV ? 'Motor Type' : 'Engine Capacity'}</label>
-          <input type="text" className="form-control" name="specs.engine" value={formData.specs.engine || ''} onChange={handleChange} placeholder={isEV ? 'e.g. Electric Motor' : 'e.g. 1.8L or 1800cc'} />
+          <input type="text" className="form-control" name="specs.engine" value={formData.specs.engine || ''} onChange={handleChange} placeholder={isEV ? 'e.g. Electric Motor' : 'e.g. 1.8L or 1800cc (Include unit)'} />
         </div>
         <div className="col-md-3">
           <label className="form-label font-mono small text-uppercase text-on-surface-variant">HP</label>
-          <input type="text" className="form-control" name="specs.horsepower" value={formData.specs.horsepower || ''} onChange={handleChange} placeholder="e.g. 150 - 180" />
+          <input type="text" className="form-control" name="specs.horsepower" value={formData.specs.horsepower || ''} onChange={handleChange} placeholder="e.g. 150 - 180 (No units)" />
         </div>
         <div className="col-md-3">
           <label className="form-label font-mono small text-uppercase text-on-surface-variant">Torque (Nm)</label>
-          <input type="text" className="form-control" name="specs.torque" value={formData.specs.torque || ''} onChange={handleChange} placeholder="e.g. 200 - 250" />
+          <input type="text" className="form-control" name="specs.torque" value={formData.specs.torque || ''} onChange={handleChange} placeholder="e.g. 200 - 250 (No units)" />
         </div>
         <div className="col-md-3">
           <label className="form-label font-mono small text-uppercase text-on-surface-variant">Top Speed (KM/H)</label>
-          <input type="text" className="form-control" name="specs.topSpeed" value={formData.specs.topSpeed || ''} onChange={handleChange} placeholder="e.g. 180 - 220" />
+          <input type="text" className="form-control" name="specs.topSpeed" value={formData.specs.topSpeed || ''} onChange={handleChange} placeholder="e.g. 180 - 220 (No units)" />
         </div>
       </div>
 
       <div className="row g-3">
         <div className="col-md-3">
           <label className="form-label font-mono small text-uppercase text-on-surface-variant">Mileage</label>
-          <input type="text" className="form-control" name="specs.mileage" value={formData.specs.mileage || ''} onChange={handleChange} placeholder="e.g. 14 - 22 KM/L" />
+          <input type="text" className="form-control" name="specs.mileage" value={formData.specs.mileage || ''} onChange={handleChange} placeholder="e.g. 14 - 22 KM/L (Include unit)" />
         </div>
         <div className="col-md-2">
           <label className="form-label font-mono small text-uppercase text-on-surface-variant">Seats</label>
@@ -307,14 +307,14 @@ const AdminCarForm: React.FC<AdminCarFormProps> = ({ car, onSuccess, onCancel })
         <div className="col-md-2">
           <label className="form-label font-mono small text-uppercase text-on-surface-variant">{isEV ? 'Battery (kWh)' : 'Fuel Tank (L)'}</label>
           {isEV ? (
-            <input type="text" className="form-control" name="specs.batteryCapacity" value={formData.specs.batteryCapacity || ''} onChange={handleChange} placeholder="e.g. 50 - 75" />
+            <input type="text" className="form-control" name="specs.batteryCapacity" value={formData.specs.batteryCapacity || ''} onChange={handleChange} placeholder="e.g. 50 - 75 (No units)" />
           ) : (
-            <input type="text" className="form-control" name="specs.fuelTankCapacity" value={formData.specs.fuelTankCapacity || ''} onChange={handleChange} placeholder="e.g. 40 - 50" />
+            <input type="text" className="form-control" name="specs.fuelTankCapacity" value={formData.specs.fuelTankCapacity || ''} onChange={handleChange} placeholder="e.g. 40 - 50 (No units)" />
           )}
         </div>
         <div className="col-md-2">
           <label className="form-label font-mono small text-uppercase text-on-surface-variant">Boot Space (L)</label>
-          <input type="text" className="form-control" name="specs.bootSpace" value={formData.specs.bootSpace || ''} onChange={handleChange} placeholder="e.g. 400 - 450" />
+          <input type="text" className="form-control" name="specs.bootSpace" value={formData.specs.bootSpace || ''} onChange={handleChange} placeholder="e.g. 400 - 450 (No units)" />
         </div>
         <div className="col-md-3">
           <label className="form-label font-mono small text-uppercase text-on-surface-variant">Tyre Size</label>
@@ -326,11 +326,11 @@ const AdminCarForm: React.FC<AdminCarFormProps> = ({ car, onSuccess, onCancel })
         <div className="row g-3">
           <div className="col-md-3">
             <label className="form-label font-mono small text-uppercase text-on-surface-variant">Range (KM)</label>
-            <input type="text" className="form-control" name="specs.range" value={formData.specs.range || ''} onChange={handleChange} placeholder="e.g. 400 - 450" />
+            <input type="text" className="form-control" name="specs.range" value={formData.specs.range || ''} onChange={handleChange} placeholder="e.g. 400 - 450 (No units)" />
           </div>
           <div className="col-md-3">
             <label className="form-label font-mono small text-uppercase text-on-surface-variant">Charging Time (hrs)</label>
-            <input type="number" className="form-control" name="specs.chargingTime" value={formData.specs.chargingTime || ''} onChange={handleChange} step="0.5" />
+            <input type="number" className="form-control" name="specs.chargingTime" value={formData.specs.chargingTime || ''} onChange={handleChange} step="0.5" placeholder="e.g. 6 (No units)" />
           </div>
         </div>
       )}
@@ -340,15 +340,15 @@ const AdminCarForm: React.FC<AdminCarFormProps> = ({ car, onSuccess, onCancel })
       <div className="row g-3">
         <div className="col-md-5">
           <label className="form-label font-mono small text-uppercase text-on-surface-variant">Dimensions (L x W x H mm)</label>
-          <input type="text" className="form-control" name="specs.dimensions" value={formData.specs.dimensions || ''} onChange={handleChange} placeholder="e.g. 4500 x 1800 x 1450" />
+          <input type="text" className="form-control" name="specs.dimensions" value={formData.specs.dimensions || ''} onChange={handleChange} placeholder="e.g. 4500 x 1800 x 1450 (No units)" />
         </div>
         <div className="col-md-4">
           <label className="form-label font-mono small text-uppercase text-on-surface-variant">Ground Clear. (mm)</label>
-          <input type="text" className="form-control" name="specs.groundClearance" value={formData.specs.groundClearance || ''} onChange={handleChange} placeholder="e.g. 150 - 180" />
+          <input type="text" className="form-control" name="specs.groundClearance" value={formData.specs.groundClearance || ''} onChange={handleChange} placeholder="e.g. 150 - 180 (No units)" />
         </div>
         <div className="col-md-3">
           <label className="form-label font-mono small text-uppercase text-on-surface-variant">Kerb Weight</label>
-          <input type="text" className="form-control" name="specs.kerbWeight" value={formData.specs.kerbWeight || ''} onChange={handleChange} placeholder="e.g. 1050 - 1100 KG" />
+          <input type="text" className="form-control" name="specs.kerbWeight" value={formData.specs.kerbWeight || ''} onChange={handleChange} placeholder="e.g. 1050 - 1100 KG (Include unit)" />
         </div>
       </div>
 
