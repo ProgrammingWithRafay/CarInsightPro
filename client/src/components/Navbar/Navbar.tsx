@@ -12,7 +12,8 @@ const Navbar: React.FC = () => {
   };
 
   return (
-    <header className="fixed-top navbar-stitch">
+    <>
+      <header className="fixed-top navbar-stitch">
       <div className="container-fluid max-w-container-max mx-auto px-3 px-md-4 py-3 d-flex justify-content-between align-items-center">
         <Link to="/" className="text-decoration-none d-flex align-items-center gap-2">
           <img src="/logo.png" alt="CarInsight Pro Logo" style={{ height: '40px', width: 'auto', borderRadius: '4px' }} />
@@ -59,7 +60,7 @@ const Navbar: React.FC = () => {
             <span className="material-symbols-outlined">menu</span>
           </button>
         </div>
-      </div>
+      </header>
 
       {/* Offcanvas Mobile Menu */}
       <div className="offcanvas offcanvas-end bg-surface border-start border-secondary" tabIndex={-1} id="mobileMenu">
@@ -77,7 +78,7 @@ const Navbar: React.FC = () => {
           {user?.role === 'admin' && <Link to="/admin" className="text-decoration-none text-on-surface fs-5 font-heading" data-bs-dismiss="offcanvas">Admin Panel</Link>}
         </div>
       </div>
-    </header>
+    </>
   );
 };
 

@@ -17,6 +17,7 @@ const Cars: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [bookmarkedIds, setBookmarkedIds] = useState<string[]>([]);
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
   
   const { isAuthenticated } = useAuth();
   const { showToast } = useToast();
@@ -143,8 +144,20 @@ const Cars: React.FC = () => {
       </header>
 
       <div className="row g-4">
+        {/* Mobile Filter Toggle Button */}
+        <div className="col-12 d-lg-none mb-2">
+          <button 
+            className="btn w-100 d-flex align-items-center justify-content-center gap-2 py-3" 
+            style={{ border: '1px solid var(--outline-variant)', backgroundColor: 'var(--surface-container-high)', color: 'var(--on-surface)', borderRadius: 'var(--radius-lg)' }}
+            onClick={() => setShowMobileFilters(!showMobileFilters)}
+          >
+            <span className="material-symbols-outlined">tune</span>
+            {showMobileFilters ? 'Hide Filters' : 'Show Filters'}
+          </button>
+        </div>
+
         {/* Sidebar */}
-        <div className="col-12 col-lg-3">
+        <div className={`col-12 col-lg-3 ${showMobileFilters ? 'd-block' : 'd-none d-lg-block'}`}>
           <FilterSidebar filters={filters} setFilters={setFilters} />
         </div>
 
