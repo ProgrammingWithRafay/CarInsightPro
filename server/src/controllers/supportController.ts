@@ -39,7 +39,9 @@ export const createMessage = async (req: Request, res: Response) => {
     const targetName = userId ? req.user?.name || name : (name || 'Guest');
 
     if (targetEmail) {
-      await sendSupportTicketCreatedEmail(targetEmail, targetName, subject);
+      sendSupportTicketCreatedEmail(targetEmail, targetName, subject).catch((err) => {
+        console.error('Failed to send support email asynchronously:', err);
+      });
     }
 
     res.status(201).json({ success: true, data: newMessage });
@@ -102,12 +104,12 @@ export const updateMessageStatus = async (req: Request, res: Response) => {
     const targetName = message.user ? (message.user as any).name : (message.name || 'Guest');
 
     if (targetEmail) {
-      await sendSupportTicketUpdateEmail(
+      sendSupportTicketUpdateEmail(
         targetEmail,
         targetName,
         message.subject,
         message.status
-      );
+      ).catch(err => console.error('Failed to send update email async:', err));
     }
 
     res.status(200).json({ success: true, data: message });
@@ -152,13 +154,13 @@ export const addReply = async (req: Request, res: Response) => {
     const targetName = supportMsg.user ? (supportMsg.user as any).name : (supportMsg.name || 'Guest');
 
     if (targetEmail) {
-      await sendSupportTicketUpdateEmail(
+      sendSupportTicketUpdateEmail(
         targetEmail,
         targetName,
         supportMsg.subject,
         supportMsg.status,
         message
-      );
+      ).catch(err => console.error('Failed to send reply email async:', err));
     }
 
     res.status(200).json({ success: true, data: supportMsg });
