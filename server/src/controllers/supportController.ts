@@ -15,7 +15,12 @@ export const createMessage = async (req: Request, res: Response) => {
     const { name, email, subject, message } = req.body;
     let userId = req.user?._id; // optionalProtect middleware will set this if logged in
 
-    // If not logged in but provided an email, check if they are a registered user
+    // If logged in, but they provided a different email, detach their logged-in user session for this ticket
+    if (userId && email && req.user && email.toLowerCase() !== req.user.email.toLowerCase()) {
+      userId = undefined;
+    }
+
+    // If not logged in (or detached) but provided an email, check if they are a registered user
     if (!userId && email) {
       const existingUser = await User.findOne({ email: email.toLowerCase() });
       if (existingUser) {
