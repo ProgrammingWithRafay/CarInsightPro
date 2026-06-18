@@ -192,18 +192,7 @@ const AdminCarForm: React.FC<AdminCarFormProps> = ({ car, onSuccess, onCancel })
         </div>
         <div className="col-md-2">
           <label className="form-label font-mono small text-uppercase text-on-surface-variant">Body Type</label>
-          <select className="form-select" name="bodyType" value={formData.bodyType || ''} onChange={handleChange}>
-            <option value="">Select</option>
-            <option value="Sedan">Sedan</option>
-            <option value="Hatchback">Hatchback</option>
-            <option value="SUV">SUV</option>
-            <option value="Crossover">Crossover</option>
-            <option value="Compact SUV">Compact SUV</option>
-            <option value="Pickup">Pickup</option>
-            <option value="MPV">MPV</option>
-            <option value="Coupe">Coupe</option>
-            <option value="Station Wagon">Wagon</option>
-          </select>
+          <input type="text" className="form-control" name="bodyType" value={formData.bodyType || ''} onChange={handleChange} placeholder="e.g. Sedan, SUV" />
         </div>
       </div>
 
