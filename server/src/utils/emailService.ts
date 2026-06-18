@@ -9,12 +9,20 @@ const createTransporter = () => {
   
   if (isGmail) {
     return nodemailer.createTransport({
-      service: 'gmail',
+      host: 'smtp.gmail.com',
+      port: 465,
+      secure: true,
       auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
       },
-    });
+      tls: {
+        rejectUnauthorized: false
+      },
+      // Force IPv4. Railway free tier does not support outbound IPv6, 
+      // causing ENETUNREACH when Node defaults to an IPv6 address.
+      family: 4 
+    } as any);
   }
 
   const port = parseInt(process.env.SMTP_PORT || '587');
