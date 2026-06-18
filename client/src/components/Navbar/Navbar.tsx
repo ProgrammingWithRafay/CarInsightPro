@@ -47,7 +47,7 @@ const Navbar: React.FC = () => {
                   <span className="material-symbols-outlined">account_circle</span>
                 )}
               </Link>
-              <button className="btn-signin bg-transparent border border-secondary text-on-surface" onClick={logout}>
+              <button className="btn-signin bg-transparent border border-secondary text-on-surface d-none d-sm-block" onClick={logout}>
                 Logout
               </button>
             </>
@@ -56,7 +56,7 @@ const Navbar: React.FC = () => {
               <Link to="/login" className="icon-btn text-decoration-none">
                 <span className="material-symbols-outlined">account_circle</span>
               </Link>
-              <Link to="/login" className="text-decoration-none">
+              <Link to="/login" className="text-decoration-none d-none d-sm-block">
                 <button className="btn-signin active-glow">Sign In</button>
               </Link>
             </>
@@ -84,6 +84,14 @@ const Navbar: React.FC = () => {
           {user?.role === 'user' && <Link to="/matchmaker" className="text-decoration-none text-on-surface fs-5 font-heading" onClick={closeOffcanvas}>Matchmaker</Link>}
           {user?.role === 'user' && <Link to="/dashboard" className="text-decoration-none text-on-surface fs-5 font-heading" onClick={closeOffcanvas}>Dashboard</Link>}
           {user?.role === 'admin' && <Link to="/admin" className="text-decoration-none text-on-surface fs-5 font-heading" onClick={closeOffcanvas}>Admin Panel</Link>}
+          
+          <hr className="border-secondary my-2" />
+          
+          {user ? (
+            <button className="btn btn-outline-danger mt-2" onClick={() => { logout(); closeOffcanvas(); }}>Logout</button>
+          ) : (
+            <Link to="/login" className="btn btn-primary mt-2" onClick={closeOffcanvas}>Sign In</Link>
+          )}
         </div>
       </div>
     </>
