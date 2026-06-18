@@ -3,6 +3,7 @@ import { adminService } from '../../services/adminService';
 import { supportService } from '../../services/supportService';
 import api from '../../services/api';
 import { useToast } from '../../hooks/useToast';
+import { useAuth } from '../../hooks/useAuth';
 import { AdminStats, User, Car } from '../../types';
 import Modal from '../../components/Modal/Modal';
 import AdminCarForm from './AdminCarForm';
@@ -29,6 +30,8 @@ const Admin: React.FC = () => {
   const [messagesLoading, setMessagesLoading] = useState(false);
   const [supportMessages, setSupportMessages] = useState<SupportMessage[]>([]);
   const { showToast } = useToast();
+  const { user, updateProfile, logout } = useAuth();
+  const [profileLoading, setProfileLoading] = useState(false);
 
   const [activeTab, setActiveTab] = useState('overview');
   const [isCarModalOpen, setIsCarModalOpen] = useState(false);
@@ -177,6 +180,33 @@ const Admin: React.FC = () => {
     loadCars();
   };
 
+  const handleUpdateProfile = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const form = e.currentTarget;
+    const nameInput = form.elements.namedItem('name') as HTMLInputElement;
+    const emailInput = form.elements.namedItem('email') as HTMLInputElement;
+    const avatarInput = form.elements.namedItem('avatar') as HTMLInputElement;
+    
+    if (!nameInput.value || !emailInput.value) {
+      return showToast('Name and email are required', 'error');
+    }
+    
+    const avatarFile = avatarInput.files && avatarInput.files.length > 0 ? avatarInput.files[0] : undefined;
+    
+    setProfileLoading(true);
+    try {
+      if (updateProfile) {
+        const res = await updateProfile(nameInput.value, emailInput.value, avatarFile);
+        showToast(res.message || 'Profile updated successfully!', 'success');
+      }
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
+      showToast(error.response?.data?.message || 'Failed to update profile', 'error');
+    } finally {
+      setProfileLoading(false);
+    }
+  };
+
 
 
   if (loading) {
@@ -224,7 +254,19 @@ const Admin: React.FC = () => {
               >
                 <span className="material-symbols-outlined">support_agent</span> Support Tickets
               </button>
+              <button 
+                className={`dashboard-nav-link ${activeTab === 'settings' ? 'active' : ''}`}
+                onClick={() => setActiveTab('settings')}
+              >
+                <span className="material-symbols-outlined">settings</span> Settings
+              </button>
             </nav>
+
+            <div className="mt-auto pt-4 border-top border-secondary d-flex flex-column gap-2">
+              <button className="dashboard-nav-link text-on-surface-variant hover:text-error mt-2" onClick={logout}>
+                <span className="material-symbols-outlined">logout</span> Logout
+              </button>
+            </div>
           </div>
         </div>
 
@@ -450,6 +492,35 @@ const Admin: React.FC = () => {
                   </div>
                 )}
               </div>
+            </div>
+          )}
+
+          {/* SETTINGS TAB */}
+          {activeTab === 'settings' && (
+            <div className="fade-in-up">
+              <h3 className="font-heading h4 mb-4">Security & Preferences</h3>
+              <form className="glass-panel p-4 rounded-4 d-flex flex-column gap-4" onSubmit={handleUpdateProfile}>
+                <div className="row g-4">
+                  <div className="col-md-6 d-flex flex-column gap-2">
+                    <label className="font-mono text-on-surface-variant text-uppercase fw-bold" style={{ fontSize: '12px' }}>FULL NAME</label>
+                    <input type="text" name="name" className="settings-input" defaultValue={user?.name} required />
+                  </div>
+                  <div className="col-md-6 d-flex flex-column gap-2">
+                    <label className="font-mono text-on-surface-variant text-uppercase fw-bold" style={{ fontSize: '12px' }}>EMAIL ADDRESS</label>
+                    <input type="email" name="email" className="settings-input" defaultValue={user?.email} required />
+                  </div>
+                  <div className="col-12 d-flex flex-column gap-2">
+                    <label className="font-mono text-on-surface-variant text-uppercase fw-bold" style={{ fontSize: '12px' }}>PROFILE PICTURE</label>
+                    <input type="file" name="avatar" className="settings-input form-control bg-transparent text-on-surface" accept="image/*" />
+                    <small className="text-on-surface-variant">Upload an image to customize your profile avatar.</small>
+                  </div>
+                </div>
+                <div className="d-flex justify-content-end gap-3 mt-3">
+                  <button type="submit" className="btn btn-primary px-4 active-glow" disabled={profileLoading}>
+                    {profileLoading ? 'Updating...' : 'Update Admin Profile'}
+                  </button>
+                </div>
+              </form>
             </div>
           )}
 

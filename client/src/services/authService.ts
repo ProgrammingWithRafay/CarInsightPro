@@ -25,8 +25,10 @@ export const authService = {
     return response.data;
   },
 
-  async updateProfile(name: string, email: string) {
-    const response = await api.put<ApiResponse<User>>('/auth/profile', { name, email });
+  async updateProfile(data: FormData | { name: string, email: string }) {
+    const response = await api.put<ApiResponse<User>>('/auth/profile', data, {
+      headers: data instanceof FormData ? { 'Content-Type': 'multipart/form-data' } : { 'Content-Type': 'application/json' }
+    });
     return response.data;
   },
 

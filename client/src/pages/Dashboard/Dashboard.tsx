@@ -156,16 +156,19 @@ const Dashboard: React.FC = () => {
     const form = e.currentTarget;
     const nameInput = form.elements.namedItem('name') as HTMLInputElement;
     const emailInput = form.elements.namedItem('email') as HTMLInputElement;
+    const avatarInput = form.elements.namedItem('avatar') as HTMLInputElement;
     
     if (!nameInput.value || !emailInput.value) {
       return showToast('Name and email are required', 'error');
     }
     
+    const avatarFile = avatarInput.files && avatarInput.files.length > 0 ? avatarInput.files[0] : undefined;
+    
     setProfileLoading(true);
     try {
       if (updateProfile) {
-        await updateProfile(nameInput.value, emailInput.value);
-        showToast('Profile updated successfully!', 'success');
+        const res = await updateProfile(nameInput.value, emailInput.value, avatarFile);
+        showToast(res.message || 'Profile updated successfully!', 'success');
       }
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } };
@@ -236,9 +239,13 @@ const Dashboard: React.FC = () => {
           <header className="glass-panel p-4 rounded-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-4">
             <div className="d-flex align-items-center gap-4">
               <div className="rounded-circle border border-2 border-primary p-1" style={{ width: '80px', height: '80px' }}>
-                <div className="w-100 h-100 rounded-circle bg-primary text-on-primary d-flex align-items-center justify-content-center fs-2 fw-bold">
-                  {user?.name.charAt(0).toUpperCase()}
-                </div>
+                {user?.avatar ? (
+                  <img src={user.avatar} alt={user.name} className="w-100 h-100 rounded-circle object-fit-cover" />
+                ) : (
+                  <div className="w-100 h-100 rounded-circle bg-primary text-on-primary d-flex align-items-center justify-content-center fs-2 fw-bold">
+                    {user?.name.charAt(0).toUpperCase()}
+                  </div>
+                )}
               </div>
               <div>
                 <h2 className="font-heading h3 m-0">{user?.name}</h2>
@@ -442,6 +449,11 @@ const Dashboard: React.FC = () => {
                     <div className="col-md-6 d-flex flex-column gap-2">
                       <label className="font-mono text-on-surface-variant text-uppercase fw-bold" style={{ fontSize: '12px' }}>EMAIL ADDRESS</label>
                       <input type="email" name="email" className="settings-input" defaultValue={user?.email} required />
+                    </div>
+                    <div className="col-12 d-flex flex-column gap-2">
+                      <label className="font-mono text-on-surface-variant text-uppercase fw-bold" style={{ fontSize: '12px' }}>PROFILE PICTURE</label>
+                      <input type="file" name="avatar" className="settings-input form-control bg-transparent text-on-surface" accept="image/*" />
+                      <small className="text-on-surface-variant">Upload an image to customize your profile avatar.</small>
                     </div>
                   </div>
                   <div className="d-flex justify-content-end gap-3 mt-3">

@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { carService } from '../../services/carService';
+import { useAuth } from '../../hooks/useAuth';
 
 import Counter from '../../components/Counter/Counter';
 import './Home.css';
 
 const Home: React.FC = () => {
+  const { user } = useAuth();
   const [stats, setStats] = useState({ totalCars: 0, totalReviews: 0 });
 
   useEffect(() => {
@@ -79,7 +81,7 @@ const Home: React.FC = () => {
             { icon: 'search', title: 'Search & Filter', desc: 'Filter by make, model, year, price, fuel type, or whatever matters to you. Find exactly what you\'re looking for.' },
             { icon: 'compare_arrows', title: 'Compare Cars', desc: 'Put two or more cars next to each other and see how they stack up on specs, price, and features.' },
             { icon: 'description', title: 'PDF Reports', desc: 'Download a clean PDF summary of any comparison. Handy if you want to share it or look at it later.' },
-            { icon: 'insights', title: 'Price Trends', desc: 'See how car prices have changed over time with simple, easy-to-read charts.' },
+            { icon: 'bookmark', title: 'Save Favorites', desc: 'Bookmark the cars you like and easily access them anytime from your personal dashboard.' },
             { icon: 'verified_user', title: 'Honest Reviews', desc: 'Read reviews from real people who actually own these cars. No fake stuff.' },
             { icon: 'admin_panel_settings', title: 'Admin Dashboard', desc: 'If you\'re an admin, you can manage car listings, users, reviews, and support messages from one place.' }
           ].map((feat, idx) => (
@@ -155,21 +157,23 @@ const Home: React.FC = () => {
 
 
       {/* CTA Banner */}
-      <section className="section-padding px-3">
-        <div className="max-w-container-max mx-auto cta-banner">
-          <div className="position-absolute top-0 start-0 w-100 h-100 opacity-25"></div>
-          <div className="position-relative z-10">
-            <h2 className="font-heading fw-bold cta-title mb-3">Ready to find your next car?</h2>
-            <p className="cta-subtitle mb-5 max-w-container-max mx-auto" style={{ maxWidth: '600px' }}>
-              Create a free account and start comparing cars in minutes. No credit card, no commitments.
-            </p>
-            <div className="d-flex flex-column flex-md-row gap-3 justify-content-center">
-              <Link to="/register"><button className="btn-cta-primary w-100">Sign Up Free</button></Link>
-              <Link to="/contact"><button className="btn-cta-secondary">Contact Us</button></Link>
+      {!user && (
+        <section className="section-padding px-3">
+          <div className="max-w-container-max mx-auto cta-banner">
+            <div className="position-absolute top-0 start-0 w-100 h-100 opacity-25"></div>
+            <div className="position-relative z-10">
+              <h2 className="font-heading fw-bold cta-title mb-3">Ready to find your next car?</h2>
+              <p className="cta-subtitle mb-5 max-w-container-max mx-auto" style={{ maxWidth: '600px' }}>
+                Create a free account and start comparing cars in minutes. No credit card, no commitments.
+              </p>
+              <div className="d-flex flex-column flex-md-row gap-3 justify-content-center">
+                <Link to="/register"><button className="btn-cta-primary w-100">Sign Up Free</button></Link>
+                <Link to="/contact"><button className="btn-cta-secondary">Contact Us</button></Link>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
     </div>
   );

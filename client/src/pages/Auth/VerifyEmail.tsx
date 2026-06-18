@@ -8,9 +8,13 @@ const VerifyEmail: React.FC = () => {
   const { token } = useParams<{ token: string }>();
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [message, setMessage] = useState('');
+  const hasVerified = React.useRef(false);
 
   useEffect(() => {
     const verify = async () => {
+      if (hasVerified.current) return;
+      hasVerified.current = true;
+      
       if (!token) {
         setStatus('error');
         setMessage('Invalid verification link.');

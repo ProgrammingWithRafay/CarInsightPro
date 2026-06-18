@@ -32,8 +32,12 @@ const Navbar: React.FC = () => {
         <div className="d-flex align-items-center gap-3">
           {user ? (
             <>
-              <Link to={user.role === 'admin' ? '/admin' : '/dashboard'} className="icon-btn text-decoration-none">
-                <span className="material-symbols-outlined">account_circle</span>
+              <Link to={user.role === 'admin' ? '/admin' : '/dashboard'} className="icon-btn text-decoration-none d-flex align-items-center justify-content-center" style={{ width: '40px', height: '40px', borderRadius: '50%', padding: 0, overflow: 'hidden' }}>
+                {user?.avatar ? (
+                  <img src={user.avatar} alt="Profile" className="w-100 h-100 object-fit-cover" />
+                ) : (
+                  <span className="material-symbols-outlined">account_circle</span>
+                )}
               </Link>
               <button className="btn-signin bg-transparent border border-secondary text-on-surface" onClick={logout}>
                 Logout

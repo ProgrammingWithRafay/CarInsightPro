@@ -4,6 +4,7 @@ import crypto from 'crypto';
 import User from '../models/User';
 import { generateToken } from '../utils/generateToken';
 import { sendVerificationEmail, sendPasswordResetEmail } from '../utils/emailService';
+import cloudinary from '../config/cloudinary';
 
 /**
  * Handles the registration of a new user.
@@ -120,15 +121,7 @@ export const verifyEmail = async (req: Request, res: Response) => {
 
     if (!user) {
       res.status(400);
-      throw new Error('Invalid verification token. Please request a new one.');
-    }
-
-    // If user is already verified, just return success
-    if (user.isVerified) {
-      return res.json({
-        success: true,
-        message: 'Email is already verified! You can now log in.',
-      });
+      throw new Error('This verification link is invalid or has already been used.');
     }
 
     // Check if token has expired
@@ -137,9 +130,14 @@ export const verifyEmail = async (req: Request, res: Response) => {
       throw new Error('Verification token has expired. Please request a new one.');
     }
 
+    if (user.pendingEmail) {
+      user.email = user.pendingEmail;
+      user.pendingEmail = undefined;
+    }
+
     user.isVerified = true;
-    // We intentionally keep the token in the DB so that if an email client pre-fetches 
-    // the link, the actual user clicking it later won't get an "Invalid token" error.
+    user.verificationToken = undefined;
+    user.verificationTokenExpires = undefined;
     await user.save();
 
     res.json({
@@ -242,6 +240,8 @@ export const updateProfile = async (req: Request, res: Response) => {
 
     const { name, email } = req.body;
 
+    let emailChanged = false;
+    
     // Validate email format if provided
     if (email) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -257,16 +257,43 @@ export const updateProfile = async (req: Request, res: Response) => {
           res.status(400);
           throw new Error('This email address is already registered to another account.');
         }
+        emailChanged = true;
       }
     }
 
     user.name = name || user.name;
-    user.email = email || user.email;
+    
+    if (emailChanged) {
+      user.pendingEmail = email;
+      const verificationToken = crypto.randomBytes(32).toString('hex');
+      user.verificationToken = verificationToken;
+      user.verificationTokenExpires = new Date(Date.now() + 24 * 60 * 60 * 1000);
+      
+      sendVerificationEmail(email, user.name, verificationToken).catch((err) => {
+        console.error('Failed to send verification email on profile update:', err);
+      });
+    }
+    
+    // Handle avatar upload if present
+    if (req.file) {
+      const uploadPromise = new Promise<string>((resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
+          { folder: 'carinsight_pro_avatars' },
+          (error, result) => {
+            if (error) reject(error);
+            else resolve(result!.secure_url);
+          }
+        );
+        uploadStream.end(req.file!.buffer);
+      });
+      user.avatar = await uploadPromise;
+    }
     
     const updatedUser = await user.save();
     
     res.json({
       success: true,
+      message: emailChanged ? 'Profile updated. A verification link has been sent to your new email. Your email will not change until it is verified.' : 'Profile updated successfully!',
       data: {
         _id: updatedUser._id,
         name: updatedUser.name,

@@ -9,6 +9,7 @@ import bcrypt from 'bcryptjs';
 export interface UserDocument extends Document {
   name: string;
   email: string;
+  pendingEmail?: string;
   password?: string;
   role: 'user' | 'admin';
   rank: 'Bronze' | 'Silver' | 'Gold';
@@ -27,6 +28,7 @@ export interface UserDocument extends Document {
 const UserSchema: Schema = new Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
+  pendingEmail: { type: String },
   password: { type: String, required: true, select: false },
   role: { type: String, enum: ['user', 'admin'], default: 'user' },
   rank: { type: String, enum: ['Bronze', 'Silver', 'Gold'], default: 'Bronze' },

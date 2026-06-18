@@ -1,6 +1,7 @@
 import express from 'express';
 import { registerUser, loginUser, logoutUser, getMe, updateProfile, verifyEmail, resendVerification, forgotPassword, resetPassword, evaluateRank } from '../controllers/authController';
 import { protect } from '../middleware/authMiddleware';
+import { upload } from '../middleware/uploadMiddleware';
 
 import rateLimit from 'express-rate-limit';
 
@@ -18,7 +19,7 @@ router.post('/register', authLimiter, registerUser);
 router.post('/login', authLimiter, loginUser);
 router.post('/logout', logoutUser);
 router.get('/me', protect, getMe);
-router.put('/profile', protect, updateProfile);
+router.put('/profile', protect, upload.single('avatar'), updateProfile);
 router.put('/evaluate-rank', protect, evaluateRank);
 router.get('/verify/:token', verifyEmail);
 router.post('/resend-verification', authLimiter, resendVerification);
