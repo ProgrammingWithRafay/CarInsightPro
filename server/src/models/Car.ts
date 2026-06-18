@@ -82,7 +82,7 @@ const CarSchema: Schema = new Schema({
     fuelTankCapacity: { type: String, required: false },
     topSpeed: { type: String, required: false },
     tyreSize: { type: String, required: false },
-    seats: { type: Number, default: 5 },
+    seats: { type: Number, default: 5, min: 1, max: 8 },
     batteryCapacity: { type: String, required: false },
     chargingTime: { type: Number, required: false },
     range: { type: String, required: false },
