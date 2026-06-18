@@ -41,6 +41,7 @@ Browse dynamic car listings, compare vehicles side-by-side, read community revie
 | JSON Web Tokens (JWT) | Secure authentication |
 | Cloudinary | Remote image hosting |
 | Multer | File upload handling |
+| Brevo API | Transactional email delivery bypassing SMTP firewalls |
 
 ---
 
