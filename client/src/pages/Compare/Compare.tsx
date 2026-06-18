@@ -58,8 +58,7 @@ const Compare: React.FC = () => {
 
   const handleShare = () => {
     if (selectedCar1 && selectedCar2) {
-      // Using a mock production domain for presentation purposes instead of localhost
-      const baseUrl = import.meta.env.VITE_APP_URL || 'https://carinsight-pro.com';
+      const baseUrl = window.location.origin;
       const url = `${baseUrl}/compare?cars=${selectedCar1._id},${selectedCar2._id}`;
       navigator.clipboard.writeText(url);
       setShareLink(url);
