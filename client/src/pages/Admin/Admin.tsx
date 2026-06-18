@@ -404,19 +404,21 @@ const Admin: React.FC = () => {
                             </td>
                             <td>{car.year}</td>
                             <td className="font-mono text-success">{formatPriceRange(car.price, car.priceMax)}</td>
-                            <td className="text-end">
-                              <button 
-                                className="btn btn-sm btn-outline-primary me-2"
-                                onClick={() => handleOpenEditModal(car)}
-                              >
-                                Edit
-                              </button>
-                              <button 
-                                className="btn btn-sm btn-outline-danger"
-                                onClick={() => handleDeleteCar(car._id)}
-                              >
-                                Delete
-                              </button>
+                            <td>
+                              <div className="d-flex justify-content-end align-items-center gap-2">
+                                <button 
+                                  className="btn btn-sm btn-outline-primary"
+                                  onClick={() => handleOpenEditModal(car)}
+                                >
+                                  Edit
+                                </button>
+                                <button 
+                                  className="btn btn-sm btn-outline-danger"
+                                  onClick={() => handleDeleteCar(car._id)}
+                                >
+                                  Delete
+                                </button>
+                              </div>
                             </td>
                           </tr>
                         ))}
@@ -470,15 +472,17 @@ const Admin: React.FC = () => {
                                 {msg.status}
                               </span>
                             </td>
-                            <td className="text-end">
-                              <button className="btn btn-sm btn-outline-info me-2" onClick={() => handleOpenMessageModal(msg)}>View</button>
-                              {msg.status !== 'Acknowledged' && msg.status !== 'Resolved' && (
-                                <button className="btn btn-sm btn-outline-primary me-2" onClick={() => handleUpdateMessageStatus(msg._id, 'Acknowledged')}>Ack</button>
-                              )}
-                              {msg.status !== 'Resolved' && (
-                                <button className="btn btn-sm btn-outline-success me-2" onClick={() => handleUpdateMessageStatus(msg._id, 'Resolved')}>Resolve</button>
-                              )}
-                              <button className="btn btn-sm btn-outline-danger" onClick={() => handleDeleteTicket(msg._id)}>Delete</button>
+                            <td>
+                              <div className="d-flex justify-content-end align-items-center gap-2">
+                                <button className="btn btn-sm btn-outline-info" onClick={() => handleOpenMessageModal(msg)}>View</button>
+                                {msg.status !== 'Acknowledged' && msg.status !== 'Resolved' && (
+                                  <button className="btn btn-sm btn-outline-primary" onClick={() => handleUpdateMessageStatus(msg._id, 'Acknowledged')}>Ack</button>
+                                )}
+                                {msg.status !== 'Resolved' && (
+                                  <button className="btn btn-sm btn-outline-success" onClick={() => handleUpdateMessageStatus(msg._id, 'Resolved')}>Resolve</button>
+                                )}
+                                <button className="btn btn-sm btn-outline-danger" onClick={() => handleDeleteTicket(msg._id)}>Delete</button>
+                              </div>
                             </td>
                           </tr>
                         ))}
