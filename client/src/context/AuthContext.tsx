@@ -1,12 +1,12 @@
 import { createContext, useState, useEffect, ReactNode } from 'react';
-import { User, AuthState, LoginCredentials, RegisterCredentials } from '../types';
+import { User, AuthState, LoginCredentials, RegisterCredentials, ApiResponse } from '../types';
 import { authService } from '../services/authService';
 
 interface AuthContextType extends AuthState {
   login: (credentials: LoginCredentials) => Promise<void>;
   register: (credentials: RegisterCredentials) => Promise<unknown>;
   logout: () => Promise<void>;
-  updateProfile: (name: string, email: string, avatar?: File) => Promise<any>;
+  updateProfile: (name: string, email: string, avatar?: File) => Promise<ApiResponse<User>>;
   evaluateRank: (reportsCount: number) => Promise<void>;
 }
 
