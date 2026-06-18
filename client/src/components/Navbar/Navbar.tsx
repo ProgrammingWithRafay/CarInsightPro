@@ -60,6 +60,7 @@ const Navbar: React.FC = () => {
             <span className="material-symbols-outlined">menu</span>
           </button>
         </div>
+      </div>
       </header>
 
       {/* Offcanvas Mobile Menu */}
