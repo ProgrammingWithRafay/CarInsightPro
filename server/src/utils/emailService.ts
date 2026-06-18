@@ -5,7 +5,7 @@ import nodemailer from 'nodemailer';
  * Automatically switches to Gmail-specific settings if the host includes 'gmail'.
  */
 const createTransporter = () => {
-  const isGmail = process.env.SMTP_HOST?.includes('gmail');
+  const isGmail = process.env.SMTP_HOST?.includes('gmail') || process.env.SMTP_USER?.includes('gmail');
   
   if (isGmail) {
     return nodemailer.createTransport({
