@@ -1,49 +1,65 @@
-import nodemailer from 'nodemailer';
+/**
+ * Replaces Nodemailer with Brevo's HTTP REST API to completely bypass
+ * Railway's outbound SMTP firewall.
+ */
 
 /**
- * Initializes the Nodemailer transporter instance based on environment variables.
- * Automatically switches to Gmail-specific settings if the host includes 'gmail'.
+ * Helper function to send an email using Brevo's REST API via native fetch.
  */
-const createTransporter = () => {
-  const isGmail = process.env.SMTP_HOST?.includes('gmail') || process.env.SMTP_USER?.includes('gmail');
-  
-  if (isGmail) {
-    return nodemailer.createTransport({
-      host: 'smtp.gmail.com',
-      port: 587,
-      secure: false, // Upgraded via STARTTLS
-      requireTLS: true,
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-      },
-      tls: {
-        rejectUnauthorized: false
-      },
-      // Force IPv4. Railway free tier does not support outbound IPv6, 
-      // causing ENETUNREACH when Node defaults to an IPv6 address.
-      family: 4 
-    } as any);
+const sendBrevoEmail = async (toEmail: string, toName: string, subject: string, htmlContent: string, senderName: string = "CarInsight Pro") => {
+  const apiKey = process.env.SMTP_PASS;
+  const senderEmail = process.env.EMAIL_FROM || 'carinsight.app@gmail.com';
+
+  if (!apiKey) {
+    console.error('Missing Brevo API Key (SMTP_PASS)');
+    return null;
   }
 
-  const port = parseInt(process.env.SMTP_PORT || '587');
-  return nodemailer.createTransport({
-    host: process.env.SMTP_HOST || 'smtp-relay.brevo.com',
-    port: port,
-    secure: port === 465,
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
+  const payload = {
+    sender: {
+      name: senderName,
+      email: senderEmail
     },
-  });
+    to: [
+      {
+        email: toEmail,
+        name: toName || 'User'
+      }
+    ],
+    subject: subject,
+    htmlContent: htmlContent
+  };
+
+  try {
+    const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
+      headers: {
+        'accept': 'application/json',
+        'api-key': apiKey,
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      console.error('Brevo API Error:', response.status, response.statusText, errorData);
+      throw new Error(`Brevo API returned ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log(`✉️  Email sent via Brevo HTTP API to ${toEmail} (Message ID: ${data.messageId})`);
+    return data;
+  } catch (err) {
+    console.error('Failed to send HTTP email via Brevo:', err);
+    throw err;
+  }
 };
 
 /**
  * Sends a welcome/verification email containing a unique confirmation link.
- * Essential for the registration flow to ensure users own the provided email address.
  */
 export const sendVerificationEmail = async (email: string, name: string, token: string) => {
-  const transporter = createTransporter();
   const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
   const verificationUrl = `${clientUrl}/verify/${token}`;
 
@@ -83,32 +99,17 @@ export const sendVerificationEmail = async (email: string, name: string, token: 
         <p style="margin: 0; font-size: 11px; color: #555;">
           &copy; ${new Date().getFullYear()} CarInsight Pro. All rights reserved.
         </p>
-        <p style="margin: 6px 0 0; font-size: 11px; color: #444;">
-          If you didn't create this account, you can safely ignore this email.
-        </p>
       </div>
     </div>
   `;
 
-  const mailOptions = {
-    from: `"CarInsight Pro" <${process.env.EMAIL_FROM || process.env.SMTP_USER}>`,
-    to: email,
-    subject: 'Verify Your Email - CarInsight Pro',
-    html: htmlContent,
-  };
-
-  const info = await transporter.sendMail(mailOptions);
-  console.log(`✉️  Verification email sent to ${email} (Message ID: ${info.messageId})`);
-  return info;
+  return sendBrevoEmail(email, name, 'Verify Your Email - CarInsight Pro', htmlContent);
 };
 
 /**
  * Notifies a user via email when an admin updates their support ticket status
- * or adds a new reply to their inquiry.
  */
 export const sendSupportTicketUpdateEmail = async (email: string, name: string, subject: string, status: string, newReply?: string) => {
-  const transporter = createTransporter();
-  
   const htmlContent = `
     <div style="max-width: 600px; margin: 0 auto; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0e1117; color: #e0e0e0; border-radius: 12px; overflow: hidden; border: 1px solid #2a2d35;">
       <div style="background: linear-gradient(135deg, #1E63FF 0%, #0d47a1 100%); padding: 40px 30px; text-align: center;">
@@ -142,30 +143,13 @@ export const sendSupportTicketUpdateEmail = async (email: string, name: string, 
     </div>
   `;
 
-  const mailOptions = {
-    from: `"CarInsight Pro Support" <${process.env.EMAIL_FROM || process.env.SMTP_USER}>`,
-    to: email,
-    subject: `Update on your Support Ticket: ${subject}`,
-    html: htmlContent,
-  };
-
-  try {
-    const info = await transporter.sendMail(mailOptions);
-    console.log(`✉️  Support update email sent to ${email} (Message ID: ${info.messageId})`);
-    return info;
-  } catch (err) {
-    console.error('Failed to send email:', err);
-    throw err;
-  }
+  return sendBrevoEmail(email, name, `Update on your Support Ticket: ${subject}`, htmlContent, "CarInsight Pro Support");
 };
 
 /**
- * Sends an automated confirmation email immediately after a user (or guest)
- * submits a new support ticket.
+ * Sends an automated confirmation email immediately after a user submits a new ticket.
  */
 export const sendSupportTicketCreatedEmail = async (email: string, name: string, subject: string) => {
-  const transporter = createTransporter();
-  
   const htmlContent = `
     <div style="max-width: 600px; margin: 0 auto; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0e1117; color: #e0e0e0; border-radius: 12px; overflow: hidden; border: 1px solid #2a2d35;">
       <div style="background: linear-gradient(135deg, #1E63FF 0%, #0d47a1 100%); padding: 40px 30px; text-align: center;">
@@ -191,28 +175,13 @@ export const sendSupportTicketCreatedEmail = async (email: string, name: string,
     </div>
   `;
 
-  const mailOptions = {
-    from: `"CarInsight Pro Support" <${process.env.EMAIL_FROM || process.env.SMTP_USER}>`,
-    to: email,
-    subject: `Support Ticket Received: ${subject}`,
-    html: htmlContent,
-  };
-
-  try {
-    const info = await transporter.sendMail(mailOptions);
-    console.log(`✉️  Support created email sent to ${email} (Message ID: ${info.messageId})`);
-    return info;
-  } catch (err) {
-    console.error('Failed to send email:', err);
-  }
+  return sendBrevoEmail(email, name, `Support Ticket Received: ${subject}`, htmlContent, "CarInsight Pro Support");
 };
 
 /**
  * Delivers a secure password reset link to the user.
- * The link contains a short-lived token to prevent unauthorized access.
  */
 export const sendPasswordResetEmail = async (email: string, name: string, token: string) => {
-  const transporter = createTransporter();
   const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
   const resetUrl = `${clientUrl}/reset-password/${token}`;
 
@@ -252,21 +221,9 @@ export const sendPasswordResetEmail = async (email: string, name: string, token:
         <p style="margin: 0; font-size: 11px; color: #555;">
           &copy; ${new Date().getFullYear()} CarInsight Pro. All rights reserved.
         </p>
-        <p style="margin: 6px 0 0; font-size: 11px; color: #444;">
-          If you didn't request a password reset, you can safely ignore this email.
-        </p>
       </div>
     </div>
   `;
 
-  const mailOptions = {
-    from: `"CarInsight Pro" <${process.env.EMAIL_FROM || process.env.SMTP_USER}>`,
-    to: email,
-    subject: 'Reset Your Password - CarInsight Pro',
-    html: htmlContent,
-  };
-
-  const info = await transporter.sendMail(mailOptions);
-  console.log(`✉️  Password reset email sent to ${email} (Message ID: ${info.messageId})`);
-  return info;
+  return sendBrevoEmail(email, name, 'Reset Your Password - CarInsight Pro', htmlContent);
 };
