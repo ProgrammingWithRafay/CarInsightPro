@@ -11,6 +11,13 @@ const Navbar: React.FC = () => {
     return location.pathname === path ? 'active' : '';
   };
 
+  const closeOffcanvas = () => {
+    const closeBtn = document.querySelector('#mobileMenu .btn-close') as HTMLButtonElement;
+    if (closeBtn) {
+      closeBtn.click();
+    }
+  };
+
   return (
     <>
       <header className="fixed-top navbar-stitch">
@@ -70,13 +77,13 @@ const Navbar: React.FC = () => {
           <button type="button" className="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
         <div className="offcanvas-body d-flex flex-column gap-3">
-          <Link to="/" className="text-decoration-none text-on-surface fs-5 font-heading" data-bs-dismiss="offcanvas">Home</Link>
-          <Link to="/cars" className="text-decoration-none text-on-surface fs-5 font-heading" data-bs-dismiss="offcanvas">Cars</Link>
-          <Link to="/compare" className="text-decoration-none text-on-surface fs-5 font-heading" data-bs-dismiss="offcanvas">Compare</Link>
-          <Link to="/ev-hub" className="text-decoration-none text-on-surface fs-5 font-heading" data-bs-dismiss="offcanvas">EV Hub</Link>
-          {user?.role === 'user' && <Link to="/matchmaker" className="text-decoration-none text-on-surface fs-5 font-heading" data-bs-dismiss="offcanvas">Matchmaker</Link>}
-          {user?.role === 'user' && <Link to="/dashboard" className="text-decoration-none text-on-surface fs-5 font-heading" data-bs-dismiss="offcanvas">Dashboard</Link>}
-          {user?.role === 'admin' && <Link to="/admin" className="text-decoration-none text-on-surface fs-5 font-heading" data-bs-dismiss="offcanvas">Admin Panel</Link>}
+          <Link to="/" className="text-decoration-none text-on-surface fs-5 font-heading" onClick={closeOffcanvas}>Home</Link>
+          <Link to="/cars" className="text-decoration-none text-on-surface fs-5 font-heading" onClick={closeOffcanvas}>Cars</Link>
+          <Link to="/compare" className="text-decoration-none text-on-surface fs-5 font-heading" onClick={closeOffcanvas}>Compare</Link>
+          <Link to="/ev-hub" className="text-decoration-none text-on-surface fs-5 font-heading" onClick={closeOffcanvas}>EV Hub</Link>
+          {user?.role === 'user' && <Link to="/matchmaker" className="text-decoration-none text-on-surface fs-5 font-heading" onClick={closeOffcanvas}>Matchmaker</Link>}
+          {user?.role === 'user' && <Link to="/dashboard" className="text-decoration-none text-on-surface fs-5 font-heading" onClick={closeOffcanvas}>Dashboard</Link>}
+          {user?.role === 'admin' && <Link to="/admin" className="text-decoration-none text-on-surface fs-5 font-heading" onClick={closeOffcanvas}>Admin Panel</Link>}
         </div>
       </div>
     </>
