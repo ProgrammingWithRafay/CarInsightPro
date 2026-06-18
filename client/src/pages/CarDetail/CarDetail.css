@@ -37,11 +37,12 @@
 }
 
 .detail-gallery-main {
-  height: 400px;
+  height: 250px; /* Reduced for mobile */
   border-radius: var(--radius-xl);
   overflow: hidden;
   border: 1px solid rgba(66, 71, 84, 0.3); /* outline-variant */
   position: relative;
+  background-color: var(--surface-container); /* Fallback background for contain */
 }
 
 @media (min-width: 768px) {
@@ -53,7 +54,7 @@
 .detail-gallery-img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain; /* Ensure car doesn't get cropped */
 }
 
 .detail-thumbnail {

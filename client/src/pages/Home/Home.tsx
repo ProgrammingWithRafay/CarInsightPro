@@ -110,10 +110,10 @@ const Home: React.FC = () => {
                 <h4 className="font-heading text-primary h3">Search</h4>
                 <p className="text-on-surface-variant">Tell us what kind of car you're looking for. Use filters or just browse around.</p>
               </div>
-              <div className="col-2 col-md-2 d-flex justify-content-center">
+              <div className="col-3 col-md-2 d-flex justify-content-center">
                 <div className="timeline-number step-1">1</div>
               </div>
-              <div className="col-10 col-md-5">
+              <div className="col-9 col-md-5">
                 <h4 className="font-heading text-primary h3 d-md-none">Search</h4>
                 <p className="text-on-surface-variant d-md-none mb-2">Tell us what kind of car you're looking for. Use filters or just browse around.</p>
                 <span className="badge border border-primary text-primary bg-transparent py-2 px-3">SEARCH</span>
@@ -125,10 +125,10 @@ const Home: React.FC = () => {
                 <h4 className="font-heading text-secondary h3">Compare</h4>
                 <p className="text-on-surface-variant">Put your favorites side by side. See which one actually gives you the most for your budget.</p>
               </div>
-              <div className="col-2 col-md-2 d-flex justify-content-center order-md-2">
+              <div className="col-3 col-md-2 d-flex justify-content-center order-md-2">
                 <div className="timeline-number step-2">2</div>
               </div>
-              <div className="col-10 col-md-5 text-md-end order-md-1">
+              <div className="col-9 col-md-5 text-md-end order-md-1">
                 <h4 className="font-heading text-secondary h3 d-md-none">Compare</h4>
                 <p className="text-on-surface-variant d-md-none mb-2">Put your favorites side by side. See which one actually gives you the most for your budget.</p>
                 <span className="badge border border-secondary text-secondary bg-transparent py-2 px-3">COMPARE</span>
@@ -140,10 +140,10 @@ const Home: React.FC = () => {
                 <h4 className="font-heading text-tertiary h3">Decide</h4>
                 <p className="text-on-surface-variant">Download a PDF report, save your bookmarks, and make your decision with confidence.</p>
               </div>
-              <div className="col-2 col-md-2 d-flex justify-content-center">
+              <div className="col-3 col-md-2 d-flex justify-content-center">
                 <div className="timeline-number step-3">3</div>
               </div>
-              <div className="col-10 col-md-5">
+              <div className="col-9 col-md-5">
                 <h4 className="font-heading text-tertiary h3 d-md-none">Decide</h4>
                 <p className="text-on-surface-variant d-md-none mb-2">Download a PDF report, save your bookmarks, and make your decision with confidence.</p>
                 <span className="badge border border-tertiary text-tertiary bg-transparent py-2 px-3">DECIDE</span>
