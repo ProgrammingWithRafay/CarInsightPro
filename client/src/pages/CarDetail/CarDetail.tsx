@@ -122,7 +122,7 @@ const CarDetail: React.FC = () => {
 
   const handleHelpful = async (reviewId: string) => {
     if (!user) {
-      showToast('Please login to mark as helpful', 'warning');
+      showToast('Please sign in first to do this', 'warning');
       return;
     }
     try {
