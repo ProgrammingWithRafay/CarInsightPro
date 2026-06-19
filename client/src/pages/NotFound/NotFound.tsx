@@ -5,7 +5,7 @@ const NotFound: React.FC = () => {
   return (
     <div className="d-flex flex-column align-items-center justify-content-center text-center px-3" style={{ minHeight: '70vh' }}>
       <div className="mb-4">
-        <span className="material-symbols-outlined" style={{ fontSize: '80px', color: 'var(--primary)', opacity: 0.6 }}>
+        <span className="material-symbols-outlined icon-hero text-primary opacity-75" aria-hidden="true">
           explore_off
         </span>
       </div>
@@ -17,7 +17,7 @@ const NotFound: React.FC = () => {
       <div className="d-flex gap-3">
         <Link to="/" className="text-decoration-none">
           <button className="btn btn-primary px-4 py-2 fw-bold">
-            <span className="material-symbols-outlined me-2" style={{ fontSize: '18px' }}>home</span>
+            <span className="material-symbols-outlined icon-md icon-inline me-2" aria-hidden="true">home</span>
             Back to Home
           </button>
         </Link>

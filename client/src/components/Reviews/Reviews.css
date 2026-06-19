@@ -1,6 +1,24 @@
 /* Styles for Reviews components */
 .review-card {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  container-type: inline-size;
+  container-name: review-card;
+}
+
+/* Container Context Setup for Review Header */
+.review-card-header {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Wide Container Adjustments */
+@container review-card (min-width: 400px) {
+  .review-card-header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
 }
 
 .review-card:hover {

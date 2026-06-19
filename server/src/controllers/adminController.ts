@@ -40,7 +40,7 @@ export const getStats = async (req: Request, res: Response) => {
  */
 export const getAllUsers = async (req: Request, res: Response) => {
   try {
-    const users = await User.find().select('-password').sort('-createdAt');
+    const users = await User.find().select('_id name email role rank avatar isBlocked isVerified createdAt').sort('-createdAt');
     res.json({ success: true, data: users });
   } catch (error: any) {
     res.status(500).json({ success: false, message: error.message });

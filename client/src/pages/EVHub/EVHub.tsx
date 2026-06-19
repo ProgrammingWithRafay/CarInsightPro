@@ -49,7 +49,7 @@ const EVHub: React.FC = () => {
     <div className="container-fluid max-w-container-max mx-auto px-3 px-md-4 pt-5 mt-4 pb-5">
       <div className="text-center mb-5 fade-in-up">
         <span className="badge bg-success bg-opacity-25 text-success border border-success px-3 py-2 fs-6 mb-3 rounded-pill">
-          <span className="material-symbols-outlined align-middle me-2 fs-5">bolt</span>
+          <span className="material-symbols-outlined icon-md icon-inline me-2" aria-hidden="true">bolt</span>
           Zero Emissions Future
         </span>
         <h1 className="display-4 font-heading fw-bold">EV & Hybrid Hub</h1>
@@ -62,7 +62,7 @@ const EVHub: React.FC = () => {
         <div className="col-12">
           <div className="glass-panel p-4 rounded-4 fade-in-up" style={{ animationDelay: '0.1s' }}>
             <h4 className="font-heading text-primary mb-3">
-              <span className="material-symbols-outlined align-middle me-2">electric_car</span>
+              <span className="material-symbols-outlined icon-lg icon-inline me-2" aria-hidden="true">electric_car</span>
               Why Go Electric?
             </h4>
             <div className="row text-on-surface-variant">
@@ -148,8 +148,9 @@ const EVHub: React.FC = () => {
               className="btn btn-sm btn-icon border-0" 
               disabled={page === 1}
               onClick={() => handlePageChange(page - 1)}
+              aria-label="Previous Page"
             >
-              <span className="material-symbols-outlined">chevron_left</span>
+              <span className="material-symbols-outlined icon-md" aria-hidden="true">chevron_left</span>
             </button>
             
             <div className="d-flex align-items-center px-3 font-mono fw-bold text-on-surface-variant">
@@ -160,8 +161,9 @@ const EVHub: React.FC = () => {
               className="btn btn-sm btn-icon border-0" 
               disabled={page === totalPages}
               onClick={() => handlePageChange(page + 1)}
+              aria-label="Next Page"
             >
-              <span className="material-symbols-outlined">chevron_right</span>
+              <span className="material-symbols-outlined icon-md" aria-hidden="true">chevron_right</span>
             </button>
           </div>
         </div>

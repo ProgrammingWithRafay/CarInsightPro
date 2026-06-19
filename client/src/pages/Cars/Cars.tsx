@@ -151,7 +151,7 @@ const Cars: React.FC = () => {
             style={{ border: '1px solid var(--outline-variant)', backgroundColor: 'var(--surface-container-high)', color: 'var(--on-surface)', borderRadius: 'var(--radius-lg)' }}
             onClick={() => setShowMobileFilters(!showMobileFilters)}
           >
-            <span className="material-symbols-outlined">tune</span>
+            <span className="material-symbols-outlined icon-md icon-inline" aria-hidden="true">tune</span>
             {showMobileFilters ? 'Hide Filters' : 'Show Filters'}
           </button>
         </div>
@@ -191,7 +191,7 @@ const Cars: React.FC = () => {
             ) : (
               <div className="col-12 text-center py-5">
                 <div className="opacity-50 mb-3">
-                  <span className="material-symbols-outlined" style={{ fontSize: '48px' }}>search_off</span>
+                  <span className="material-symbols-outlined icon-xxl" aria-hidden="true">search_off</span>
                 </div>
                 <h4 className="font-heading text-on-surface">No vehicles match your telemetry</h4>
                 <p className="text-on-surface-variant">Try adjusting your filters or search query.</p>
@@ -207,8 +207,9 @@ const Cars: React.FC = () => {
                   className="btn btn-sm btn-icon border-0" 
                   disabled={filters.page === 1}
                   onClick={() => handlePageChange(filters.page! - 1)}
+                  aria-label="Previous Page"
                 >
-                  <span className="material-symbols-outlined">chevron_left</span>
+                  <span className="material-symbols-outlined icon-md" aria-hidden="true">chevron_left</span>
                 </button>
                 
                 <div className="d-flex align-items-center px-3 font-mono fw-bold text-on-surface-variant">
@@ -219,8 +220,9 @@ const Cars: React.FC = () => {
                   className="btn btn-sm btn-icon border-0" 
                   disabled={filters.page === carsData.pagination.pages}
                   onClick={() => handlePageChange(filters.page! + 1)}
+                  aria-label="Next Page"
                 >
-                  <span className="material-symbols-outlined">chevron_right</span>
+                  <span className="material-symbols-outlined icon-md" aria-hidden="true">chevron_right</span>
                 </button>
               </div>
             </div>

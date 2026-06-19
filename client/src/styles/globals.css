@@ -68,9 +68,30 @@ h1, h2, h3, h4, h5, h6, .font-heading {
   font-family: var(--font-mono);
 }
 
-/* Material Icons Helper */
+/* Standard Icon Sizes (Aligning with spacing scale) */
+.icon-sm { font-size: 1rem !important; }    /* 16px */
+.icon-md { font-size: 1.25rem !important; } /* 20px - Default */
+.icon-lg { font-size: 1.5rem !important; }  /* 24px */
+.icon-xl { font-size: 2rem !important; }    /* 32px */
+.icon-xxl { font-size: 3rem !important; }   /* 48px */
+.icon-hero { font-size: 5rem !important; }  /* 80px */
+
+/* Alignment helpers for text + icon */
+.icon-inline {
+  vertical-align: -0.125em; /* Optically aligns icon with adjacent text */
+}
+
+/* Material Icons Standardization */
 .material-symbols-outlined {
   font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-filled {
+  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24 !important;
 }
 
 /* Common UI Elements from Stitch */

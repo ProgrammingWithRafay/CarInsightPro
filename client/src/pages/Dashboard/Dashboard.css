@@ -38,9 +38,6 @@
   box-shadow: 0 0 15px rgba(49, 49, 192, 0.3);
 }
 
-.dashboard-nav-link .material-symbols-outlined {
-  font-size: 1.25rem;
-}
 
 .dashboard-stat-label {
   font-family: var(--font-mono);

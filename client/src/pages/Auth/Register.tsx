@@ -70,8 +70,8 @@ const Register: React.FC = () => {
         <div className="container px-3 position-relative z-10 py-5">
           <div className="auth-card-stitch fade-in-up text-center">
             <div className="mb-4">
-              <div className="auth-header-icon" style={{ width: '80px', height: '80px', margin: '0 auto' }}>
-                <span className="material-symbols-outlined text-primary" style={{ fontSize: '40px' }}>mark_email_read</span>
+              <div className="auth-header-icon">
+                <span className="material-symbols-outlined icon-xxl text-primary" aria-hidden="true">mark_email_read</span>
               </div>
             </div>
             <h2 className="font-heading mb-3 text-on-surface">Check Your Email</h2>
@@ -93,7 +93,7 @@ const Register: React.FC = () => {
                   <span className="spinner-border spinner-border-sm" aria-hidden="true"></span>
                 ) : (
                   <>
-                    <span className="material-symbols-outlined align-middle me-2" style={{ fontSize: '18px' }}>refresh</span>
+                    <span className="material-symbols-outlined icon-md icon-inline me-2" aria-hidden="true">refresh</span>
                     Resend Verification Email
                   </>
                 )}
@@ -117,7 +117,7 @@ const Register: React.FC = () => {
           <div className="text-center mb-4">
             <Link to="/" className="text-decoration-none d-inline-block">
               <div className="auth-header-icon">
-                <span className="material-symbols-outlined text-primary fs-3">app_registration</span>
+                <span className="material-symbols-outlined icon-xl text-primary" aria-hidden="true">app_registration</span>
               </div>
             </Link>
             <h2 className="font-heading mb-1 text-on-surface">Operator Registration</h2>
@@ -129,7 +129,7 @@ const Register: React.FC = () => {
             <div>
               <label className="form-label font-mono text-uppercase fw-bold" style={{ fontSize: '10px' }}>Full Designation</label>
               <div className="auth-input-group">
-                <span className="material-symbols-outlined auth-input-icon fs-5">badge</span>
+                <span className="material-symbols-outlined auth-input-icon icon-md" aria-hidden="true">badge</span>
                 <input 
                   type="text" 
                   name="name"
@@ -145,7 +145,7 @@ const Register: React.FC = () => {
             <div>
               <label className="form-label font-mono text-uppercase fw-bold" style={{ fontSize: '10px' }}>Email Address</label>
               <div className="auth-input-group">
-                <span className="material-symbols-outlined auth-input-icon fs-5">mail</span>
+                <span className="material-symbols-outlined auth-input-icon icon-md" aria-hidden="true">mail</span>
                 <input 
                   type="email" 
                   name="email"
@@ -161,7 +161,7 @@ const Register: React.FC = () => {
             <div>
               <label className="form-label font-mono text-uppercase fw-bold m-0" style={{ fontSize: '10px' }}>Access Key</label>
               <div className="auth-input-group mt-1">
-                <span className="material-symbols-outlined auth-input-icon fs-5">lock</span>
+                <span className="material-symbols-outlined auth-input-icon icon-md" aria-hidden="true">lock</span>
                 <input 
                   type="password" 
                   name="password"
@@ -178,7 +178,7 @@ const Register: React.FC = () => {
             <div>
               <label className="form-label font-mono text-uppercase fw-bold m-0" style={{ fontSize: '10px' }}>Verify Access Key</label>
               <div className="auth-input-group mt-1">
-                <span className="material-symbols-outlined auth-input-icon fs-5">lock_clock</span>
+                <span className="material-symbols-outlined auth-input-icon icon-md" aria-hidden="true">lock_clock</span>
                 <input 
                   type="password" 
                   name="confirmPassword"

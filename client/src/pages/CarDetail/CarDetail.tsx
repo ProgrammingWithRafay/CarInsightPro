@@ -229,7 +229,7 @@ const CarDetail: React.FC = () => {
               <div className="d-flex flex-column gap-3 flex-grow-1">
                 <div className="spec-bento-card">
                   <div className="spec-bento-icon bg-primary bg-opacity-10 text-primary">
-                    <span className="material-symbols-outlined">speed</span>
+                    <span className="material-symbols-outlined icon-lg" aria-hidden="true">speed</span>
                   </div>
                   <div>
                     <div className="spec-label">Engine</div>
@@ -239,7 +239,7 @@ const CarDetail: React.FC = () => {
 
                 <div className="spec-bento-card">
                   <div className="spec-bento-icon bg-secondary bg-opacity-10 text-secondary">
-                    <span className="material-symbols-outlined">bolt</span>
+                    <span className="material-symbols-outlined icon-lg" aria-hidden="true">bolt</span>
                   </div>
                   <div>
                     <div className="spec-label">Power Output</div>
@@ -249,7 +249,7 @@ const CarDetail: React.FC = () => {
 
                 <div className="spec-bento-card">
                   <div className="spec-bento-icon bg-tertiary bg-opacity-10 text-tertiary">
-                    <span className="material-symbols-outlined">straighten</span>
+                    <span className="material-symbols-outlined icon-lg" aria-hidden="true">straighten</span>
                   </div>
                   <div>
                     <div className="spec-label">Dimensions</div>
@@ -264,11 +264,11 @@ const CarDetail: React.FC = () => {
                   onClick={handleToggleBookmark}
                   disabled={bookmarkLoading}
                 >
-                  <span className={`material-symbols-outlined ${isBookmarked ? 'text-primary' : ''}`} style={isBookmarked ? { fontVariationSettings: "'FILL' 1" } : {}}>favorite</span> 
+                  <span className={`material-symbols-outlined icon-md icon-inline ${isBookmarked ? 'text-primary icon-filled' : ''}`} aria-hidden="true">favorite</span> 
                   {bookmarkLoading ? 'Updating...' : isBookmarked ? 'Saved to Dashboard' : 'Save to Dashboard'}
                 </button>
                 <button className="btn btn-outline-secondary text-on-surface w-100 py-3 fw-bold d-flex align-items-center justify-content-center gap-2" onClick={handleDownloadReport}>
-                  <span className="material-symbols-outlined">download</span> Download Report
+                  <span className="material-symbols-outlined icon-md icon-inline" aria-hidden="true">download</span> Download Report
                 </button>
               </div>
             </div>
@@ -314,7 +314,7 @@ const CarDetail: React.FC = () => {
                     ].filter(s => s.val !== 'N/A').map((s, i) => (
                       <div key={i} className="col-6 col-md-4">
                         <div className="p-3 bg-surface-container-high rounded-3 border border-secondary h-100 d-flex align-items-center gap-3">
-                          <span className="material-symbols-outlined text-primary" style={{ fontSize: '22px' }}>{s.icon}</span>
+                          <span className="material-symbols-outlined icon-lg text-primary" aria-hidden="true">{s.icon}</span>
                           <div>
                             <span className="d-block font-mono text-on-surface-variant text-uppercase" style={{ fontSize: '10px' }}>{s.label}</span>
                             <span className="font-body fw-bold" style={{ fontSize: '14px' }}>{s.val}</span>
@@ -368,7 +368,7 @@ const CarDetail: React.FC = () => {
                   </div>
                 ) : !showReviewForm && (
                   <div className="glass-panel p-5 text-center rounded-4 mt-4">
-                    <span className="material-symbols-outlined text-on-surface-variant mb-3" style={{ fontSize: '48px' }}>speaker_notes_off</span>
+                    <span className="material-symbols-outlined icon-xxl text-on-surface-variant mb-3" aria-hidden="true">speaker_notes_off</span>
                     <h5 className="font-heading">No reviews logged yet.</h5>
                     <p className="text-on-surface-variant">Be the first to provide technical feedback.</p>
                   </div>

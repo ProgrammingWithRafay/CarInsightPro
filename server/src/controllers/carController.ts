@@ -21,7 +21,9 @@ export const getCars = async (req: Request, res: Response) => {
 
     // Search by make or model
     if (req.query.search) {
-      const searchRegex = new RegExp(req.query.search as string, 'i');
+      const searchStr = req.query.search as string;
+      const escapedSearch = searchStr.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const searchRegex = new RegExp(escapedSearch, 'i');
       query.$or = [{ make: searchRegex }, { model: searchRegex }];
     }
 

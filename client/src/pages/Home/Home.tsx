@@ -40,7 +40,7 @@ const Home: React.FC = () => {
           <div className="d-flex flex-column flex-md-row gap-3 justify-content-center mt-5">
             <Link to="/cars" className="text-decoration-none">
               <button className="hero-btn-primary bg-primary text-on-primary border-0 rounded-4 fw-bold w-100 justify-content-center">
-                Browse Cars <span className="material-symbols-outlined">directions_car</span>
+                Browse Cars <span className="material-symbols-outlined icon-md icon-inline ms-1" aria-hidden="true">directions_car</span>
               </button>
             </Link>
             <Link to="/contact" className="text-decoration-none">
@@ -88,7 +88,7 @@ const Home: React.FC = () => {
             <div key={idx} className="col-12 col-md-4">
               <div className="bento-card h-100">
                 <div className="bento-icon-wrapper">
-                  <span className="material-symbols-outlined text-primary">{feat.icon}</span>
+                  <span className="material-symbols-outlined icon-xl text-primary" aria-hidden="true">{feat.icon}</span>
                 </div>
                 <h3 className="font-heading h4 text-on-surface mb-2">{feat.title}</h3>
                 <p className="text-on-surface-variant m-0">{feat.desc}</p>

@@ -54,7 +54,7 @@ const ResetPassword: React.FC = () => {
           <div className="text-center mb-4">
             <Link to="/" className="text-decoration-none d-inline-block">
               <div className="auth-header-icon">
-                <span className="material-symbols-outlined text-primary fs-3">directions_car</span>
+                <span className="material-symbols-outlined icon-xl text-primary" aria-hidden="true">directions_car</span>
               </div>
             </Link>
             <h2 className="font-heading mb-1 text-on-surface">
@@ -67,7 +67,7 @@ const ResetPassword: React.FC = () => {
 
           {success ? (
             <div className="text-center py-4">
-              <span className="material-symbols-outlined text-success mb-3" style={{ fontSize: '48px' }}>check_circle</span>
+              <span className="material-symbols-outlined icon-xxl text-success mb-3" aria-hidden="true">check_circle</span>
               <h5 className="font-heading text-on-surface mb-2">Password Updated</h5>
               <p className="text-on-surface-variant small mb-4">
                 Your access key has been reset successfully. You can now log in with your new credentials.
@@ -84,7 +84,7 @@ const ResetPassword: React.FC = () => {
               <div>
                 <label className="form-label font-mono text-uppercase fw-bold" style={{ fontSize: '10px' }}>New Access Key</label>
                 <div className="auth-input-group">
-                  <span className="material-symbols-outlined auth-input-icon fs-5">lock</span>
+                  <span className="material-symbols-outlined auth-input-icon icon-md" aria-hidden="true">lock</span>
                   <input
                     type="password"
                     className="auth-input"
@@ -100,7 +100,7 @@ const ResetPassword: React.FC = () => {
               <div>
                 <label className="form-label font-mono text-uppercase fw-bold" style={{ fontSize: '10px' }}>Confirm Access Key</label>
                 <div className="auth-input-group">
-                  <span className="material-symbols-outlined auth-input-icon fs-5">lock</span>
+                  <span className="material-symbols-outlined auth-input-icon icon-md" aria-hidden="true">lock</span>
                   <input
                     type="password"
                     className="auth-input"
@@ -119,7 +119,7 @@ const ResetPassword: React.FC = () => {
 
               <div className="text-center mt-3">
                 <Link to="/login" className="btn btn-link text-on-surface-variant text-decoration-none small p-0">
-                  <span className="material-symbols-outlined align-middle me-1" style={{ fontSize: '14px' }}>arrow_back</span>
+                  <span className="material-symbols-outlined icon-sm icon-inline me-1" aria-hidden="true">arrow_back</span>
                   Back to Login
                 </Link>
               </div>

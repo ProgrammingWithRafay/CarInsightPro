@@ -121,7 +121,7 @@ const Dashboard: React.FC = () => {
    * Uses optimistic UI updating to immediately remove the car from the screen
    * before the API call finishes, providing a snappier user experience.
    */
-  const handleRemoveBookmark = async (id: string) => {
+  const handleRemoveBookmark = React.useCallback(async (id: string) => {
     try {
       // Optimistically update the UI immediately
       setBookmarks(prev => prev.filter(car => car._id !== id));
@@ -131,7 +131,7 @@ const Dashboard: React.FC = () => {
       // If it fails, we should ideally revert, but a page refresh will sync state
       showToast('Failed to remove bookmark', 'error');
     }
-  };
+  }, [showToast]);
 
   const [profileLoading, setProfileLoading] = useState(false);
   
@@ -195,38 +195,38 @@ const Dashboard: React.FC = () => {
                 className={`dashboard-nav-link ${activeTab === 'saved' ? 'active' : ''}`}
                 onClick={() => setActiveTab('saved')}
               >
-                <span className="material-symbols-outlined">directions_car</span> Inventory
+                <span className="material-symbols-outlined icon-md icon-inline me-2" aria-hidden="true">directions_car</span> Inventory
               </button>
               <button 
                 className={`dashboard-nav-link ${activeTab === 'reports' ? 'active' : ''}`}
                 onClick={() => setActiveTab('reports')}
               >
-                <span className="material-symbols-outlined">assessment</span> Reports
+                <span className="material-symbols-outlined icon-md icon-inline me-2" aria-hidden="true">assessment</span> Reports
               </button>
               <button 
                 className={`dashboard-nav-link ${activeTab === 'tickets' ? 'active' : ''}`}
                 onClick={() => setActiveTab('tickets')}
               >
-                <span className="material-symbols-outlined">support_agent</span> Support Tickets
+                <span className="material-symbols-outlined icon-md icon-inline me-2" aria-hidden="true">support_agent</span> Support Tickets
               </button>
               <button 
                 className={`dashboard-nav-link ${activeTab === 'reviews' ? 'active' : ''}`}
                 onClick={() => setActiveTab('reviews')}
               >
-                <span className="material-symbols-outlined">analytics</span> Analytics
+                <span className="material-symbols-outlined icon-md icon-inline me-2" aria-hidden="true">analytics</span> Analytics
               </button>
               <button 
                 className={`dashboard-nav-link ${activeTab === 'settings' ? 'active' : ''}`}
                 onClick={() => setActiveTab('settings')}
               >
-                <span className="material-symbols-outlined">settings</span> Settings
+                <span className="material-symbols-outlined icon-md icon-inline me-2" aria-hidden="true">settings</span> Settings
               </button>
             </nav>
 
             <div className="mt-auto pt-4 border-top border-secondary d-flex flex-column gap-2">
               <Link to="/cars" className="text-decoration-none"><button className="btn btn-primary w-100 py-2 fw-bold active-glow">Generate Report</button></Link>
               <button className="dashboard-nav-link text-on-surface-variant hover:text-error mt-2" onClick={logout}>
-                <span className="material-symbols-outlined">logout</span> Logout
+                <span className="material-symbols-outlined icon-md icon-inline me-2" aria-hidden="true">logout</span> Logout
               </button>
             </div>
           </div>
@@ -290,7 +290,7 @@ const Dashboard: React.FC = () => {
                       <div className="col" key={car._id}>
                         <CarCard 
                           car={car} 
-                          onBookmark={() => handleRemoveBookmark(car._id)} 
+                          onBookmark={handleRemoveBookmark} 
                           isBookmarked={true} 
                         />
                       </div>
@@ -326,7 +326,7 @@ const Dashboard: React.FC = () => {
                 ) : (
                   <div className="glass-panel p-4 rounded-4">
                     <div className="text-center py-5 opacity-50">
-                      <span className="material-symbols-outlined fs-1 mb-2">history_edu</span>
+                      <span className="material-symbols-outlined icon-hero mb-2 opacity-50" aria-hidden="true">history_edu</span>
                       <p className="m-0">No reports generated yet.</p>
                     </div>
                   </div>
@@ -403,7 +403,7 @@ const Dashboard: React.FC = () => {
                               <img src={(review.car as Car).images[0]} alt="car" width="60" height="40" className="rounded object-fit-cover" />
                             ) : (
                               <div className="bg-secondary rounded d-flex align-items-center justify-content-center" style={{ width: 60, height: 40 }}>
-                                <span className="material-symbols-outlined text-white small">directions_car</span>
+                                <span className="material-symbols-outlined icon-md text-white" aria-hidden="true">directions_car</span>
                               </div>
                             )}
                             <div>
@@ -411,7 +411,7 @@ const Dashboard: React.FC = () => {
                                 {(review.car as Car) ? `${(review.car as Car).year} ${(review.car as Car).make} ${(review.car as Car).model}` : 'Deleted Car'}
                               </h4>
                               <div className="d-flex align-items-center gap-1">
-                                <span className="material-symbols-outlined text-tertiary" style={{ fontSize: '16px', fontVariationSettings: "'FILL' 1" }}>star</span>
+                                <span className="material-symbols-outlined icon-sm text-tertiary icon-filled" aria-hidden="true">star</span>
                                 <span className="fw-bold">{(review.rating).toFixed(1)}</span>
                                 <span className="text-on-surface-variant small ms-2">{new Date(review.createdAt).toLocaleDateString()}</span>
                               </div>
@@ -429,7 +429,7 @@ const Dashboard: React.FC = () => {
                 ) : (
                   <div className="glass-panel p-4 rounded-4">
                     <div className="text-center py-5 opacity-50">
-                      <span className="material-symbols-outlined fs-1 mb-2">analytics</span>
+                      <span className="material-symbols-outlined icon-hero mb-2 opacity-50" aria-hidden="true">analytics</span>
                       <p className="m-0">You haven't logged any reviews yet.</p>
                     </div>
                   </div>

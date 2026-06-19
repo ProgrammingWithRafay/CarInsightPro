@@ -58,9 +58,6 @@
   color: var(--error);
 }
 
-.car-card-bookmark .material-symbols-outlined {
-  font-size: 20px;
-}
 
 .car-card-content {
   padding: 1.5rem; /* p-stack-md */
@@ -101,4 +98,30 @@
   color: var(--on-surface-variant);
   font-family: var(--font-body);
   text-transform: uppercase;
+}
+
+/* Container Context Setup */
+.car-card-wrapper {
+  container-type: inline-size;
+  container-name: car-card;
+  display: block;
+}
+
+/* Wide Container Adjustments */
+@container car-card (min-width: 450px) {
+  .car-card-stitch {
+    flex-direction: row;
+    align-items: stretch;
+  }
+  
+  .car-card-img-container {
+    height: auto;
+    width: 40%;
+    min-height: 12rem;
+  }
+  
+  .car-card-content {
+    width: 60%;
+    justify-content: center;
+  }
 }

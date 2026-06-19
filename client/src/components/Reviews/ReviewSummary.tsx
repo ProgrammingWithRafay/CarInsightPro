@@ -22,7 +22,7 @@ const ReviewSummary: React.FC<ReviewSummaryProps> = ({ aggregatedSubScores, tota
     const stars = [];
     for (let i = 1; i <= 5; i++) {
       stars.push(
-        <span key={i} className={`material-symbols-outlined ${i <= rating ? 'text-warning' : 'text-on-surface-variant'}`}>
+        <span key={i} className={`material-symbols-outlined icon-md ${i <= rating ? 'text-warning icon-filled' : 'text-on-surface-variant'}`} aria-hidden="true">
           star
         </span>
       );

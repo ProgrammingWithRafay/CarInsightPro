@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useState, useEffect, ReactNode, useCallback, useMemo } from 'react';
 import { User, AuthState, LoginCredentials, RegisterCredentials, ApiResponse } from '../types';
 import { authService } from '../services/authService';
 
@@ -48,27 +48,27 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     checkAuth();
   }, []);
 
-  const login = async (credentials: LoginCredentials) => {
+  const login = useCallback(async (credentials: LoginCredentials) => {
     const res = await authService.login(credentials);
     if (res.success) {
       setUser(res.data);
       setIsAuthenticated(true);
     }
-  };
+  }, []);
 
-  const register = async (credentials: RegisterCredentials) => {
+  const register = useCallback(async (credentials: RegisterCredentials) => {
     const res = await authService.register(credentials);
     // Don't auto-login — user needs to verify email first
     return res;
-  };
+  }, []);
 
-  const logout = async () => {
+  const logout = useCallback(async () => {
     await authService.logout();
     setUser(null);
     setIsAuthenticated(false);
-  };
+  }, []);
 
-  const updateProfile = async (name: string, email: string, avatar?: File) => {
+  const updateProfile = useCallback(async (name: string, email: string, avatar?: File) => {
     let payload;
     if (avatar) {
       const formData = new FormData();
@@ -85,18 +85,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setUser(res.data);
     }
     return res;
-  };
+  }, []);
 
-  const evaluateRank = async (reportsCount: number) => {
+  const evaluateRank = useCallback(async (reportsCount: number) => {
     if (!user) return;
     const res = await authService.evaluateRank(reportsCount);
     if (res.success && res.data?.updated) {
       setUser(prev => prev ? { ...prev, rank: res.data!.rank } : null);
     }
-  };
+  }, [user]);
+
+  const value = useMemo(() => ({
+    user, isAuthenticated, isLoading, login, register, logout, updateProfile, evaluateRank
+  }), [user, isAuthenticated, isLoading, login, register, logout, updateProfile, evaluateRank]);
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, isLoading, login, register, logout, updateProfile, evaluateRank }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );

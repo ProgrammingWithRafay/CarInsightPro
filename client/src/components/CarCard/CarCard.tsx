@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { Link } from 'react-router-dom';
 import { Car } from '../../types';
 import { formatPriceRange } from '../../utils/formatPrice';
@@ -6,7 +6,7 @@ import './CarCard.css';
 
 interface CarCardProps {
   car: Car;
-  onBookmark?: () => void;
+  onBookmark?: (id: string) => void;
   isBookmarked?: boolean;
 }
 
@@ -19,11 +19,11 @@ const CarCard: React.FC<CarCardProps> = ({ car, onBookmark, isBookmarked = false
   const handleBookmarkClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (onBookmark) onBookmark();
+    if (onBookmark) onBookmark(car._id);
   };
 
   return (
-    <Link to={`/cars/${car._id}`} className="text-decoration-none h-100 d-block">
+    <Link to={`/cars/${car._id}`} className="text-decoration-none h-100 d-block car-card-wrapper">
       <div className="glass-panel car-card-stitch group">
         <div className="car-card-img-container">
           <img 
@@ -37,8 +37,8 @@ const CarCard: React.FC<CarCardProps> = ({ car, onBookmark, isBookmarked = false
             aria-label={isBookmarked ? "Remove from saved" : "Save car"}
           >
             <span 
-              className="material-symbols-outlined" 
-              style={{ fontVariationSettings: isBookmarked ? "'FILL' 1" : "'FILL' 0" }}
+              className={`material-symbols-outlined icon-md ${isBookmarked ? 'icon-filled' : ''}`}
+              aria-hidden="true"
             >
               favorite
             </span>
@@ -62,4 +62,4 @@ const CarCard: React.FC<CarCardProps> = ({ car, onBookmark, isBookmarked = false
   );
 };
 
-export default CarCard;
+export default memo(CarCard);

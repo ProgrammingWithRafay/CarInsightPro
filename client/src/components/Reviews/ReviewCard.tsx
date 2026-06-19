@@ -15,7 +15,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review, onHelpful, currentUserI
     const stars = [];
     for (let i = 1; i <= 5; i++) {
       stars.push(
-        <span key={i} className={`material-symbols-outlined fs-6 ${i <= rating ? 'text-warning' : 'text-on-surface-variant'}`}>
+        <span key={i} className={`material-symbols-outlined icon-sm ${i <= rating ? 'text-warning icon-filled' : 'text-on-surface-variant'}`} aria-hidden="true">
           star
         </span>
       );
@@ -27,7 +27,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review, onHelpful, currentUserI
 
   return (
     <div className="review-card glass-panel p-4 rounded-4 mb-3">
-      <div className="d-flex justify-content-between align-items-start mb-3">
+      <div className="review-card-header mb-3">
         <div className="d-flex align-items-center gap-3">
           {user.avatar ? (
             <img src={user.avatar} alt={user.name} className="rounded-circle" width="48" height="48" />
@@ -84,7 +84,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review, onHelpful, currentUserI
           className={`btn btn-sm d-flex align-items-center gap-1 ${isHelpful ? 'btn-primary' : 'btn-outline-secondary'}`}
           onClick={() => onHelpful && onHelpful(review._id)}
         >
-          <span className="material-symbols-outlined fs-6">thumb_up</span>
+          <span className="material-symbols-outlined icon-sm icon-inline" aria-hidden="true">thumb_up</span>
           Helpful ({review.helpful.length})
         </button>
       </div>

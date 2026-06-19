@@ -61,11 +61,11 @@ const VerifyEmail: React.FC = () => {
           {status === 'success' && (
             <>
               <div className="mb-4">
-                <div className="auth-header-icon" style={{ width: '80px', height: '80px', margin: '0 auto', background: 'rgba(0, 200, 83, 0.15)', borderColor: '#00C853' }}>
-                  <span className="material-symbols-outlined" style={{ fontSize: '40px', color: '#00C853' }}>verified</span>
+                <div className="auth-header-icon">
+                  <span className="material-symbols-outlined icon-xl text-success" aria-hidden="true">verified</span>
                 </div>
               </div>
-              <h2 className="font-heading mb-3 text-on-surface">Email Verified!</h2>
+              <h4 className="font-heading text-on-surface mb-2 mt-3">Identity Verified</h4>
               <p className="text-on-surface-variant mb-4">{message}</p>
               <Link to="/login" className="btn btn-primary w-100 py-3 fw-bold active-glow text-decoration-none">
                 Proceed to Login
@@ -76,11 +76,11 @@ const VerifyEmail: React.FC = () => {
           {status === 'error' && (
             <>
               <div className="mb-4">
-                <div className="auth-header-icon" style={{ width: '80px', height: '80px', margin: '0 auto', background: 'rgba(255, 82, 82, 0.15)', borderColor: '#FF5252' }}>
-                  <span className="material-symbols-outlined" style={{ fontSize: '40px', color: '#FF5252' }}>error</span>
+                <div className="auth-header-icon">
+                  <span className="material-symbols-outlined icon-xl text-error" aria-hidden="true">error</span>
                 </div>
               </div>
-              <h2 className="font-heading mb-3 text-on-surface">Verification Failed</h2>
+              <h4 className="font-heading text-on-surface mb-2 mt-3">Verification Failed</h4>
               <p className="text-on-surface-variant mb-4">{message}</p>
               <div className="d-flex flex-column gap-3">
                 <Link to="/register" className="btn btn-outline-primary w-100 py-2 text-decoration-none">

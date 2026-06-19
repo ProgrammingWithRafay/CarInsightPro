@@ -17,7 +17,7 @@ export const registerUser = async (req: Request, res: Response) => {
   try {
     const { name, email, password } = req.body;
 
-    const userExists = await User.findOne({ email });
+    const userExists = await User.findOne({ email: String(email) });
     if (userExists) {
       res.status(400);
       throw new Error('User already exists');
@@ -71,9 +71,9 @@ export const loginUser = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
 
-    const user = await User.findOne({ email }).select('+password');
+    const user = await User.findOne({ email: String(email) }).select('+password');
 
-    if (user && (await user.comparePassword(password))) {
+    if (user && (await user.comparePassword(String(password)))) {
       // Check if email is verified
       if (!user.isVerified) {
         res.status(403);
@@ -159,7 +159,7 @@ export const resendVerification = async (req: Request, res: Response) => {
   try {
     const { email } = req.body;
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email: String(email) });
 
     if (!user) {
       res.status(404);
@@ -214,7 +214,18 @@ export const getMe = async (req: Request, res: Response) => {
   try {
     const user = await User.findById(req.user?._id).select('-password');
     if (user) {
-      res.json({ success: true, data: user });
+      res.json({ 
+        success: true, 
+        data: {
+          _id: user._id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          rank: user.rank,
+          avatar: user.avatar,
+          bookmarks: user.bookmarks
+        } 
+      });
     } else {
       res.status(404);
       throw new Error('User not found');
@@ -252,7 +263,7 @@ export const updateProfile = async (req: Request, res: Response) => {
 
       // Check if email is already taken by another user
       if (email !== user.email) {
-        const existingUser = await User.findOne({ email });
+        const existingUser = await User.findOne({ email: String(email) });
         if (existingUser) {
           res.status(400);
           throw new Error('This email address is already registered to another account.');
@@ -376,7 +387,7 @@ export const forgotPassword = async (req: Request, res: Response) => {
   try {
     const { email } = req.body;
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email: String(email) });
 
     if (!user) {
       // Return a generic success message to prevent email enumeration

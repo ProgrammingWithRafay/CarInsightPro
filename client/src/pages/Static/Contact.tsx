@@ -95,7 +95,7 @@ const Contact: React.FC = () => {
                 {isSubmitting ? (
                   <><span className="spinner-border spinner-border-sm me-2" /> Sending...</>
                 ) : (
-                  <><span className="material-symbols-outlined me-2" style={{ fontSize: '18px' }}>send</span> Send Message</>
+                  <><span className="material-symbols-outlined icon-md icon-inline me-2" aria-hidden="true">send</span> Send Message</>
                 )}
               </button>
             </form>
@@ -107,7 +107,7 @@ const Contact: React.FC = () => {
             <div className="glass-panel p-4 rounded-4">
               <div className="d-flex align-items-center gap-3 mb-3">
                 <div className="contact-icon-wrapper bg-primary bg-opacity-10">
-                  <span className="material-symbols-outlined text-primary">mail</span>
+                  <span className="material-symbols-outlined icon-lg text-primary" aria-hidden="true">mail</span>
                 </div>
                 <div>
                   <div className="font-mono small text-uppercase text-on-surface-variant">Email</div>
@@ -119,7 +119,7 @@ const Contact: React.FC = () => {
             <div className="glass-panel p-4 rounded-4">
               <div className="d-flex align-items-center gap-3 mb-3">
                 <div className="contact-icon-wrapper bg-primary bg-opacity-10">
-                  <span className="material-symbols-outlined text-primary">schedule</span>
+                  <span className="material-symbols-outlined icon-lg text-primary" aria-hidden="true">schedule</span>
                 </div>
                 <div>
                   <div className="font-mono small text-uppercase text-on-surface-variant">Response Time</div>
@@ -131,7 +131,7 @@ const Contact: React.FC = () => {
             <div className="glass-panel p-4 rounded-4">
               <div className="d-flex align-items-center gap-3 mb-3">
                 <div className="contact-icon-wrapper bg-primary bg-opacity-10">
-                  <span className="material-symbols-outlined text-primary">support_agent</span>
+                  <span className="material-symbols-outlined icon-lg text-primary" aria-hidden="true">support_agent</span>
                 </div>
                 <div>
                   <div className="font-mono small text-uppercase text-on-surface-variant">Live Support</div>

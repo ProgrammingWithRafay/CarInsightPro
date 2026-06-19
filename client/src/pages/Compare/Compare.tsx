@@ -187,15 +187,15 @@ const Compare: React.FC = () => {
           <div className="d-flex flex-column align-items-end mb-4">
             <div className="d-flex justify-content-end gap-3">
               <button className="btn btn-outline-primary d-flex align-items-center gap-2" onClick={handleShare}>
-                <span className="material-symbols-outlined fs-5">share</span> Share Comparison
+                <span className="material-symbols-outlined icon-md" aria-hidden="true">share</span> Share Comparison
               </button>
               <button className="btn btn-primary d-flex align-items-center gap-2" onClick={handleDownloadPdf}>
-                <span className="material-symbols-outlined fs-5">picture_as_pdf</span> Download PDF Report
+                <span className="material-symbols-outlined icon-md" aria-hidden="true">picture_as_pdf</span> Download PDF Report
               </button>
             </div>
             {shareLink && (
               <div className="mt-3 fade-in d-flex align-items-center gap-2 p-2 rounded bg-surface-container-high border border-primary">
-                <span className="material-symbols-outlined text-success fs-5">check_circle</span>
+                <span className="material-symbols-outlined icon-md text-success" aria-hidden="true">check_circle</span>
                 <span className="text-on-surface small">Link copied to clipboard:</span>
                 <input type="text" readOnly value={shareLink} className="form-control form-control-sm bg-transparent border-0 text-primary font-mono" style={{minWidth: '350px'}} onClick={e => e.currentTarget.select()} />
               </div>

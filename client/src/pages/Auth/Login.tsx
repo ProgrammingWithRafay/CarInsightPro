@@ -69,7 +69,7 @@ const Login: React.FC = () => {
           <div className="text-center mb-4">
             <Link to="/" className="text-decoration-none d-inline-block">
               <div className="auth-header-icon">
-                <span className="material-symbols-outlined text-primary fs-3">directions_car</span>
+                <span className="material-symbols-outlined icon-xl text-primary" aria-hidden="true">directions_car</span>
               </div>
             </Link>
             <h2 className="font-heading mb-1 text-on-surface">
@@ -84,8 +84,8 @@ const Login: React.FC = () => {
             // Forgot password form
             forgotSent ? (
               <div className="text-center py-4">
-                <span className="material-symbols-outlined text-success mb-3" style={{ fontSize: '48px' }}>mark_email_read</span>
-                <h5 className="font-heading text-on-surface mb-2">Check Your Email</h5>
+                <span className="material-symbols-outlined icon-xxl text-success mb-3" aria-hidden="true">mark_email_read</span>
+                <h5 className="font-heading text-on-surface mb-2">Reset Link Sent</h5>
                 <p className="text-on-surface-variant small mb-4">
                   If an account exists for <strong className="text-primary">{forgotEmail}</strong>, we've sent a password reset link. It will expire in 1 hour.
                 </p>
@@ -99,9 +99,9 @@ const Login: React.FC = () => {
             ) : (
               <form onSubmit={handleForgotPassword} className="d-flex flex-column gap-3">
                 <div>
-                  <label className="form-label font-mono text-uppercase fw-bold" style={{ fontSize: '10px' }}>Email Address</label>
+                  <label className="form-label font-mono text-uppercase fw-bold label-xs">Email Address</label>
                   <div className="auth-input-group">
-                    <span className="material-symbols-outlined auth-input-icon fs-5">mail</span>
+                    <span className="material-symbols-outlined auth-input-icon icon-md" aria-hidden="true">mail</span>
                     <input 
                       type="email" 
                       className="auth-input" 
@@ -118,12 +118,8 @@ const Login: React.FC = () => {
                 </button>
 
                 <div className="text-center mt-3">
-                  <button 
-                    type="button"
-                    className="btn btn-link text-on-surface-variant text-decoration-none small p-0"
-                    onClick={() => setShowForgot(false)}
-                  >
-                    <span className="material-symbols-outlined align-middle me-1" style={{ fontSize: '14px' }}>arrow_back</span>
+                  <button type="button" className="btn btn-link text-on-surface-variant text-decoration-none small p-0" onClick={() => setShowForgot(false)}>
+                    <span className="material-symbols-outlined icon-sm icon-inline me-1" aria-hidden="true">arrow_back</span>
                     Back to Login
                   </button>
                 </div>
@@ -133,9 +129,9 @@ const Login: React.FC = () => {
             // Normal login form
             <form onSubmit={handleSubmit} className="d-flex flex-column gap-3">
               <div>
-                <label className="form-label font-mono text-uppercase fw-bold" style={{ fontSize: '10px' }}>Email Address</label>
+                <label className="form-label font-mono text-uppercase fw-bold label-xs">Email Address</label>
                 <div className="auth-input-group">
-                  <span className="material-symbols-outlined auth-input-icon fs-5">mail</span>
+                  <span className="material-symbols-outlined auth-input-icon icon-md" aria-hidden="true">mail</span>
                   <input 
                     type="email" 
                     className="auth-input" 
@@ -149,18 +145,17 @@ const Login: React.FC = () => {
 
               <div>
                 <div className="d-flex justify-content-between align-items-center mb-1">
-                  <label className="form-label font-mono text-uppercase fw-bold m-0" style={{ fontSize: '10px' }}>Access Key</label>
+                  <label className="form-label font-mono text-uppercase fw-bold m-0 label-xs">Access Key</label>
                   <button 
                     type="button"
-                    className="btn btn-link text-primary text-decoration-none font-mono p-0 border-0" 
-                    style={{ fontSize: '10px' }}
+                    className="btn btn-link text-primary text-decoration-none font-mono p-0 border-0 label-xs" 
                     onClick={() => setShowForgot(true)}
                   >
                     Reset Key?
                   </button>
                 </div>
-                <div className="auth-input-group">
-                  <span className="material-symbols-outlined auth-input-icon fs-5">lock</span>
+                <div className="auth-input-group mt-1">
+                  <span className="material-symbols-outlined auth-input-icon icon-md" aria-hidden="true">lock</span>
                   <input 
                     type="password" 
                     className="auth-input" 

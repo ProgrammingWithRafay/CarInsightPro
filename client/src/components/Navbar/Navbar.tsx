@@ -44,7 +44,7 @@ const Navbar: React.FC = () => {
                 {user?.avatar ? (
                   <img src={user.avatar} alt="Profile" className="w-100 h-100 object-fit-cover" />
                 ) : (
-                  <span className="material-symbols-outlined">account_circle</span>
+                  <span className="material-symbols-outlined icon-md icon-inline" aria-hidden="true">account_circle</span>
                 )}
               </Link>
               <button className="btn-signin bg-transparent border border-secondary text-on-surface d-none d-sm-block" onClick={logout}>
@@ -54,7 +54,7 @@ const Navbar: React.FC = () => {
           ) : (
             <>
               <Link to="/login" className="icon-btn text-decoration-none">
-                <span className="material-symbols-outlined">account_circle</span>
+                <span className="material-symbols-outlined icon-md icon-inline" aria-hidden="true">account_circle</span>
               </Link>
               <Link to="/login" className="text-decoration-none d-none d-sm-block">
                 <button className="btn-signin active-glow">Sign In</button>
@@ -64,7 +64,7 @@ const Navbar: React.FC = () => {
           
           {/* Mobile Menu Toggle (Simplified for now) */}
           <button className="icon-btn d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileMenu">
-            <span className="material-symbols-outlined">menu</span>
+            <span className="material-symbols-outlined icon-md" aria-hidden="true">menu</span>
           </button>
         </div>
       </div>
