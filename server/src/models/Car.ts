@@ -103,5 +103,9 @@ CarSchema.index({ make: 1, model: 1 });
 CarSchema.index({ price: 1 });
 CarSchema.index({ fuelType: 1 });
 CarSchema.index({ 'specs.seats': 1 });
+CarSchema.index({ transmission: 1 });
+CarSchema.index({ safetyRating: 1 });
+CarSchema.index({ avgRating: -1 });
+CarSchema.index({ year: -1 });
 
 export default mongoose.model<CarDocument>('Car', CarSchema);

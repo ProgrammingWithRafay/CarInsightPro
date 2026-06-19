@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { useToast } from '../../hooks/useToast';
+import OptimizedImage from '../../components/OptimizedImage/OptimizedImage';
 import { carService } from '../../services/carService';
 import { supportService } from '../../services/supportService';
 import { reviewService } from '../../services/reviewService';
@@ -240,7 +241,7 @@ const Dashboard: React.FC = () => {
             <div className="d-flex align-items-center gap-4">
               <div className="rounded-circle border border-2 border-primary p-1" style={{ width: '80px', height: '80px' }}>
                 {user?.avatar ? (
-                  <img src={user.avatar} alt={user.name} className="w-100 h-100 rounded-circle object-fit-cover" />
+                  <OptimizedImage src={user.avatar} alt={user.name} className="w-100 h-100 rounded-circle object-fit-cover" />
                 ) : (
                   <div className="w-100 h-100 rounded-circle bg-primary text-on-primary d-flex align-items-center justify-content-center fs-2 fw-bold">
                     {user?.name.charAt(0).toUpperCase()}
@@ -400,7 +401,7 @@ const Dashboard: React.FC = () => {
                         <div className="d-flex justify-content-between align-items-start mb-3">
                           <div className="d-flex align-items-center gap-3">
                             {(review.car as Car)?.images?.[0] ? (
-                              <img src={(review.car as Car).images[0]} alt="car" width="60" height="40" className="rounded object-fit-cover" />
+                              <OptimizedImage src={(review.car as Car).images[0]} alt="car" width="60" height="40" className="rounded object-fit-cover" />
                             ) : (
                               <div className="bg-secondary rounded d-flex align-items-center justify-content-center" style={{ width: 60, height: 40 }}>
                                 <span className="material-symbols-outlined icon-md text-white" aria-hidden="true">directions_car</span>

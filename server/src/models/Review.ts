@@ -42,6 +42,8 @@ const ReviewSchema: Schema = new Schema({
 
 // Index for hot query (fetching reviews by car ID)
 ReviewSchema.index({ car: 1 });
+ReviewSchema.index({ user: 1 });
+ReviewSchema.index({ createdAt: -1 });
 
 /**
  * Pre-validate middleware.

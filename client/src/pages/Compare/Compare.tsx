@@ -5,6 +5,7 @@ import { Car, FilterState } from '../../types';
 import jsPDF from 'jspdf';
 import { generateCarReport } from '../../utils/pdfGenerator';
 import { formatPriceRange } from '../../utils/formatPrice';
+import OptimizedImage from '../../components/OptimizedImage/OptimizedImage';
 import './Compare.css';
 
 const Compare: React.FC = () => {
@@ -152,7 +153,7 @@ const Compare: React.FC = () => {
             </select>
             {selectedCar1 && (
               <div className="mt-4 text-center fade-in-up">
-                <img src={selectedCar1.images[0]} alt={selectedCar1.model} className="img-fluid rounded-4 mb-3 object-fit-cover" style={{ height: '200px', width: '100%' }} />
+                <OptimizedImage src={selectedCar1.images[0]} alt={selectedCar1.model} className="img-fluid rounded-4 mb-3 object-fit-cover" style={{ height: '200px', width: '100%' }} />
                 <h3 className="font-heading text-on-surface h4">{selectedCar1.make} {selectedCar1.model}</h3>
                 <span className="font-mono text-primary fw-bold fs-5 d-block mb-3">{formatPriceRange(selectedCar1.price, selectedCar1.priceMax)}</span>
                 <button className="btn btn-sm btn-outline-primary" onClick={() => generateCarReport(selectedCar1, [])}>Download Report</button>
@@ -171,7 +172,7 @@ const Compare: React.FC = () => {
             </select>
             {selectedCar2 && (
               <div className="mt-4 text-center fade-in-up">
-                <img src={selectedCar2.images[0]} alt={selectedCar2.model} className="img-fluid rounded-4 mb-3 object-fit-cover" style={{ height: '200px', width: '100%' }} />
+                <OptimizedImage src={selectedCar2.images[0]} alt={selectedCar2.model} className="img-fluid rounded-4 mb-3 object-fit-cover" style={{ height: '200px', width: '100%' }} />
                 <h3 className="font-heading text-on-surface h4">{selectedCar2.make} {selectedCar2.model}</h3>
                 <span className="font-mono text-secondary fw-bold fs-5 d-block mb-3">{formatPriceRange(selectedCar2.price, selectedCar2.priceMax)}</span>
                 <button className="btn btn-sm btn-outline-primary" onClick={() => generateCarReport(selectedCar2, [])}>Download Report</button>

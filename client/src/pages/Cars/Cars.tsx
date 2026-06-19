@@ -1,21 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { carService } from '../../services/carService';
-import { Car, FilterState, ApiResponse } from '../../types';
+import { Car, FilterState } from '../../types';
 import CarCard from '../../components/CarCard/CarCard';
 import FilterSidebar from '../../components/FilterSidebar/FilterSidebar';
 import Skeleton from '../../components/Skeleton/Skeleton';
 import { useDebounce } from '../../hooks/useDebounce';
 import { useAuth } from '../../hooks/useAuth';
 import { useToast } from '../../hooks/useToast';
-import axios from 'axios';
+import { useQuery } from '@tanstack/react-query';
 import './Cars.css';
 
 const Cars: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [carsData, setCarsData] = useState<ApiResponse<Car[]> | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [bookmarkedIds, setBookmarkedIds] = useState<string[]>([]);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   
@@ -54,6 +51,19 @@ const Cars: React.FC = () => {
     setSearchParams(params, { replace: true });
   }, [filters, setSearchParams]);
 
+  const activeFilters = { ...filters, search: debouncedSearch };
+
+  const { data: carsData, isLoading: loading, error: queryError } = useQuery({
+    queryKey: ['cars', activeFilters],
+    queryFn: async () => {
+      const res = await carService.getCars(activeFilters);
+      if (!res.success) throw new Error('Failed to fetch data');
+      return res;
+    }
+  });
+
+  const error = queryError ? queryError.message : null;
+
   // Fetch user's bookmarks on mount
   useEffect(() => {
     if (isAuthenticated) {
@@ -70,46 +80,33 @@ const Cars: React.FC = () => {
       showToast('Please sign in to save cars', 'error');
       return;
     }
+    
+    // Optimistic UI
+    const isCurrentlyBookmarked = bookmarkedIds.includes(carId);
+    if (isCurrentlyBookmarked) {
+      setBookmarkedIds(prev => prev.filter(id => id !== carId));
+    } else {
+      setBookmarkedIds(prev => [...prev, carId]);
+    }
+
     try {
-      if (bookmarkedIds.includes(carId)) {
+      if (isCurrentlyBookmarked) {
         await carService.removeBookmark(carId);
-        setBookmarkedIds(prev => prev.filter(id => id !== carId));
         showToast('Removed from saved cars', 'info');
       } else {
         await carService.addBookmark(carId);
-        setBookmarkedIds(prev => [...prev, carId]);
         showToast('Saved to dashboard', 'success');
       }
     } catch {
+      // Revert on error
+      if (isCurrentlyBookmarked) {
+        setBookmarkedIds(prev => [...prev, carId]);
+      } else {
+        setBookmarkedIds(prev => prev.filter(id => id !== carId));
+      }
       showToast('Failed to update bookmark', 'error');
     }
   };
-
-  const fetchCars = React.useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const activeFilters = { ...filters, search: debouncedSearch };
-      const res = await carService.getCars(activeFilters);
-      if (res.success) {
-        setCarsData(res);
-      } else {
-        setError('Failed to fetch data');
-      }
-    } catch (err: unknown) {
-      if (axios.isAxiosError(err)) {
-        setError(err.response?.data?.message || 'Failed to fetch cars');
-      } else {
-        setError('Failed to fetch cars');
-      }
-    } finally {
-      setLoading(false);
-    }
-  }, [filters, debouncedSearch]);
-
-  useEffect(() => {
-    fetchCars();
-  }, [fetchCars]);
 
   const handlePageChange = (newPage: number) => {
     setFilters(prev => ({ ...prev, page: newPage }));

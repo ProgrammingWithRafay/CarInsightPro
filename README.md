@@ -1,153 +1,107 @@
 # CarInsight Pro
 
-A premium, full-stack car research and comparison platform built with React, Node.js, Express, and MongoDB. 
-Browse dynamic car listings, compare vehicles side-by-side, read community reviews, explore the EV Hub, take a tailored car recommendation quiz, and manage everything through a comprehensive Admin Panel.
-
----
+CarInsight Pro is a car research and comparison platform built with React, Node.js, Express, and MongoDB. It allows users to browse car listings, compare specs, read community reviews, and get personalized recommendations.
 
 ## Features
 
-- **Dynamic Car Listings** — Browse, search, and filter a curated database of cars directly from the database.
-- **Car Detail Pages** — View full specs and premium image galleries.
-- **Side-by-Side Comparison** — Compare up to 3 vehicles across key metrics (Engine, Range, Price, etc.).
-- **Reviews & Ratings** — Community-driven car reviews with a 1-5 star rating system across Style, Comfort, Fuel Economy/Battery, Performance, and Value.
-- **EV & Hybrid Hub** — Dedicated section for electric and hybrid vehicle information.
-- **Matchmaker Quiz** — Answer questions to get personalized vehicle recommendations.
-- **Admin Panel** — Full CMS to manually add, edit, and delete cars, manage users, and track support tickets.
-- **Authentication** — Secure JWT-based login/register with HTTP-only cookies.
-- **Cloud Image Uploads** — Car images securely uploaded and managed via Cloudinary.
-- **PDF Export** — Generate comparison reports as downloadable PDFs.
-- **Continuous Integration** — GitHub Actions workflow checks TypeScript errors and ESLint rules automatically.
-
----
+- **Car Listings & Search** — Filter a database of cars by make, model, price, and specs.
+- **Detailed Specs & Comparisons** — View full vehicle details and compare up to 3 cars side-by-side.
+- **Community Reviews** — Users can leave detailed reviews and ratings based on performance, comfort, and value.
+- **EV & Hybrid Hub** — A dedicated section for electric and hybrid vehicles.
+- **Matchmaker Quiz** — An interactive quiz to help users find cars that fit their lifestyle.
+- **Admin Panel** — A built-in CMS to manage inventory, users, reviews, and support tickets.
+- **PDF Export** — Generate and download car comparison reports.
 
 ## Tech Stack
 
-### Frontend (Client)
-| Technology | Purpose |
-|---|---|
-| React 18 & TypeScript | Core UI framework and strict typing |
-| Vite | Lightning-fast build tool |
-| React Router v6 | Client-side routing with automatic scroll management |
-| Bootstrap 5 & Custom CSS | Layouts, grids, and premium dark-mode styling |
-| jsPDF | PDF generation for comparison reports |
-
-### Backend (Server)
-| Technology | Purpose |
-|---|---|
-| Node.js & Express | Server runtime and API framework |
-| TypeScript | Type safety across endpoints |
-| MongoDB + Mongoose | NoSQL Database & ODM |
-| JSON Web Tokens (JWT) | Secure authentication |
-| Cloudinary | Remote image hosting |
-| Multer | File upload handling |
-| Brevo API | Transactional email delivery bypassing SMTP firewalls |
-
----
+- **Frontend:** React 18, TypeScript, Vite, React Router v6, Bootstrap 5
+- **State & Data Fetching:** TanStack React Query (with route-level code splitting)
+- **Backend:** Node.js, Express, TypeScript
+- **Database:** MongoDB & Mongoose (with optimized query indexing)
+- **Authentication:** JWT with HTTP-only cookies
+- **Media:** Cloudinary for image hosting and automatic optimization
+- **Email:** Brevo API for transactional emails
 
 ## Project Structure
 
 ```text
 CarInsightPro/
-├── .github/workflows/     # GitHub Actions CI pipeline
-├── client/                # React Frontend
+├── client/                # React SPA
 │   ├── public/
 │   └── src/
-│       ├── components/    # Reusable UI (Navbar, Footer, FilterSidebar, etc.)
-│       ├── context/       # Auth and Toast Providers
-│       ├── hooks/         # Custom React hooks
-│       ├── pages/         # Full Views (Home, Admin, Cars, Compare, etc.)
-│       ├── services/      # Axios API service handlers
-│       ├── styles/        # Global CSS theme and design tokens
-│       ├── types/         # TypeScript interfaces
-│       └── utils/         # Formatting helpers
-├── server/                # Express Backend
+│       ├── components/    # Reusable UI components
+│       ├── pages/         # Route views (Home, Cars, Admin, etc.)
+│       ├── services/      # Axios API calls
+│       └── utils/         # Formatting and PDF helpers
+├── server/                # Express API
 │   ├── src/
-│   │   ├── config/        # Environment and DB config
-│   │   ├── controllers/   # Route handlers for Cars, Users, Reviews
-│   │   ├── data/          # Admin user creation scripts
-│   │   ├── middleware/    # Auth verification and error boundaries
-│   │   ├── models/        # Mongoose Database Schemas
-│   │   ├── routes/        # API route definitions
-│   │   └── server.ts      # Main Express application
+│   │   ├── controllers/   # Request handlers
+│   │   ├── middleware/    # Auth & error handling
+│   │   ├── models/        # Mongoose schemas
+│   │   └── routes/        # API endpoints
 │   └── package.json
 └── README.md
 ```
 
----
-
-## Getting Started (Local Development)
+## Local Development
 
 ### Prerequisites
 
-- **Node.js** v18+ and **npm**
-- **MongoDB** (Atlas cloud or local instance)
-- **Cloudinary** account (for image uploads)
+- Node.js v18+
+- MongoDB instance (local or Atlas)
+- Cloudinary account
 
-### 1. Clone the Repository
+### 1. Clone the repository
 
 ```bash
 git clone https://github.com/your-username/CarInsightPro.git
 cd CarInsightPro
 ```
 
-### 2. Set Up Environment Variables
+### 2. Environment Variables
 
-Copy the example files and fill in your credentials. **Never push `.env` files to GitHub!**
+Copy the `.env.example` files and add your API keys:
 
 ```bash
-# Server
 cp server/.env.example server/.env
-
-# Client
 cp client/.env.example client/.env
 ```
 
 ### 3. Install Dependencies
 
 ```bash
-# Install server dependencies
+# Install backend dependencies
 cd server
 npm install
 
-# Install client dependencies
+# Install frontend dependencies
 cd ../client
 npm install
 ```
 
-### 4. Create the Admin User
+### 4. Create an Admin Account
 
-To access the Admin Panel, you need to create the initial admin account:
+To access the admin dashboard, you'll need to seed an initial admin user:
 
 ```bash
 cd server
 npm run create-admin
 ```
 
-### 5. Run the Development Servers
+### 5. Start the App
 
-Open two terminal windows:
+Run both the client and server in development mode:
 
 ```bash
-# Terminal 1 — Backend (runs on port 5000)
-cd server
+# In the server directory (Port 5000)
 npm run dev
 
-# Terminal 2 — Frontend (runs on port 5173)
-cd client
+# In a new terminal, in the client directory (Port 5173)
 npm run dev
 ```
 
-Visit **http://localhost:5173** in your browser. From there, log in with your Admin credentials and navigate to the Admin Panel to start adding vehicles.
-
----
+Visit `http://localhost:5173` to view the app.
 
 ## Deployment
 
-This project is configured to be deployed using **Vercel** for the frontend client and **Railway** for the Express backend. The MongoDB database should be hosted on MongoDB Atlas.
-
----
-
-## License
-
-This project was built with dedication and passion as a hands-on learning journey into full-stack web development. It represents countless hours of effort, problem-solving, and growth as a developer.
+The frontend is ready to be deployed on Vercel or Netlify. The Express backend can be hosted on a service like Railway or Render, connected to a MongoDB Atlas cluster.

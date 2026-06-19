@@ -1,74 +1,73 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { carService } from '../../services/carService';
 import { reviewService } from '../../services/reviewService';
-import { Car, Review } from '../../types';
+
 import { useAuth } from '../../hooks/useAuth';
 import { useToast } from '../../hooks/useToast';
 import Skeleton from '../../components/Skeleton/Skeleton';
 import ReviewSummary from '../../components/Reviews/ReviewSummary';
 import ReviewForm from '../../components/Reviews/ReviewForm';
 import ReviewCard from '../../components/Reviews/ReviewCard';
+import OptimizedImage from '../../components/OptimizedImage/OptimizedImage';
 import { SubScores } from '../../types';
 import axios from 'axios';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
-import { generateCarReport } from '../../utils/pdfGenerator';
 import { formatPriceRange } from '../../utils/formatPrice';
 import './CarDetail.css';
 
 const CarDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const [car, setCar] = useState<Car | null>(null);
-  const [reviews, setReviews] = useState<Review[]>([]);
-  const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [isBookmarked, setIsBookmarked] = useState(false);
-  const [bookmarkLoading, setBookmarkLoading] = useState(false);
-
-  const [aggregatedSubScores, setAggregatedSubScores] = useState<SubScores | undefined>();
   const [showReviewForm, setShowReviewForm] = useState(false);
 
   const { user } = useAuth();
   const { showToast } = useToast();
-  const navigate = useNavigate();
 
-  /**
-   * Fetches all necessary data for the car detail page in parallel.
-   * This includes the core car info, all reviews, and the user's bookmark status.
-   * Uses Promise.all to reduce waterfall loading times.
-   */
-  const fetchCarDetails = React.useCallback(async () => {
-    setLoading(true);
-    try {
-      const [carRes, reviewsRes, bookmarksRes] = await Promise.all([
-        carService.getCarById(id!),
-        reviewService.getReviews(id!),
-        user ? carService.getBookmarks() : Promise.resolve({ success: false, data: [] })
-      ]);
-      
-      if (carRes.success) setCar(carRes.data);
-      if (reviewsRes.success && reviewsRes.data) {
-        setReviews(reviewsRes.data.reviews || []);
-        setAggregatedSubScores(reviewsRes.data.aggregatedSubScores);
-      }
-      if (bookmarksRes.success && bookmarksRes.data) {
-        const bookmarked = bookmarksRes.data.some((b: { _id?: string } | string) => typeof b === 'string' ? b === id : b._id === id);
-        setIsBookmarked(bookmarked);
-      }
-    } catch {
-      showToast('Failed to load vehicle telemetry', 'error');
-      navigate('/cars');
-    } finally {
-      setLoading(false);
-    }
-  }, [id, showToast, navigate, user]);
+  const queryClient = useQueryClient();
+
+  const { data: car, isLoading: loadingCar } = useQuery({
+    queryKey: ['car', id],
+    queryFn: async () => {
+      const res = await carService.getCarById(id!);
+      if (!res.success) throw new Error('Failed to load car');
+      return res.data;
+    },
+    enabled: !!id
+  });
+
+  const { data: reviewData } = useQuery({
+    queryKey: ['reviews', id],
+    queryFn: async () => {
+      const res = await reviewService.getReviews(id!);
+      return res.data;
+    },
+    enabled: !!id
+  });
+
+  const reviews = reviewData?.reviews || [];
+  const aggregatedSubScores = reviewData?.aggregatedSubScores;
+
+  const { data: bookmarksData } = useQuery({
+    queryKey: ['bookmarks'],
+    queryFn: async () => {
+      const res = await carService.getBookmarks();
+      return res.data;
+    },
+    enabled: !!user
+  });
+
+  const loading = loadingCar;
 
   useEffect(() => {
-    if (id) {
-      fetchCarDetails();
+    if (bookmarksData && id) {
+      const bookmarked = bookmarksData.some((b: { _id?: string } | string) => typeof b === 'string' ? b === id : b._id === id);
+      setIsBookmarked(bookmarked);
     }
-  }, [id, fetchCarDetails]);
+  }, [bookmarksData, id]);
 
   /**
    * Handles the submission of a new user review.
@@ -80,7 +79,8 @@ const CarDetail: React.FC = () => {
       if (res.success) {
         showToast('Review submitted successfully', 'success');
         setShowReviewForm(false);
-        fetchCarDetails();
+        queryClient.invalidateQueries({ queryKey: ['reviews', id] });
+        queryClient.invalidateQueries({ queryKey: ['car', id] });
       }
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
@@ -102,21 +102,23 @@ const CarDetail: React.FC = () => {
       return;
     }
     
-    setBookmarkLoading(true);
+    // Optimistic UI update
+    const previousBookmarked = isBookmarked;
+    setIsBookmarked(!isBookmarked);
+    
     try {
-      if (isBookmarked) {
+      if (previousBookmarked) {
         await carService.removeBookmark(id!);
-        setIsBookmarked(false);
         showToast('Removed from Dashboard', 'info');
       } else {
         await carService.addBookmark(id!);
-        setIsBookmarked(true);
         showToast('Saved to Dashboard', 'success');
       }
+      queryClient.invalidateQueries({ queryKey: ['bookmarks'] });
     } catch {
+      // Revert on error
+      setIsBookmarked(previousBookmarked);
       showToast('Failed to update bookmarks', 'error');
-    } finally {
-      setBookmarkLoading(false);
     }
   };
 
@@ -127,7 +129,7 @@ const CarDetail: React.FC = () => {
     }
     try {
       await reviewService.markHelpful(reviewId);
-      fetchCarDetails();
+      queryClient.invalidateQueries({ queryKey: ['reviews', id] });
     } catch {
       console.error('Failed to mark review as helpful');
     }
@@ -141,6 +143,7 @@ const CarDetail: React.FC = () => {
     if (!car) return;
     try {
       showToast('Generating car report...', 'info');
+      const { generateCarReport } = await import('../../utils/pdfGenerator');
       await generateCarReport(car, reviews);
       showToast('Report downloaded successfully', 'success');
     } catch {
@@ -199,10 +202,11 @@ const CarDetail: React.FC = () => {
           <div className="col-lg-8">
             <div className="d-flex flex-column gap-3">
               <div className="detail-gallery-main" style={{ height: '500px', overflow: 'hidden' }}>
-                <img 
+                <OptimizedImage 
                   src={car.images[activeImageIndex] || '/placeholder.png'} 
                   alt={car.model} 
                   className="detail-gallery-img"
+                  lazy={false}
                 />
               </div>
               {car.images.length > 1 && (
@@ -213,7 +217,7 @@ const CarDetail: React.FC = () => {
                       className={`detail-thumbnail flex-shrink-0 w-25 ${activeImageIndex === idx ? 'active' : ''}`}
                       onClick={() => setActiveImageIndex(idx)}
                     >
-                      <img src={img} alt="thumbnail" className="w-100 h-100 object-fit-cover" />
+                      <OptimizedImage src={img} alt="thumbnail" className="w-100 h-100 object-fit-cover" />
                     </div>
                   ))}
                 </div>
@@ -262,10 +266,10 @@ const CarDetail: React.FC = () => {
                 <button 
                   className={`btn w-100 py-3 fw-bold d-flex align-items-center justify-content-center gap-2 active-glow ${isBookmarked ? 'btn-outline-primary text-on-surface' : 'btn-primary'}`}
                   onClick={handleToggleBookmark}
-                  disabled={bookmarkLoading}
+                  aria-label={isBookmarked ? "Remove from dashboard" : "Save to dashboard"}
                 >
                   <span className={`material-symbols-outlined icon-md icon-inline ${isBookmarked ? 'text-primary icon-filled' : ''}`} aria-hidden="true">favorite</span> 
-                  {bookmarkLoading ? 'Updating...' : isBookmarked ? 'Saved to Dashboard' : 'Save to Dashboard'}
+                  {isBookmarked ? 'Saved to Dashboard' : 'Save to Dashboard'}
                 </button>
                 <button className="btn btn-outline-secondary text-on-surface w-100 py-3 fw-bold d-flex align-items-center justify-content-center gap-2" onClick={handleDownloadReport}>
                   <span className="material-symbols-outlined icon-md icon-inline" aria-hidden="true">download</span> Download Report

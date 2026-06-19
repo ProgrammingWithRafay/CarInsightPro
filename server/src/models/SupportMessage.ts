@@ -39,4 +39,8 @@ const SupportMessageSchema: Schema = new Schema({
   timestamps: true
 });
 
+SupportMessageSchema.index({ user: 1 });
+SupportMessageSchema.index({ status: 1 });
+SupportMessageSchema.index({ createdAt: -1 });
+
 export default mongoose.model<ISupportMessage>('SupportMessage', SupportMessageSchema);

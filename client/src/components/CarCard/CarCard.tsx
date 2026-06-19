@@ -2,6 +2,7 @@ import React, { memo } from 'react';
 import { Link } from 'react-router-dom';
 import { Car } from '../../types';
 import { formatPriceRange } from '../../utils/formatPrice';
+import OptimizedImage from '../OptimizedImage/OptimizedImage';
 import './CarCard.css';
 
 interface CarCardProps {
@@ -26,7 +27,7 @@ const CarCard: React.FC<CarCardProps> = ({ car, onBookmark, isBookmarked = false
     <Link to={`/cars/${car._id}`} className="text-decoration-none h-100 d-block car-card-wrapper">
       <div className="glass-panel car-card-stitch group">
         <div className="car-card-img-container">
-          <img 
+          <OptimizedImage 
             src={car.images[0] || '/placeholder.png'} 
             alt={`${car.make} ${car.model}`} 
             className="car-card-img"
