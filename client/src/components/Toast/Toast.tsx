@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Toast as ToastType } from '../../types';
 import './Toast.css';
 
@@ -8,12 +9,15 @@ interface ToastContainerProps {
 }
 
 const ToastContainer: React.FC<ToastContainerProps> = ({ toasts, removeToast }) => {
-  return (
-    <div className="toast-container">
+  if (typeof document === 'undefined') return null;
+
+  return createPortal(
+    <div className="custom-toast-container">
       {toasts.map((toast) => (
         <ToastItem key={toast.id} toast={toast} removeToast={removeToast} />
       ))}
-    </div>
+    </div>,
+    document.body
   );
 };
 

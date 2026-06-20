@@ -1,4 +1,4 @@
-.toast-container {
+.custom-toast-container {
   position: fixed;
   bottom: 1.5rem;
   right: 1.5rem;
@@ -57,7 +57,7 @@
 }
 
 @media (max-width: 575.98px) {
-  .toast-container {
+  .custom-toast-container {
     bottom: 1rem;
     right: 1rem;
     left: 1rem;
