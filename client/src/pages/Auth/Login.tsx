@@ -14,7 +14,7 @@ const Login: React.FC = () => {
   const [forgotEmail, setForgotEmail] = useState('');
   const [forgotLoading, setForgotLoading] = useState(false);
   const [forgotSent, setForgotSent] = useState(false);
-  
+
   const { login } = useAuth();
   const { showToast } = useToast();
   const navigate = useNavigate();
@@ -25,7 +25,7 @@ const Login: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    
+
     try {
       await login({ email, password });
       showToast('Authentication successful.', 'success');
@@ -44,7 +44,7 @@ const Login: React.FC = () => {
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setForgotLoading(true);
-    
+
     try {
       await authService.forgotPassword(forgotEmail);
       setForgotSent(true);
@@ -63,7 +63,7 @@ const Login: React.FC = () => {
   return (
     <div className="auth-page-stitch">
       <div className="auth-bg-glow"></div>
-      
+
       <div className="container px-3 position-relative z-10">
         <div className="auth-card-stitch fade-in-up">
           <div className="text-center mb-4">
@@ -89,7 +89,7 @@ const Login: React.FC = () => {
                 <p className="text-on-surface-variant small mb-4">
                   If an account exists for <strong className="text-primary">{forgotEmail}</strong>, we've sent a password reset link. It will expire in 1 hour.
                 </p>
-                <button 
+                <button
                   className="btn btn-outline-primary w-100 py-2"
                   onClick={() => { setShowForgot(false); setForgotSent(false); setForgotEmail(''); }}
                 >
@@ -102,13 +102,13 @@ const Login: React.FC = () => {
                   <label className="form-label font-mono text-uppercase fw-bold label-xs">Email Address</label>
                   <div className="auth-input-group">
                     <span className="material-symbols-outlined auth-input-icon icon-md" aria-hidden="true">mail</span>
-                    <input 
-                      type="email" 
-                      className="auth-input" 
-                      placeholder="operator@system.com"
+                    <input
+                      type="email"
+                      className="auth-input"
+                      placeholder="ali.raza@email.com"
                       value={forgotEmail}
                       onChange={(e) => setForgotEmail(e.target.value)}
-                      required 
+                      required
                     />
                   </div>
                 </div>
@@ -132,13 +132,13 @@ const Login: React.FC = () => {
                 <label className="form-label font-mono text-uppercase fw-bold label-xs">Email Address</label>
                 <div className="auth-input-group">
                   <span className="material-symbols-outlined auth-input-icon icon-md" aria-hidden="true">mail</span>
-                  <input 
-                    type="email" 
-                    className="auth-input" 
-                    placeholder="operator@system.com"
+                  <input
+                    type="email"
+                    className="auth-input"
+                    placeholder="ali.raza@domain.pk"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    required 
+                    required
                   />
                 </div>
               </div>
@@ -146,9 +146,9 @@ const Login: React.FC = () => {
               <div>
                 <div className="d-flex justify-content-between align-items-center mb-1">
                   <label className="form-label font-mono text-uppercase fw-bold m-0 label-xs">Access Key</label>
-                  <button 
+                  <button
                     type="button"
-                    className="btn btn-link text-primary text-decoration-none font-mono p-0 border-0 label-xs" 
+                    className="btn btn-link text-primary text-decoration-none font-mono p-0 border-0 label-xs"
                     onClick={() => setShowForgot(true)}
                   >
                     Reset Key?
@@ -156,13 +156,13 @@ const Login: React.FC = () => {
                 </div>
                 <div className="auth-input-group mt-1">
                   <span className="material-symbols-outlined auth-input-icon icon-md" aria-hidden="true">lock</span>
-                  <input 
-                    type="password" 
-                    className="auth-input" 
+                  <input
+                    type="password"
+                    className="auth-input"
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    required 
+                    required
                   />
                 </div>
               </div>

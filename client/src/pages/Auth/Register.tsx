@@ -16,7 +16,7 @@ const Register: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
   const [resending, setResending] = useState(false);
-  
+
   const { register } = useAuth();
   const { showToast } = useToast();
 
@@ -26,13 +26,13 @@ const Register: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (formData.password !== formData.confirmPassword) {
       return showToast('Access keys do not match.', 'error');
     }
-    
+
     setLoading(true);
-    
+
     try {
       await register(formData);
       setEmailSent(true);
@@ -76,16 +76,16 @@ const Register: React.FC = () => {
             </div>
             <h2 className="font-heading mb-3 text-on-surface">Check Your Email</h2>
             <p className="text-on-surface-variant mb-4" style={{ lineHeight: '1.7' }}>
-              We've sent a verification link to<br/>
+              We've sent a verification link to<br />
               <strong className="text-primary">{formData.email}</strong>
             </p>
             <p className="text-on-surface-variant small mb-4">
               Click the link in the email to activate your account. The link expires in 24 hours.
             </p>
-            
+
             <div className="d-flex flex-column gap-3 mt-4">
-              <button 
-                className="btn btn-outline-primary w-100 py-2" 
+              <button
+                className="btn btn-outline-primary w-100 py-2"
                 onClick={handleResend}
                 disabled={resending}
               >
@@ -111,7 +111,7 @@ const Register: React.FC = () => {
   return (
     <div className="auth-page-stitch">
       <div className="auth-bg-glow"></div>
-      
+
       <div className="container px-3 position-relative z-10 py-5">
         <div className="auth-card-stitch fade-in-up">
           <div className="text-center mb-4">
@@ -125,19 +125,19 @@ const Register: React.FC = () => {
           </div>
 
           <form onSubmit={handleSubmit} className="d-flex flex-column gap-3">
-            
+
             <div>
               <label className="form-label font-mono text-uppercase fw-bold" style={{ fontSize: '10px' }}>Full Designation</label>
               <div className="auth-input-group">
                 <span className="material-symbols-outlined auth-input-icon icon-md" aria-hidden="true">badge</span>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   name="name"
-                  className="auth-input" 
-                  placeholder="Alexander Sterling"
+                  className="auth-input"
+                  placeholder="Ali Raza"
                   value={formData.name}
                   onChange={handleChange}
-                  required 
+                  required
                 />
               </div>
             </div>
@@ -146,14 +146,14 @@ const Register: React.FC = () => {
               <label className="form-label font-mono text-uppercase fw-bold" style={{ fontSize: '10px' }}>Email Address</label>
               <div className="auth-input-group">
                 <span className="material-symbols-outlined auth-input-icon icon-md" aria-hidden="true">mail</span>
-                <input 
-                  type="email" 
+                <input
+                  type="email"
                   name="email"
-                  className="auth-input" 
-                  placeholder="operator@system.com"
+                  className="auth-input"
+                  placeholder="ali.raza@email.com"
                   value={formData.email}
                   onChange={handleChange}
-                  required 
+                  required
                 />
               </div>
             </div>
@@ -162,15 +162,15 @@ const Register: React.FC = () => {
               <label className="form-label font-mono text-uppercase fw-bold m-0" style={{ fontSize: '10px' }}>Access Key</label>
               <div className="auth-input-group mt-1">
                 <span className="material-symbols-outlined auth-input-icon icon-md" aria-hidden="true">lock</span>
-                <input 
-                  type="password" 
+                <input
+                  type="password"
                   name="password"
-                  className="auth-input" 
+                  className="auth-input"
                   placeholder="••••••••"
                   value={formData.password}
                   onChange={handleChange}
                   minLength={6}
-                  required 
+                  required
                 />
               </div>
             </div>
@@ -179,15 +179,15 @@ const Register: React.FC = () => {
               <label className="form-label font-mono text-uppercase fw-bold m-0" style={{ fontSize: '10px' }}>Verify Access Key</label>
               <div className="auth-input-group mt-1">
                 <span className="material-symbols-outlined auth-input-icon icon-md" aria-hidden="true">lock_clock</span>
-                <input 
-                  type="password" 
+                <input
+                  type="password"
                   name="confirmPassword"
-                  className="auth-input" 
+                  className="auth-input"
                   placeholder="••••••••"
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   minLength={6}
-                  required 
+                  required
                 />
               </div>
             </div>
