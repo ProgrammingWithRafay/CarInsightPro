@@ -102,6 +102,15 @@ npm run dev
 
 Visit `http://localhost:5173` to view the app.
 
+## Testing
+
+The backend test suite runs on Jest and Supertest, utilizing `mongodb-memory-server` to mock the database. This ensures tests run in an isolated in-memory environment without affecting real data.
+
+```bash
+cd server
+npm test
+```
+
 ## Deployment
 
 The frontend is ready to be deployed on Vercel or Netlify. The Express backend can be hosted on a service like Railway or Render, connected to a MongoDB Atlas cluster.

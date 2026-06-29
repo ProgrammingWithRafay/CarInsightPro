@@ -7,10 +7,9 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
-    "skipLibCheck": true,
-    "types": ["jest", "node"]
+    "skipLibCheck": true
   },
-  "include": ["src/**/*", "scripts/**/*", "__tests__/**/*"],
+  "include": ["src/**/*", "scripts/**/*"],
   "ts-node": {
     "files": true
   }
