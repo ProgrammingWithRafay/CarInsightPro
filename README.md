@@ -21,7 +21,7 @@ CarInsight Pro is a car research and comparison platform built with React, Node.
 - **Authentication:** JWT with HTTP-only cookies
 - **Media:** Cloudinary for image hosting and automatic optimization
 - **Email:** Brevo API for transactional emails
-
+- **Testing:** Jest, Supertest (Backend API testing)
 ## Project Structure
 
 ```text
